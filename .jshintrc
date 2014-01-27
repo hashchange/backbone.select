@@ -1,5 +1,5 @@
 {
-  "curly": true,
+  "curly": false,
   "eqeqeq": true,
   "immed": false,
   "latedef": true,
@@ -9,6 +9,7 @@
   "undef": true,
   "boss": true,
   "eqnull": true,
+  "expr": true,
   "browser": true,
   "globals": {
     "jQuery": true,

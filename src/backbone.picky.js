@@ -380,7 +380,7 @@ Backbone.Picky = (function (Backbone, _) {
   function onRemove (model, collection, options) {
     if (model._pickyCollections) model._pickyCollections = _.without(model._pickyCollections, collection._pickyCid);
     if (model.selected) {
-      if (model._pickyCollections && model._pickyCollections.length == 0) {
+      if (model._pickyCollections && model._pickyCollections.length === 0) {
         collection.deselect(model, options);
       } else {
         collection.deselect(model, _.extend({}, options, {_skipModelCall: true}));
