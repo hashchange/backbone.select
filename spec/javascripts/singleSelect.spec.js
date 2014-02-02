@@ -777,6 +777,48 @@ describe("single-select collection", function(){
     });
   });
 
+  describe('Model-sharing status flag', function () {
+
+    describe('when model sharing is disabled', function () {
+      var collection;
+
+      it('with no models being passed in during construction, the _modelSharingEnabled property is not set to true', function () {
+        // Ie, the property must not exist, or be false.
+        collection = new Collection();
+        expect(collection._modelSharingEnabled).not.toBe(true);
+      });
+
+      it('with models being passed in during construction, the _modelSharingEnabled property is not set to true', function () {
+        // Ie, the property must not exist, or be false.
+        collection = new Collection( [new Model()]);
+        expect(collection._modelSharingEnabled).not.toBe(true);
+      });
+    });
+
+    describe('when model sharing is enabled', function () {
+      var SharingCollection, collection;
+
+      beforeEach(function () {
+        SharingCollection = Backbone.Collection.extend({
+          initialize: function(models){
+            Backbone.Picky.SingleSelect.applyTo(this, models);
+          }
+        });
+      });
+
+      it('with no models being passed in during construction, the _modelSharingEnabled property is true', function () {
+        collection = new SharingCollection();
+        expect(collection._modelSharingEnabled).toBe(true);
+      });
+
+      it('with models being passed in during construction, the _modelSharingEnabled property is true', function () {
+        collection = new SharingCollection( [new Model()]);
+        expect(collection._modelSharingEnabled).toBe(true);
+      });
+    });
+
+  });
+
   describe('Checking for memory leaks', function () {
 
     describe('when a collection is replaced by another one and is not referenced by a variable any more, with model sharing disabled', function () {

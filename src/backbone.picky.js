@@ -28,6 +28,10 @@ Backbone.Picky = (function (Backbone, _) {
       this.collection.listenTo(this.collection, 'add', onAdd);
       this.collection.listenTo(this.collection, 'remove', onRemove);
 
+      // Internal flag, but also part of the API. Can be queried safely by other
+      // components. Read-only.
+      this._modelSharingEnabled = true;
+
     }
 
   };
@@ -109,6 +113,10 @@ Backbone.Picky = (function (Backbone, _) {
       this.collection.listenTo(this.collection, 'reset', onResetMultiSelect);
       this.collection.listenTo(this.collection, 'add', onAdd);
       this.collection.listenTo(this.collection, 'remove', onRemove);
+
+      // Internal flag, but also part of the API. Can be queried safely by other
+      // components. Read-only.
+      this._modelSharingEnabled = true;
 
     }
 
