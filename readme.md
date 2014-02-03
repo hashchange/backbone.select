@@ -592,11 +592,14 @@ event; the re-selection of all items in the collection is also covered by
 ## Sharing models among collections
 
 Models can be part of more than one collection, and Backbone.Picky still manages
-selections correctly.
+selections correctly. You must enable model sharing explicitly, though, and play
+by a few rules.
 
-Collections don't have to be of the same type. A model can be part of single-
-select and multi-select collections at the same time. Backbone.Picky handles all
-aspects of it:
+### Features
+
+When sharing models among collections, the collections don't have to be of the
+same type. A model can be part of single-select and multi-select collections at
+the same time. Backbone.Picky handles all aspects of it:
 
 - Suppose you have selected a model (or models) in one collection, and then you
   create another one with these models. The new collection will pick up the
@@ -617,16 +620,27 @@ aspects of it:
   deselect all but one of them. The last model added to the single-select
   collection "wins", ie its `selected` status survives.
 
-That said, there are a few things you must and mustn't do in order to make
-sharing work.
+### Enabling model sharing
 
-- Models passed in during instantiation must be passed on to the mixin
-  constructor. Create the mixin with `Backbone.Picky.SingleSelect.applyTo(this, models)`
-  instead of `Backbone.Picky.SingleSelect.applyTo(this)` (without the `models`
-  argument).
+To enable model sharing, models passed in during instantiation must be passed on
+to the mixin constructor. Create the mixin with
 
-  Setting up the second parameter like this turns on the "model-sharing mode".
-  See the Basic Usage sections of SingleSelect and MultiSelect.
+    Backbone.Picky.SingleSelect.applyTo(this, models)
+
+instead of `Backbone.Picky.SingleSelect.applyTo(this)` (without the `models`
+argument).
+
+Do that even if you never populate your collection during instantiation, and the
+`models` argument evaluates to `undefined` all the time. The parameter must be
+specified regardless.
+
+Setting up the second parameter like this turns on the "model-sharing mode". See
+the Basic Usage sections of SingleSelect and MultiSelect.
+
+### Restrictions when sharing models
+
+There are a few things you must and mustn't do in order to make sharing work,
+and keep yourself out of trouble.
 
 - Don't use the `silent` option when adding models, removing them, or resetting
   a collection. If you change the contents of a collection silently, the
@@ -652,6 +666,21 @@ sharing work.
 
   Note that you don't need to call `close()` if you use Backbone.Picky in
   "single-collection mode", without sharing models among collections.
+
+### Events
+
+If you are working with events a lot, there are a few details which may help.
+
+- When selected models are added or removed, the collection is updated and the
+  corresponding `select:*` event is fired. In its options, the name of the
+  initial Backbone `add` or `remove` event is available as `options._externalEvent`.
+  The `select:*` options also contain the event options of the initial Backbone
+  event.
+
+- By contrast, a `reset` does not trigger a `select:*` or `deselect:one` event
+  on the collection which is reset. The command is meant to suppress individual
+  notifications, just like it does for `add` and `remove` events, and only fires
+  a `reset` event in the end.
 
 ## Custom options
 
@@ -706,6 +735,7 @@ see all of the specs for Backbone.Picky
 
 ### pre v0.3.0
 
+* Added `options._externalEvent`, available when the selection in a collection is altered during an `add` or `remove` action
 * Added `applyTo` class methods for setup
 * Removed support for creating new Picky objects solely with the constructor
 * Event handlers with standard names are invoked automatically if they exist (`onSelect`, `onDeselect`, `onReselect`, `onSelectNone`, `onSelectSome`, `onSelectAll`)

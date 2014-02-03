@@ -32,9 +32,13 @@ describe("models shared between multiple collections", function(){
       reselectLogger = new Logger();
 
       // Always create `var selectLogger = new Logger(); var reselectLogger =
-      // new Logger();` before instantiating LoggedMultiSelectCollection
+      // new Logger();` before instantiating LoggedSingleSelectCollection, or
+      // pass loggers in as options
       LoggedSingleSelectCollection = SingleSelectCollection.extend({
-        initialize: function(models){
+        initialize: function(models, options){
+          var selectLogger = options && options.selectLogger || selectLogger,
+              reselectLogger = options && options.reselectLogger || reselectLogger;
+
           this.on("select:one", function (model) {
             selectLogger.log( "select:one event: Model " + model.cid + " selected in collection " + this._pickyCid );
           });
@@ -50,9 +54,13 @@ describe("models shared between multiple collections", function(){
       });
 
       // Always create `var selectLogger = new Logger(); var reselectLogger =
-      // new Logger();` before instantiating LoggedMultiSelectCollection
+      // new Logger();` before instantiating LoggedMultiSelectCollection, or
+      // pass loggers in as options
       LoggedMultiSelectCollection = MultiSelectCollection.extend({
-        initialize: function(models){
+        initialize: function(models, options){
+          var selectLogger = options && options.selectLogger || selectLogger,
+              reselectLogger = options && options.reselectLogger || reselectLogger;
+
           this.on("select:none", function () {
             selectLogger.log( "select:none event fired in collection " + this._pickyCid );
           });
@@ -131,6 +139,23 @@ describe("models shared between multiple collections", function(){
 
     it("should not trigger a reselect:one or reselect:any event on a collection it is added to", function(){
       expect(reselectLogger.entries.length).toEqual(0);
+    });
+
+    it('should not trigger a deselect:one event when added to a singe-select collection, even if multiple models with selected status are added, and all but the last one are deselected', function () {
+      var options = {
+            selectLogger: new Logger(),
+            reselectLogger: new Logger()
+          },
+          m1 = new Model(),
+          m2 = new Model(),
+          collection;
+
+      m1.select();
+      m2.select();
+
+      //noinspection JSUnusedAssignment
+      collection = new LoggedSingleSelectCollection([m1, m2], options);
+      expect(selectLogger.entries.length).toEqual(0);
     });
   });
 
@@ -706,4 +731,136 @@ describe("models shared between multiple collections", function(){
     });
   });
 
+  describe('option signalling the external event', function () {
+
+    describe('when a selected model is added', function () {
+      var model1, model2, model3, singleCollectionA, multiCollectionA;
+
+      beforeEach(function(){
+        Model = Model.extend({
+          onDeselect: function (model, options) {
+            this.externalEventOnDeselect = options && options._externalEvent;
+          }
+        });
+
+        MultiSelectCollection = MultiSelectCollection.extend({
+          onSelectSome: function (diff, collection, options) {
+            this.externalEventOnSelectSome = options && options._externalEvent;
+          }
+        });
+
+        model1 = new Model();
+        model2 = new Model();
+        model3 = new Model();
+
+        singleCollectionA = new SingleSelectCollection([model1]);
+        multiCollectionA  = new MultiSelectCollection([model1, model2]);
+
+        model1.select();
+        model2.select();
+        model3.select();
+
+        spyOn(singleCollectionA, "trigger").andCallThrough();
+        spyOn(multiCollectionA, "trigger").andCallThrough();
+      });
+
+      it('should set _externalEvent: "add" in the select:one event when added to a single-select collection', function () {
+        singleCollectionA.add(model2);
+        expect(singleCollectionA.trigger).toHaveBeenCalledWith("select:one", model2, singleCollectionA, {_externalEvent: "add"});
+      });
+
+      it('should set _externalEvent: "add" in the deselect:one event when added to a single-select collection', function () {
+        singleCollectionA.add(model2);
+        expect(singleCollectionA.trigger).toHaveBeenCalledWith("deselect:one", model1, singleCollectionA, {_externalEvent: "add"});
+      });
+
+      it('should not propagate the _externalEvent: "add" option to the deselected model when added to a single-select collection', function () {
+        singleCollectionA.add(model2);
+        expect(model1.externalEventOnDeselect).toBeUndefined();
+      });
+
+      it('should set _externalEvent: "add" in the select:some or select:all event when added to a multi-select collection', function () {
+        multiCollectionA.add(model3);
+        expect(multiCollectionA.trigger).toHaveBeenCalledWith("select:all", { selected: [model3], deselected: [] }, multiCollectionA, {_externalEvent: "add"});
+      });
+
+      it('should not propagate the _externalEvent: "add" option to another collection when the addition is inducing a deselection there', function () {
+        singleCollectionA.add(model2);
+        expect(multiCollectionA.externalEventOnSelectSome).toBeUndefined();
+      });
+    });
+
+    describe('when a selected model is removed', function () {
+      var model1, model2,
+          singleCollectionA, multiCollectionA;
+
+      beforeEach(function(){
+        Model = Model.extend({
+          onDeselect: function (model, options) {
+            this.externalEventOnDeselect = options && options._externalEvent;
+          }
+        });
+
+        model1 = new Model();
+        model2 = new Model();
+
+        singleCollectionA = new SingleSelectCollection([model1, model2]);
+        multiCollectionA  = new MultiSelectCollection([model1, model2]);
+
+        model1.select();
+
+        spyOn(model1, "trigger").andCallThrough();
+        spyOn(model2, "trigger").andCallThrough();
+        spyOn(singleCollectionA, "trigger").andCallThrough();
+        spyOn(multiCollectionA, "trigger").andCallThrough();
+      });
+
+      it('should not propagate the _externalEvent: "remove" option to the deselected model when the model is removed from all collections (single-select collection last)', function () {
+        multiCollectionA.remove(model1);
+        singleCollectionA.remove(model1);
+        expect(model1.externalEventOnDeselect).toBeUndefined();
+      });
+
+      it('should not propagate the _externalEvent: "remove" option to the deselected model when the model is removed from all collections (multi-select collection last)', function () {
+        singleCollectionA.remove(model1);
+        multiCollectionA.remove(model1);
+        expect(model1.externalEventOnDeselect).toBeUndefined();
+      });
+
+      it('should set _externalEvent: "remove" in the deselect:one event, and pass along options.index from the remove event, when the model is removed from a single-select collection', function () {
+        singleCollectionA.remove(model1);
+        expect(singleCollectionA.trigger).toHaveBeenCalledWith("deselect:one", model1, singleCollectionA, {_externalEvent: "remove", index: 0});
+      });
+
+      it('should set _externalEvent: "remove" in the select:some or select:none event, and pass along options.index from the remove event, when the model is removed from a multi-select collection', function () {
+        multiCollectionA.remove(model1);
+        expect(multiCollectionA.trigger).toHaveBeenCalledWith("select:none", { selected: [], deselected: [model1] }, multiCollectionA, {_externalEvent: "remove", index: 0});
+      });
+
+      it('should set _externalEvent: "remove" in the select:all event, and pass along options.index from the remove event, when the model is removed from a multi-select collection and all remaining models are still selected', function () {
+        var model3 = new Model();
+        var model4 = new Model();
+
+        var multiCollection = new MultiSelectCollection([model3, model4]);
+        model3.select();
+        model4.select();
+
+        spyOn(multiCollection, "trigger").andCallThrough();
+
+        multiCollection.remove(model3);
+        expect(multiCollection.trigger).toHaveBeenCalledWithInitial("select:all", { selected: [], deselected: [model3] }, multiCollection, {_externalEvent: "remove", index: 0});
+      });
+    });
+
+    // `reset` event:
+    //
+    // The _externalEvent: "reset" is not implemented. reset() is meant to
+    // suppress individual notifications. Just like the add event, selection
+    // events are silenced during a reset. Hence, without a selection event,
+    // _externalEvent: "reset" won't ever occur.
+    //
+    // Whatever needs to be done, should be dealt with in the reset event
+    // handler.
+
+  });
 });
