@@ -18,7 +18,10 @@ Backbone.Picky = (function (Backbone, _) {
       // 'models' argument provided, model-sharing mode
       _.each(models || [], function (model) {
         registerCollectionWithModel(model, this);
-        if (model.selected) this.selected = model;
+        if (model.selected) {
+          if (this.selected) this.selected.deselect();
+          this.selected = model;
+        }
       }, this);
 
       this.collection.listenTo(this.collection, '_selected', this.select);

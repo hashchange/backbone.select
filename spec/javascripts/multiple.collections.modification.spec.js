@@ -141,6 +141,32 @@ describe("models shared between multiple collections", function(){
       expect(reselectLogger.entries.length).toEqual(0);
     });
 
+    it("should be selected in a single-select collection if multiple models with selected status are added, and it is the last of them", function(){
+      var m1 = new Model(),
+          m2 = new Model(),
+          collection;
+
+      m1.select();
+      m2.select();
+
+      collection = new SingleSelectCollection([m1, m2]);
+      expect(m2.selected).toBe(true);
+      expect(collection.selected).toBe(m2);
+    });
+
+    it("should be deselected in a single-select collection if multiple models with selected status are added, and it is not the last of them", function(){
+      var m1 = new Model(),
+          m2 = new Model(),
+          collection;
+
+      m1.select();
+      m2.select();
+
+      //noinspection JSUnusedAssignment
+      collection = new SingleSelectCollection([m1, m2]);
+      expect(m1.selected).toBe(false);
+    });
+
     it('should not trigger a deselect:one event when added to a singe-select collection, even if multiple models with selected status are added, and all but the last one are deselected', function () {
       var options = {
             selectLogger: new Logger(),
@@ -156,6 +182,21 @@ describe("models shared between multiple collections", function(){
       //noinspection JSUnusedAssignment
       collection = new LoggedSingleSelectCollection([m1, m2], options);
       expect(selectLogger.entries.length).toEqual(0);
+    });
+
+    it('should trigger a deselected event on the model when added to a singe-select collection together with other selected models, and it is not the last of them', function () {
+      var m1 = new Model(),
+          m2 = new Model(),
+          collection;
+
+      m1.select();
+      m2.select();
+
+      spyOn(m1, "trigger").andCallThrough();
+
+      //noinspection JSUnusedAssignment
+      collection = new SingleSelectCollection([m1, m2]);
+      expect(m1.trigger).toHaveBeenCalledWithInitial("deselected");
     });
   });
 
@@ -594,6 +635,11 @@ describe("models shared between multiple collections", function(){
     it('should trigger a deselected event on a different model when the reset is inducing a deselection in another multi-select collection', function () {
       singleCollectionA.reset([model1, model2]);
       expect(model1.trigger).toHaveBeenCalledWithInitial("deselected", model1);
+    });
+
+    it('should trigger a deselected event on the model when added to a singe-select collection together with other selected models, and it is not the last of them', function () {
+      singleCollectionA.reset([model1, model2]);
+      expect(model1.trigger).toHaveBeenCalledWithInitial("deselected");
     });
 
     it('should not trigger a deselect:one event when added to a singe-select collection, even if multiple models with selected status are added, and all but the last one are deselected', function () {
