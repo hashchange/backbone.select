@@ -1,14 +1,14 @@
 Backbone.Select = (function (Backbone, _) {
   var Select = {};
 
-  // Select.SingleSelect
+  // Select.One
   // ------------------
   // A single-select mixin for Backbone.Collection, allowing a single
   // model to be selected within a collection. Selection of another
   // model within the collection causes the previous model to be
   // deselected.
 
-  Select.SingleSelect = function(collection, models){
+  Select.One = function(collection, models){
     this._pickyCid = _.uniqueId('singleSelect');
     this.collection = collection;
     this.trigger = trigger(collection);
@@ -39,7 +39,7 @@ Backbone.Select = (function (Backbone, _) {
 
   };
 
-  _.extend(Select.SingleSelect.prototype, {
+  _.extend(Select.One.prototype, {
 
     // Select a model, deselecting any previously
     // selected model
@@ -90,13 +90,13 @@ Backbone.Select = (function (Backbone, _) {
 
   });
 
-  // Select.MultiSelect
+  // Select.Many
   // -----------------
   // A multi-select mixin for Backbone.Collection, allowing a collection to
   // have multiple items selected, including `selectAll` and `deselectAll`
   // capabilities.
 
-  Select.MultiSelect = function (collection, models) {
+  Select.Many = function (collection, models) {
     this._pickyCid = _.uniqueId('multiSelect');
     this.collection = collection;
     this.selected = {};
@@ -125,7 +125,7 @@ Backbone.Select = (function (Backbone, _) {
 
   };
 
-  _.extend(Select.MultiSelect.prototype, {
+  _.extend(Select.Many.prototype, {
 
     // Select a specified model, make sure the
     // model knows it's selected, and hold on to
@@ -221,17 +221,17 @@ Backbone.Select = (function (Backbone, _) {
     }
   });
 
-  // Select.Selectable
+  // Select.Me
   // ----------------
   // A selectable mixin for Backbone.Model, allowing a model to be selected,
-  // enabling it to work with Select.MultiSelect or on it's own
+  // enabling it to work with Select.Many or on it's own
 
-  Select.Selectable = function (model) {
+  Select.Me = function (model) {
     this.model = model;
     this.trigger = trigger(model);
   };
 
-  _.extend(Select.Selectable.prototype, {
+  _.extend(Select.Me.prototype, {
 
     // Select this model, and tell our
     // collection that we're selected
@@ -296,33 +296,33 @@ Backbone.Select = (function (Backbone, _) {
   });
 
   // Applying the mixin: class methods for setup
-  Select.Selectable.applyTo = function (hostObject) {
-    _.extend(hostObject, new Backbone.Select.Selectable(hostObject));
+  Select.Me.applyTo = function (hostObject) {
+    _.extend(hostObject, new Backbone.Select.Me(hostObject));
   };
 
-  Select.SingleSelect.applyTo = function (hostObject, models) {
+  Select.One.applyTo = function (hostObject, models) {
     var singleSelect;
 
     if (arguments.length < 2) {
       // standard mode
-      singleSelect =  new Backbone.Select.SingleSelect(hostObject);
+      singleSelect =  new Backbone.Select.One(hostObject);
     } else {
       // model-sharing mode
-      singleSelect =  new Backbone.Select.SingleSelect(hostObject, models);
+      singleSelect =  new Backbone.Select.One(hostObject, models);
     }
 
     _.extend(hostObject, singleSelect);
   };
 
-  Select.MultiSelect.applyTo = function (hostObject, models) {
+  Select.Many.applyTo = function (hostObject, models) {
     var multiSelect;
 
     if (arguments.length < 2) {
       // standard mode
-      multiSelect =  new Backbone.Select.MultiSelect(hostObject);
+      multiSelect =  new Backbone.Select.Many(hostObject);
     } else {
       // model-sharing mode
-      multiSelect =  new Backbone.Select.MultiSelect(hostObject, models);
+      multiSelect =  new Backbone.Select.Many(hostObject, models);
     }
 
     _.extend(hostObject, multiSelect);

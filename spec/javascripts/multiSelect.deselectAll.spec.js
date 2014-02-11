@@ -1,7 +1,7 @@
 describe("multi-select collection: deselectAll", function(){
   var Model = Backbone.Model.extend({
     initialize: function(){
-      Backbone.Select.Selectable.applyTo(this);
+      Backbone.Select.Me.applyTo(this);
     }
   });
   
@@ -9,7 +9,7 @@ describe("multi-select collection: deselectAll", function(){
     model: Model,
 
     initialize: function(){
-      Backbone.Select.MultiSelect.applyTo(this);
+      Backbone.Select.Many.applyTo(this);
     }
   });
   

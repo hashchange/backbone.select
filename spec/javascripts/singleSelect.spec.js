@@ -2,7 +2,7 @@ describe("single-select collection", function(){
 
   var Model = Backbone.Model.extend({
     initialize: function(){
-      Backbone.Select.Selectable.applyTo(this);
+      Backbone.Select.Me.applyTo(this);
     }
   });
 
@@ -10,7 +10,7 @@ describe("single-select collection", function(){
     model: Model,
 
     initialize: function(){
-     Backbone.Select.SingleSelect.applyTo(this);
+     Backbone.Select.One.applyTo(this);
     }
   });
 
@@ -801,7 +801,7 @@ describe("single-select collection", function(){
       beforeEach(function () {
         SharingCollection = Backbone.Collection.extend({
           initialize: function(models){
-            Backbone.Select.SingleSelect.applyTo(this, models);
+            Backbone.Select.One.applyTo(this, models);
           }
         });
       });
@@ -866,7 +866,7 @@ describe("single-select collection", function(){
           model: Model,
 
           initialize: function(models){
-            Backbone.Select.SingleSelect.applyTo(this, models);
+            Backbone.Select.One.applyTo(this, models);
           }
         });
 

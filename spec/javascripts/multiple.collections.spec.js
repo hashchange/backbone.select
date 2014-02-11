@@ -2,7 +2,7 @@ describe("models shared between multiple collections", function(){
 
   var Model = Backbone.Model.extend({
     initialize: function(){
-      Backbone.Select.Selectable.applyTo(this);
+      Backbone.Select.Me.applyTo(this);
     }
   });
 
@@ -10,7 +10,7 @@ describe("models shared between multiple collections", function(){
     model: Model,
 
     initialize: function(models){
-      Backbone.Select.SingleSelect.applyTo(this, models);
+      Backbone.Select.One.applyTo(this, models);
     }
   });
 
@@ -18,7 +18,7 @@ describe("models shared between multiple collections", function(){
     model: Model,
 
     initialize: function(models){
-      Backbone.Select.MultiSelect.applyTo(this, models);
+      Backbone.Select.Many.applyTo(this, models);
     }
   });
 

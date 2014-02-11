@@ -1,7 +1,7 @@
 describe("selectable model", function(){
   var Model = Backbone.Model.extend({
     initialize: function(){
-      Backbone.Select.Selectable.applyTo(this);
+      Backbone.Select.Me.applyTo(this);
     }
   });
 
