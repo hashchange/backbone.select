@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">67.34</p>
+      <p class="stat">67.84</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">512</p>
+      <p class="stat">490</p>
     </div>
   </div>
   <div class="row historical">
@@ -63,11 +63,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
-      <p class="stat">97.61</p>
+      <p class="stat">93.53</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
-      <p class="stat">4.77</p>
+      <p class="stat">4.50</p>
     </div>
   </div>
 </div>
@@ -93,45 +93,16 @@
     <textarea id="file-source" class="col-md-12">Backbone.Select = (function (Backbone, _) {
   var Select = {};
 
-  // Select.SingleSelect
+  // Select.One
   // ------------------
   // A single-select mixin for Backbone.Collection, allowing a single
   // model to be selected within a collection. Selection of another
   // model within the collection causes the previous model to be
   // deselected.
 
-  Select.SingleSelect = function(collection, models){
-    this._pickyCid = _.uniqueId(&#039;singleSelect&#039;);
-    this.collection = collection;
-    this.trigger = trigger(collection);
+  Select.One = function(){};
 
-    if (arguments.length &gt; 1) {
-
-      // &#039;models&#039; argument provided, model-sharing mode
-      _.each(models || [], function (model) {
-        registerCollectionWithModel(model, this);
-        if (model.selected) {
-          if (this.selected) this.selected.deselect();
-          this.selected = model;
-        }
-      }, this);
-
-      this.collection.listenTo(this.collection, &#039;_selected&#039;, this.select);
-      this.collection.listenTo(this.collection, &#039;_deselected&#039;, this.deselect);
-
-      this.collection.listenTo(this.collection, &#039;reset&#039;, onResetSingleSelect);
-      this.collection.listenTo(this.collection, &#039;add&#039;, onAdd);
-      this.collection.listenTo(this.collection, &#039;remove&#039;, onRemove);
-
-      // Mode flag, undocumented, but part of the API (monitored by tests). Can
-      // be queried safely by other components. Use it read-only.
-      this._modelSharingEnabled = true;
-
-    }
-
-  };
-
-  _.extend(Select.SingleSelect.prototype, {
+  _.extend(Select.One.prototype, {
 
     // Select a model, deselecting any previously
     // selected model
@@ -182,42 +153,15 @@
 
   });
 
-  // Select.MultiSelect
+  // Select.Many
   // -----------------
   // A multi-select mixin for Backbone.Collection, allowing a collection to
   // have multiple items selected, including `selectAll` and `deselectAll`
   // capabilities.
 
-  Select.MultiSelect = function (collection, models) {
-    this._pickyCid = _.uniqueId(&#039;multiSelect&#039;);
-    this.collection = collection;
-    this.selected = {};
-    this.trigger = trigger(collection);
+  Select.Many = function () {};
 
-    if (arguments.length &gt; 1) {
-
-      // &#039;models&#039; argument provided, model-sharing mode
-      _.each(models || [], function (model) {
-        registerCollectionWithModel(model, this);
-        if (model.selected) this.selected[model.cid] = model;
-      }, this);
-
-      this.collection.listenTo(this.collection, &#039;_selected&#039;, this.select);
-      this.collection.listenTo(this.collection, &#039;_deselected&#039;, this.deselect);
-
-      this.collection.listenTo(this.collection, &#039;reset&#039;, onResetMultiSelect);
-      this.collection.listenTo(this.collection, &#039;add&#039;, onAdd);
-      this.collection.listenTo(this.collection, &#039;remove&#039;, onRemove);
-
-      // Mode flag, undocumented, but part of the API (monitored by tests). Can
-      // be queried safely by other components. Use it read-only.
-      this._modelSharingEnabled = true;
-
-    }
-
-  };
-
-  _.extend(Select.MultiSelect.prototype, {
+  _.extend(Select.Many.prototype, {
 
     // Select a specified model, make sure the
     // model knows it&#039;s selected, and hold on to
@@ -313,17 +257,14 @@
     }
   });
 
-  // Select.Selectable
+  // Select.Me
   // ----------------
   // A selectable mixin for Backbone.Model, allowing a model to be selected,
-  // enabling it to work with Select.MultiSelect or on it&#039;s own
+  // enabling it to work with Select.One or Select.Many, or on it&#039;s own.
 
-  Select.Selectable = function (model) {
-    this.model = model;
-    this.trigger = trigger(model);
-  };
+  Select.Me = function () {};
 
-  _.extend(Select.Selectable.prototype, {
+  _.extend(Select.Me.prototype, {
 
     // Select this model, and tell our
     // collection that we&#039;re selected
@@ -388,36 +329,73 @@
   });
 
   // Applying the mixin: class methods for setup
-  Select.Selectable.applyTo = function (hostObject) {
-    _.extend(hostObject, new Backbone.Select.Selectable(hostObject));
+  Select.Me.applyTo = function (hostObject) {
+    _.extend(hostObject, new Backbone.Select.Me());
+    hostObject.trigger = trigger(hostObject);
   };
 
-  Select.SingleSelect.applyTo = function (hostObject, models) {
-    var singleSelect;
+  Select.One.applyTo = function (hostObject, models, options) {
 
-    if (arguments.length &lt; 2) {
-      // standard mode
-      singleSelect =  new Backbone.Select.SingleSelect(hostObject);
-    } else {
+    _.extend(hostObject, new Backbone.Select.One());
+
+    hostObject._pickyCid = _.uniqueId(&#039;singleSelect&#039;);
+    hostObject.trigger = trigger(hostObject);
+
+    if (options &amp;&amp; options.enableModelSharing) {
+
       // model-sharing mode
-      singleSelect =  new Backbone.Select.SingleSelect(hostObject, models);
+      _.each(models || [], function (model) {
+        registerCollectionWithModel(model, hostObject);
+        if (model.selected) {
+          if (hostObject.selected) hostObject.selected.deselect();
+          hostObject.selected = model;
+        }
+      });
+
+      hostObject.listenTo(hostObject, &#039;_selected&#039;, hostObject.select);
+      hostObject.listenTo(hostObject, &#039;_deselected&#039;, hostObject.deselect);
+
+      hostObject.listenTo(hostObject, &#039;reset&#039;, onResetSingleSelect);
+      hostObject.listenTo(hostObject, &#039;add&#039;, onAdd);
+      hostObject.listenTo(hostObject, &#039;remove&#039;, onRemove);
+
+      // Mode flag, undocumented, but part of the API (monitored by tests). Can
+      // be queried safely by other components. Use it read-only.
+      hostObject._modelSharingEnabled = true;
+
     }
 
-    _.extend(hostObject, singleSelect);
   };
 
-  Select.MultiSelect.applyTo = function (hostObject, models) {
-    var multiSelect;
+  Select.Many.applyTo = function (hostObject, models, options) {
 
-    if (arguments.length &lt; 2) {
-      // standard mode
-      multiSelect =  new Backbone.Select.MultiSelect(hostObject);
-    } else {
+    _.extend(hostObject, new Backbone.Select.Many());
+
+    hostObject._pickyCid = _.uniqueId(&#039;multiSelect&#039;);
+    hostObject.selected = {};
+    hostObject.trigger = trigger(hostObject);
+
+    if (options &amp;&amp; options.enableModelSharing) {
+
       // model-sharing mode
-      multiSelect =  new Backbone.Select.MultiSelect(hostObject, models);
+      _.each(models || [], function (model) {
+        registerCollectionWithModel(model, hostObject);
+        if (model.selected) hostObject.selected[model.cid] = model;
+      });
+
+      hostObject.listenTo(hostObject, &#039;_selected&#039;, hostObject.select);
+      hostObject.listenTo(hostObject, &#039;_deselected&#039;, hostObject.deselect);
+
+      hostObject.listenTo(hostObject, &#039;reset&#039;, onResetMultiSelect);
+      hostObject.listenTo(hostObject, &#039;add&#039;, onAdd);
+      hostObject.listenTo(hostObject, &#039;remove&#039;, onRemove);
+
+      // Mode flag, undocumented, but part of the API (monitored by tests). Can
+      // be queried safely by other components. Use it read-only.
+      hostObject._modelSharingEnabled = true;
+
     }
 
-    _.extend(hostObject, multiSelect);
   };
 
   // Helper Methods
