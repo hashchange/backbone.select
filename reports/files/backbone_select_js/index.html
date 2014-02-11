@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome-ie7.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/jsoverson/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>backbone.select.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
+      <p class="stat">67.34</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
+      <p class="stat">512</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
+      <p class="stat">97.61</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
+      <p class="stat">4.77</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">Backbone.Select = (function (Backbone, _) {
+  var Select = {};
+
+  // Select.SingleSelect
+  // ------------------
+  // A single-select mixin for Backbone.Collection, allowing a single
+  // model to be selected within a collection. Selection of another
+  // model within the collection causes the previous model to be
+  // deselected.
+
+  Select.SingleSelect = function(collection, models){
+    this._pickyCid = _.uniqueId(&#039;singleSelect&#039;);
+    this.collection = collection;
+    this.trigger = trigger(collection);
+
+    if (arguments.length &gt; 1) {
+
+      // &#039;models&#039; argument provided, model-sharing mode
+      _.each(models || [], function (model) {
+        registerCollectionWithModel(model, this);
+        if (model.selected) {
+          if (this.selected) this.selected.deselect();
+          this.selected = model;
+        }
+      }, this);
+
+      this.collection.listenTo(this.collection, &#039;_selected&#039;, this.select);
+      this.collection.listenTo(this.collection, &#039;_deselected&#039;, this.deselect);
+
+      this.collection.listenTo(this.collection, &#039;reset&#039;, onResetSingleSelect);
+      this.collection.listenTo(this.collection, &#039;add&#039;, onAdd);
+      this.collection.listenTo(this.collection, &#039;remove&#039;, onRemove);
+
+      // Mode flag, undocumented, but part of the API (monitored by tests). Can
+      // be queried safely by other components. Use it read-only.
+      this._modelSharingEnabled = true;
+
+    }
+
+  };
+
+  _.extend(Select.SingleSelect.prototype, {
+
+    // Select a model, deselecting any previously
+    // selected model
+    select: function(model, options){
+      var reselected = model &amp;&amp; this.selected === model ? model : undefined;
+
+      options || (options = {});
+      options._processedBy || (options._processedBy = []);
+      if (options._processedBy[this._pickyCid]) { return; }
+
+      if (!reselected) {
+        this.deselect(undefined, _.omit(options, &quot;_silentLocally&quot;));
+        this.selected = model;
+      }
+      options._processedBy[this._pickyCid] = this;
+
+      if (!options._processedBy[this.selected.cid]) this.selected.select(stripLocalOptions(options));
+
+      if (!(options.silent || options._silentLocally)) {
+
+        if (reselected) {
+          if (!options._silentReselect) this.trigger(&quot;reselect:one&quot;, model, this, stripInternalOptions(options));
+        } else {
+          this.trigger(&quot;select:one&quot;, model, this, stripInternalOptions(options));
+        }
+
+      }
+    },
+
+    // Deselect a model, resulting in no model
+    // being selected
+    deselect: function(model, options){
+      options || (options = {});
+      if (!this.selected){ return; }
+
+      model = model || this.selected;
+      if (this.selected !== model){ return; }
+
+      delete this.selected;
+      if (!options._skipModelCall) model.deselect(stripLocalOptions(options));
+      if (!(options.silent || options._silentLocally)) this.trigger(&quot;deselect:one&quot;, model, this, stripInternalOptions(options));
+    },
+
+    close: function () {
+      unregisterCollectionWithModels(this);
+      this.stopListening();
+    }
+
+  });
+
+  // Select.MultiSelect
+  // -----------------
+  // A multi-select mixin for Backbone.Collection, allowing a collection to
+  // have multiple items selected, including `selectAll` and `deselectAll`
+  // capabilities.
+
+  Select.MultiSelect = function (collection, models) {
+    this._pickyCid = _.uniqueId(&#039;multiSelect&#039;);
+    this.collection = collection;
+    this.selected = {};
+    this.trigger = trigger(collection);
+
+    if (arguments.length &gt; 1) {
+
+      // &#039;models&#039; argument provided, model-sharing mode
+      _.each(models || [], function (model) {
+        registerCollectionWithModel(model, this);
+        if (model.selected) this.selected[model.cid] = model;
+      }, this);
+
+      this.collection.listenTo(this.collection, &#039;_selected&#039;, this.select);
+      this.collection.listenTo(this.collection, &#039;_deselected&#039;, this.deselect);
+
+      this.collection.listenTo(this.collection, &#039;reset&#039;, onResetMultiSelect);
+      this.collection.listenTo(this.collection, &#039;add&#039;, onAdd);
+      this.collection.listenTo(this.collection, &#039;remove&#039;, onRemove);
+
+      // Mode flag, undocumented, but part of the API (monitored by tests). Can
+      // be queried safely by other components. Use it read-only.
+      this._modelSharingEnabled = true;
+
+    }
+
+  };
+
+  _.extend(Select.MultiSelect.prototype, {
+
+    // Select a specified model, make sure the
+    // model knows it&#039;s selected, and hold on to
+    // the selected model.
+    select: function (model, options) {
+      var prevSelected = multiSelectionToArray(this.selected),
+          reselected = this.selected[model.cid] ? [ model ] : [];
+
+      options || (options = {});
+      options._processedBy || (options._processedBy = []);
+
+      if (reselected.length &amp;&amp; options._processedBy[this._pickyCid]) { return; }
+
+      if (!reselected.length) {
+        this.selected[model.cid] = model;
+        this.selectedLength = _.size(this.selected);
+      }
+      options._processedBy[this._pickyCid] = this;
+
+      if (!options._processedBy[model.cid]) model.select(stripLocalOptions(options));
+      triggerMultiSelectEvents(this, prevSelected, options, reselected);
+    },
+
+    // Deselect a specified model, make sure the
+    // model knows it has been deselected, and remove
+    // the model from the selected list.
+    deselect: function (model, options) {
+      var prevSelected = multiSelectionToArray(this.selected);
+
+      options || (options = {});
+      if (!this.selected[model.cid]) { return; }
+
+      delete this.selected[model.cid];
+      this.selectedLength = _.size(this.selected);
+
+      if (!options._skipModelCall) model.deselect(stripLocalOptions(options));
+      triggerMultiSelectEvents(this, prevSelected, options);
+    },
+
+    // Select all models in this collection
+    selectAll: function (options) {
+      var prevSelected = multiSelectionToArray(this.selected),
+          reselected = [];
+
+      options || (options = {});
+      options._processedBy || (options._processedBy = []);
+
+      this.selectedLength = 0;
+      this.each(function (model) {
+        this.selectedLength++;
+        if (this.selected[model.cid]) reselected.push(model);
+        this.select(model, _.extend({}, options, {_silentLocally: true}));
+      }, this);
+      options._processedBy[this._pickyCid] = this;
+
+      triggerMultiSelectEvents(this, prevSelected, options, reselected);
+    },
+
+    // Deselect all models in this collection
+    deselectAll: function (options) {
+      var prevSelected;
+
+      if (this.selectedLength === 0) { return; }
+      prevSelected = multiSelectionToArray(this.selected);
+
+      this.each(function (model) {
+        if (model.selected) this.selectedLength--;
+        this.deselect(model, _.extend({}, options, {_silentLocally: true}));
+      }, this);
+
+      this.selectedLength = 0;
+      triggerMultiSelectEvents(this, prevSelected, options);
+    },
+
+    selectNone: function (options) {
+      this.deselectAll(options);
+    },
+
+    // Toggle select all / none. If some are selected, it
+    // will select all. If all are selected, it will select 
+    // none. If none are selected, it will select all.
+    toggleSelectAll: function (options) {
+      if (this.selectedLength === this.length) {
+        this.deselectAll(options);
+      } else {
+        this.selectAll(options);
+      }
+    },
+
+    close: function () {
+      unregisterCollectionWithModels(this);
+      this.stopListening();
+    }
+  });
+
+  // Select.Selectable
+  // ----------------
+  // A selectable mixin for Backbone.Model, allowing a model to be selected,
+  // enabling it to work with Select.MultiSelect or on it&#039;s own
+
+  Select.Selectable = function (model) {
+    this.model = model;
+    this.trigger = trigger(model);
+  };
+
+  _.extend(Select.Selectable.prototype, {
+
+    // Select this model, and tell our
+    // collection that we&#039;re selected
+    select: function (options) {
+      var reselected = this.selected;
+
+      options || (options = {});
+      options._processedBy || (options._processedBy = []);
+
+      if (options._processedBy[this.cid]) { return; }
+
+      this.selected = true;
+      options._processedBy[this.cid] = this;
+
+      if (this._pickyCollections) {
+        // Model-sharing mode: notify collections with an event
+        this.trigger(&quot;_selected&quot;, this, stripLocalOptions(options));
+      } else if (this.collection) {
+        // Single collection only: no event listeners set up in collection, call
+        // it directly
+        if (!options._processedBy[this.collection._pickyCid]) this.collection.select(this, stripLocalOptions(options));
+      }
+
+      if (!(options.silent || options._silentLocally)) {
+        if (reselected) {
+          if (!options._silentReselect) this.trigger(&quot;reselected&quot;, this, stripInternalOptions(options));
+        } else {
+          this.trigger(&quot;selected&quot;, this, stripInternalOptions(options));
+        }
+      }
+    },
+
+    // Deselect this model, and tell our
+    // collection that we&#039;re deselected
+    deselect: function (options) {
+      options || (options = {});
+      if (!this.selected) { return; }
+
+      this.selected = false;
+
+      if (this._pickyCollections) {
+        // Model-sharing mode: notify collections with an event
+        this.trigger(&quot;_deselected&quot;, this, stripLocalOptions(options));
+      } else if (this.collection) {
+        // Single collection only: no event listeners set up in collection, call
+        // it directly
+        this.collection.deselect(this, stripLocalOptions(options));
+      }
+
+      if (!(options.silent || options._silentLocally)) this.trigger(&quot;deselected&quot;, this, stripInternalOptions(options));
+    },
+
+    // Change selected to the opposite of what
+    // it currently is
+    toggleSelected: function (options) {
+      if (this.selected) {
+        this.deselect(options);
+      } else {
+        this.select(options);
+      }
+    }
+  });
+
+  // Applying the mixin: class methods for setup
+  Select.Selectable.applyTo = function (hostObject) {
+    _.extend(hostObject, new Backbone.Select.Selectable(hostObject));
+  };
+
+  Select.SingleSelect.applyTo = function (hostObject, models) {
+    var singleSelect;
+
+    if (arguments.length &lt; 2) {
+      // standard mode
+      singleSelect =  new Backbone.Select.SingleSelect(hostObject);
+    } else {
+      // model-sharing mode
+      singleSelect =  new Backbone.Select.SingleSelect(hostObject, models);
+    }
+
+    _.extend(hostObject, singleSelect);
+  };
+
+  Select.MultiSelect.applyTo = function (hostObject, models) {
+    var multiSelect;
+
+    if (arguments.length &lt; 2) {
+      // standard mode
+      multiSelect =  new Backbone.Select.MultiSelect(hostObject);
+    } else {
+      // model-sharing mode
+      multiSelect =  new Backbone.Select.MultiSelect(hostObject, models);
+    }
+
+    _.extend(hostObject, multiSelect);
+  };
+
+  // Helper Methods
+  // --------------
+
+  // Trigger events from a multi-select collection based on the number of
+  // selected items.
+  var triggerMultiSelectEvents = function (collection, prevSelected, options, reselected) {
+    function mapCidsToModels (cids, collection, previousSelection) {
+      function mapper (cid) {
+        // Find the model in the collection. If not found, it has been removed,
+        // so get it from the array of previously selected models.
+        return collection.get(cid) || previousSelection[cid];
+      }
+      return _.map(cids, mapper);
+    }
+
+    options || (options = {});
+    if (options.silent || options._silentLocally) return;
+
+    var selectedLength = collection.selectedLength,
+        length = collection.length,
+        prevSelectedCids = _.keys(prevSelected),
+        selectedCids = _.keys(collection.selected),
+        addedCids = _.difference( selectedCids, prevSelectedCids ),
+        removedCids = _.difference( prevSelectedCids, selectedCids ),
+        unchanged = (selectedLength === prevSelectedCids.length &amp;&amp; addedCids.length === 0 &amp;&amp; removedCids.length === 0),
+        diff;
+
+    if (reselected &amp;&amp; reselected.length &amp;&amp; !options._silentReselect) {
+      collection.trigger(&quot;reselect:any&quot;, reselected, collection, stripInternalOptions(options));
+    }
+
+    if (unchanged) return;
+
+    diff = {
+      selected: mapCidsToModels(addedCids, collection, prevSelected),
+      deselected: mapCidsToModels(removedCids, collection, prevSelected)
+    };
+
+    if (selectedLength === length) {
+      collection.trigger(&quot;select:all&quot;, diff, collection, stripInternalOptions(options));
+      return;
+    }
+
+    if (selectedLength === 0) {
+      collection.trigger(&quot;select:none&quot;, diff, collection, stripInternalOptions(options));
+      return;
+    }
+
+    if (selectedLength &gt; 0 &amp;&amp; selectedLength &lt; length) {
+      collection.trigger(&quot;select:some&quot;, diff, collection, stripInternalOptions(options));
+      return;
+    }
+  };
+
+  function onAdd (model, collection) {
+    registerCollectionWithModel(model, collection);
+    if (model.selected) collection.select(model, {_silentReselect: true, _externalEvent: &quot;add&quot;});
+  }
+
+  function onRemove (model, collection, options) {
+    releaseModel(model, collection, _.extend({}, options, {_externalEvent: &quot;remove&quot;}));
+  }
+
+  function releaseModel (model, collection, options) {
+    if (model._pickyCollections) model._pickyCollections = _.without(model._pickyCollections, collection._pickyCid);
+    if (model.selected) {
+      if (model._pickyCollections &amp;&amp; model._pickyCollections.length === 0) {
+        collection.deselect(model, options);
+      } else {
+        collection.deselect(model, _.extend({}, options, {_skipModelCall: true}));
+      }
+    }
+  }
+
+  function onResetSingleSelect (collection, options) {
+    var selected,
+        excessiveSelections,
+        deselectOnRemove = _.find(options.previousModels, function (model) { return model.selected; });
+
+    if (deselectOnRemove) releaseModel(deselectOnRemove, collection, {_silentLocally: true});
+
+    selected = collection.filter(function (model) { return model.selected; });
+    excessiveSelections = _.initial(selected);
+    if (excessiveSelections.length) _.each(excessiveSelections, function (model) { model.deselect(); });
+    if (selected.length) collection.select(_.last(selected), {silent: true});
+  }
+
+  function onResetMultiSelect (collection, options) {
+    var select,
+        deselect = _.filter(options.previousModels, function (model) { return model.selected; });
+
+    if (deselect) _.each(deselect, function (model) { releaseModel(model, collection, {_silentLocally: true}); });
+
+    select = collection.filter(function (model) { return model.selected; });
+    if (select.length) _.each(select, function (model) { collection.select(model, {silent: true}); });
+  }
+
+  function registerCollectionWithModel (model, collection) {
+    model._pickyCollections || (model._pickyCollections = []);
+    model._pickyCollections.push(collection._pickyCid);
+  }
+
+  function unregisterCollectionWithModels (collection) {
+    collection.each(function (model) {
+      releaseModel(model, collection, {_silentLocally: true});
+    });
+  }
+
+  function stripLocalOptions (options) {
+    return _.omit(options, &quot;_silentLocally&quot;, &quot;_externalEvent&quot;);
+  }
+
+  function stripInternalOptions (options) {
+    return _.omit(options, &quot;_silentLocally&quot;, &quot;_silentReselect&quot;, &quot;_skipModelCall&quot;, &quot;_processedBy&quot;);
+  }
+
+  function multiSelectionToArray (selectionsHash) {
+    function mapper (value, key) {
+      selectedArr[key] = value;
+    }
+
+    var selectedArr = [];
+    _.each(selectionsHash, mapper);
+
+    return selectedArr;
+  }
+
+  // Creates a new trigger method which calls the predefined event handlers
+  // (onDeselect etc) as well as triggering the event.
+  //
+  // Adapted from Marionette.triggerMethod.
+  function trigger (context) {
+
+    // Take the event section (&quot;section1:section2:section3&quot;)
+    // and turn it into an uppercase name
+    //noinspection JSUnusedLocalSymbols
+    function getEventName (match, prefix, eventName) {
+      return eventName.toUpperCase();
+    }
+
+    // Unifies event names for the method call:
+    // - (re, de)selected   =&gt; (re, de)select
+    // - (re, de)select:one =&gt; (re, de)select
+    // - reselect:any       =&gt; reselect
+    function unifyEventNames (eventName) {
+      if (eventName.slice(-2) === &quot;ed&quot; ) {
+        eventName = eventName.slice(0, -2);
+      } else if (eventName.slice(-4) === &quot;:one&quot; || eventName.slice(-4) === &quot;:any&quot;) {
+        eventName = eventName.slice(0, -4);
+      }
+
+      return eventName;
+    }
+
+    var origTrigger = context.trigger,
+
+    // Split the event name on the &quot;:&quot;
+        splitter = /(^|:)(\w)/gi;
+
+    // Return an augmented trigger method implementation, in order to replace
+    // the original trigger method
+    return function (event, eventArgs) {
+      // get the method name from the event name
+      var unifiedEvent = unifyEventNames(event),
+          methodName = &#039;on&#039; + unifiedEvent.replace(splitter, getEventName),
+          method = this[methodName];
+
+      // call the onMethodName if it exists
+      if (_.isFunction(method)) {
+        // pass all trigger arguments, except the event name
+        method.apply(this, _.tail(arguments));
+      }
+
+      // trigger the event
+      origTrigger.apply(this, arguments);
+      return this;
+
+    };
+  }
+
+  return Select;
+})(Backbone, _);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

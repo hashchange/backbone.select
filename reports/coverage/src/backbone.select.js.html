@@ -1,0 +1,1858 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/backbone.select.js</title>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="../prettify.css">
+
+    <style>
+        body, html {
+            margin:0; padding: 0;
+        }
+        body {
+            font-family: Helvetica Neue, Helvetica,Arial;
+            font-size: 10pt;
+        }
+        div.header, div.footer {
+            background: #eee;
+            padding: 1em;
+        }
+        div.header {
+            z-index: 100;
+            position: fixed;
+            top: 0;
+            border-bottom: 1px solid #666;
+            width: 100%;
+        }
+        div.footer {
+            border-top: 1px solid #666;
+        }
+        div.body {
+            margin-top: 10em;
+        }
+        div.meta {
+            font-size: 90%;
+            text-align: center;
+        }
+        h1, h2, h3 {
+            font-weight: normal;
+        }
+        h1 {
+            font-size: 12pt;
+        }
+        h2 {
+            font-size: 10pt;
+        }
+        pre {
+            font-family: Consolas, Menlo, Monaco, monospace;
+            margin: 0;
+            padding: 0;
+            line-height: 14px;
+            font-size: 14px;
+            -moz-tab-size: 2;
+            -o-tab-size:  2;
+            tab-size: 2;
+        }
+
+        div.path { font-size: 110%; }
+        div.path a:link, div.path a:visited { color: #000; }
+        table.coverage { border-collapse: collapse; margin:0; padding: 0 }
+
+        table.coverage td {
+            margin: 0;
+            padding: 0;
+            color: #111;
+            vertical-align: top;
+        }
+        table.coverage td.line-count {
+            width: 50px;
+            text-align: right;
+            padding-right: 5px;
+        }
+        table.coverage td.line-coverage {
+            color: #777 !important;
+            text-align: right;
+            border-left: 1px solid #666;
+            border-right: 1px solid #666;
+        }
+
+        table.coverage td.text {
+        }
+
+        table.coverage td span.cline-any {
+            display: inline-block;
+            padding: 0 5px;
+            width: 40px;
+        }
+        table.coverage td span.cline-neutral {
+            background: #eee;
+        }
+        table.coverage td span.cline-yes {
+            background: #b5d592;
+            color: #999;
+        }
+        table.coverage td span.cline-no {
+            background: #fc8c84;
+        }
+
+        .cstat-yes { color: #111; }
+        .cstat-no { background: #fc8c84; color: #111; }
+        .fstat-no { background: #ffc520; color: #111 !important; }
+        .cbranch-no { background:  yellow !important; color: #111; }
+
+        .cstat-skip { background: #ddd; color: #111; }
+        .fstat-skip { background: #ddd; color: #111 !important; }
+        .cbranch-skip { background: #ddd !important; color: #111; }
+
+        .missing-if-branch {
+            display: inline-block;
+            margin-right: 10px;
+            position: relative;
+            padding: 0 4px;
+            background: black;
+            color: yellow;
+        }
+
+        .skip-if-branch {
+            display: none;
+            margin-right: 10px;
+            position: relative;
+            padding: 0 4px;
+            background: #ccc;
+            color: white;
+        }
+
+        .missing-if-branch .typ, .skip-if-branch .typ {
+            color: inherit !important;
+        }
+
+        .entity, .metric { font-weight: bold; }
+        .metric { display: inline-block; border: 1px solid #333; padding: 0.3em; background: white; }
+        .metric small { font-size: 80%; font-weight: normal; color: #666; }
+
+        div.coverage-summary table { border-collapse: collapse; margin: 3em; font-size: 110%; }
+        div.coverage-summary td, div.coverage-summary table  th { margin: 0; padding: 0.25em 1em; border-top: 1px solid #666; border-bottom: 1px solid #666; }
+        div.coverage-summary th { text-align: left; border: 1px solid #666; background: #eee; font-weight: normal; }
+        div.coverage-summary th.file { border-right: none !important; }
+        div.coverage-summary th.pic { border-left: none !important; text-align: right; }
+        div.coverage-summary th.pct { border-right: none !important; }
+        div.coverage-summary th.abs { border-left: none !important; text-align: right; }
+        div.coverage-summary td.pct { text-align: right; border-left: 1px solid #666; }
+        div.coverage-summary td.abs { text-align: right; font-size: 90%; color: #444; border-right: 1px solid #666; }
+        div.coverage-summary td.file { text-align: right; border-left: 1px solid #666; white-space: nowrap;  }
+        div.coverage-summary td.pic { min-width: 120px !important;  }
+        div.coverage-summary a:link { text-decoration: none; color: #000; }
+        div.coverage-summary a:visited { text-decoration: none; color: #333; }
+        div.coverage-summary a:hover { text-decoration: underline; }
+        div.coverage-summary tfoot td { border-top: 1px solid #666; }
+
+        div.coverage-summary .yui3-datatable-sort-indicator, div.coverage-summary .dummy-sort-indicator {
+            height: 10px;
+            width: 7px;
+            display: inline-block;
+            margin-left: 0.5em;
+        }
+        div.coverage-summary .yui3-datatable-sort-indicator {
+            background: url("http://yui.yahooapis.com/3.6.0/build/datatable-sort/assets/skins/sam/sort-arrow-sprite.png") no-repeat scroll 0 0 transparent;
+        }
+        div.coverage-summary .yui3-datatable-sorted .yui3-datatable-sort-indicator {
+            background-position: 0 -20px;
+        }
+        div.coverage-summary .yui3-datatable-sorted-desc .yui3-datatable-sort-indicator {
+            background-position: 0 -10px;
+        }
+
+        .high { background: #b5d592 !important; }
+        .medium { background: #ffe87c !important; }
+        .low { background: #fc8c84 !important; }
+
+        span.cover-fill, span.cover-empty {
+            display:inline-block;
+            border:1px solid #444;
+            background: white;
+            height: 12px;
+        }
+        span.cover-fill {
+            background: #ccc;
+            border-right: 1px solid #444;
+        }
+        span.cover-empty {
+            background: white;
+            border-left: none;
+        }
+        span.cover-full {
+            border-right: none !important;
+        }
+        pre.prettyprint {
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .com { color: #999 !important; }
+        .ignore-none { color: #999; font-weight: normal; }
+
+    </style>
+</head>
+<body>
+<div class="header high">
+    <h1>Code coverage report for <span class="entity">src/backbone.select.js</span></h1>
+    <h2>
+        
+        Statements: <span class="metric">99.22% <small>(253 / 255)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        
+        
+        Branches: <span class="metric">96.02% <small>(169 / 176)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        
+        
+        Functions: <span class="metric">100% <small>(50 / 50)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        
+        
+        Lines: <span class="metric">100% <small>(220 / 220)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        
+        Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
+    </h2>
+    <div class="path"><a href="../index.html">All files</a> &#187; <a href="index.html">src\</a> &#187; backbone.select.js</div>
+</div>
+<div class="body">
+<pre><table class="coverage">
+<tr><td class="line-count">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513</td><td class="line-coverage"><span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">545</span>
+<span class="cline-any cline-yes">545</span>
+<span class="cline-any cline-yes">545</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">545</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">453</span>
+<span class="cline-any cline-yes">609</span>
+<span class="cline-any cline-yes">609</span>
+<span class="cline-any cline-yes">22</span>
+<span class="cline-any cline-yes">22</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">453</span>
+<span class="cline-any cline-yes">453</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">453</span>
+<span class="cline-any cline-yes">453</span>
+<span class="cline-any cline-yes">453</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">453</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">863</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">863</span>
+<span class="cline-any cline-yes">863</span>
+<span class="cline-any cline-yes">863</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">727</span>
+<span class="cline-any cline-yes">631</span>
+<span class="cline-any cline-yes">631</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">727</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">727</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">727</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">635</span>
+<span class="cline-any cline-yes">55</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">580</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">872</span>
+<span class="cline-any cline-yes">872</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">203</span>
+<span class="cline-any cline-yes">203</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">198</span>
+<span class="cline-any cline-yes">198</span>
+<span class="cline-any cline-yes">198</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">392</span>
+<span class="cline-any cline-yes">730</span>
+<span class="cline-any cline-yes">730</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">392</span>
+<span class="cline-any cline-yes">392</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">392</span>
+<span class="cline-any cline-yes">392</span>
+<span class="cline-any cline-yes">392</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">392</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1325</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1325</span>
+<span class="cline-any cline-yes">1325</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1325</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1179</span>
+<span class="cline-any cline-yes">1012</span>
+<span class="cline-any cline-yes">1012</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1179</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1179</span>
+<span class="cline-any cline-yes">1179</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">432</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">432</span>
+<span class="cline-any cline-yes">432</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">285</span>
+<span class="cline-any cline-yes">285</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">285</span>
+<span class="cline-any cline-yes">285</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">65</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">65</span>
+<span class="cline-any cline-yes">65</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">65</span>
+<span class="cline-any cline-yes">65</span>
+<span class="cline-any cline-yes">130</span>
+<span class="cline-any cline-yes">130</span>
+<span class="cline-any cline-yes">130</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">65</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">65</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48</span>
+<span class="cline-any cline-yes">48</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48</span>
+<span class="cline-any cline-yes">96</span>
+<span class="cline-any cline-yes">96</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48</span>
+<span class="cline-any cline-yes">48</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22</span>
+<span class="cline-any cline-yes">9</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1268</span>
+<span class="cline-any cline-yes">1268</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1260</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1260</span>
+<span class="cline-any cline-yes">1260</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1260</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1260</span>
+<span class="cline-any cline-yes">1260</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1260</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-yes">616</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">551</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1260</span>
+<span class="cline-any cline-yes">1116</span>
+<span class="cline-any cline-yes">107</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1009</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">485</span>
+<span class="cline-any cline-yes">485</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">295</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">295</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">122</span>
+<span class="cline-any cline-yes">173</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">165</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">295</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1268</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">545</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">545</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">92</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">453</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">545</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">252</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">392</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">644</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1153</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2210</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1577</span>
+<span class="cline-any cline-yes">1577</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1191</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1191</span>
+<span class="cline-any cline-yes">82</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1191</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1105</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1105</span>
+<span class="cline-any cline-yes">370</span>
+<span class="cline-any cline-yes">370</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">735</span>
+<span class="cline-any cline-yes">109</span>
+<span class="cline-any cline-yes">109</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">626</span>
+<span class="cline-any cline-yes">626</span>
+<span class="cline-any cline-yes">626</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">26</span>
+<span class="cline-any cline-yes">26</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">31</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">106</span>
+<span class="cline-any cline-yes">106</span>
+<span class="cline-any cline-yes">98</span>
+<span class="cline-any cline-yes">27</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">71</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-yes">30</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">17</span>
+<span class="cline-any cline-yes">42</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">33</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17</span>
+<span class="cline-any cline-yes">17</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1365</span>
+<span class="cline-any cline-yes">1365</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">6</span>
+<span class="cline-any cline-yes">12</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">2165</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">3322</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1488</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1870</span>
+<span class="cline-any cline-yes">1870</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1870</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">8973</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">7865</span>
+<span class="cline-any cline-yes">5717</span>
+<span class="cline-any cline-yes">2148</span>
+<span class="cline-any cline-yes">879</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7865</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2457</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2457</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7865</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7865</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7865</span>
+<span class="cline-any cline-yes">7865</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">Backbone.Select = (function (Backbone, _) {
+  var Select = {};
+&nbsp;
+  // Select.SingleSelect
+  // ------------------
+  // A single-select mixin for Backbone.Collection, allowing a single
+  // model to be selected within a collection. Selection of another
+  // model within the collection causes the previous model to be
+  // deselected.
+&nbsp;
+  Select.SingleSelect = function(collection, models){
+    this._pickyCid = _.uniqueId('singleSelect');
+    this.collection = collection;
+    this.trigger = trigger(collection);
+&nbsp;
+    if (arguments.length &gt; 1) {
+&nbsp;
+      // 'models' argument provided, model-sharing mode
+      _.each(models || [], function (model) {
+        registerCollectionWithModel(model, this);
+        if (model.selected) {
+          if (this.selected) this.selected.deselect();
+          this.selected = model;
+        }
+      }, this);
+&nbsp;
+      this.collection.listenTo(this.collection, '_selected', this.select);
+      this.collection.listenTo(this.collection, '_deselected', this.deselect);
+&nbsp;
+      this.collection.listenTo(this.collection, 'reset', onResetSingleSelect);
+      this.collection.listenTo(this.collection, 'add', onAdd);
+      this.collection.listenTo(this.collection, 'remove', onRemove);
+&nbsp;
+      // Mode flag, undocumented, but part of the API (monitored by tests). Can
+      // be queried safely by other components. Use it read-only.
+      this._modelSharingEnabled = true;
+&nbsp;
+    }
+&nbsp;
+  };
+&nbsp;
+  _.extend(Select.SingleSelect.prototype, {
+&nbsp;
+    // Select a model, deselecting any previously
+    // selected model
+    select: function(model, options){
+      var reselected = model &amp;&amp; this.selected === model ? model : undefined;
+&nbsp;
+      options || (options = {});
+      options._processedBy || (options._processedBy = []);
+      if (options._processedBy[this._pickyCid]) { return; }
+&nbsp;
+      if (!reselected) {
+        this.deselect(undefined, _.omit(options, "_silentLocally"));
+        this.selected = model;
+      }
+      options._processedBy[this._pickyCid] = this;
+&nbsp;
+      if (!options._processedBy[this.selected.cid]) this.selected.select(stripLocalOptions(options));
+&nbsp;
+      if (!(options.silent || options._silentLocally)) {
+&nbsp;
+        if (reselected) {
+          if (!options._silentReselect) this.trigger("reselect:one", model, this, stripInternalOptions(options));
+        } else {
+          this.trigger("select:one", model, this, stripInternalOptions(options));
+        }
+&nbsp;
+      }
+    },
+&nbsp;
+    // Deselect a model, resulting in no model
+    // being selected
+    deselect: function(model, options){
+      options || (options = {});
+      if (!this.selected){ return; }
+&nbsp;
+      model = model || this.selected;
+      if (this.selected !== model){ return; }
+&nbsp;
+      delete this.selected;
+      if (!options._skipModelCall) model.deselect(stripLocalOptions(options));
+      if (!(options.silent || options._silentLocally)) this.trigger("deselect:one", model, this, stripInternalOptions(options));
+    },
+&nbsp;
+    close: function () {
+      unregisterCollectionWithModels(this);
+      this.stopListening();
+    }
+&nbsp;
+  });
+&nbsp;
+  // Select.MultiSelect
+  // -----------------
+  // A multi-select mixin for Backbone.Collection, allowing a collection to
+  // have multiple items selected, including `selectAll` and `deselectAll`
+  // capabilities.
+&nbsp;
+  Select.MultiSelect = function (collection, models) {
+    this._pickyCid = _.uniqueId('multiSelect');
+    this.collection = collection;
+    this.selected = {};
+    this.trigger = trigger(collection);
+&nbsp;
+    if (arguments.length &gt; 1) {
+&nbsp;
+      // 'models' argument provided, model-sharing mode
+      _.each(models || [], function (model) {
+        registerCollectionWithModel(model, this);
+        if (model.selected) this.selected[model.cid] = model;
+      }, this);
+&nbsp;
+      this.collection.listenTo(this.collection, '_selected', this.select);
+      this.collection.listenTo(this.collection, '_deselected', this.deselect);
+&nbsp;
+      this.collection.listenTo(this.collection, 'reset', onResetMultiSelect);
+      this.collection.listenTo(this.collection, 'add', onAdd);
+      this.collection.listenTo(this.collection, 'remove', onRemove);
+&nbsp;
+      // Mode flag, undocumented, but part of the API (monitored by tests). Can
+      // be queried safely by other components. Use it read-only.
+      this._modelSharingEnabled = true;
+&nbsp;
+    }
+&nbsp;
+  };
+&nbsp;
+  _.extend(Select.MultiSelect.prototype, {
+&nbsp;
+    // Select a specified model, make sure the
+    // model knows it's selected, and hold on to
+    // the selected model.
+    select: function (model, options) {
+      var prevSelected = multiSelectionToArray(this.selected),
+          reselected = this.selected[model.cid] ? [ model ] : [];
+&nbsp;
+      options || (options = {});
+      options._processedBy || (options._processedBy = []);
+&nbsp;
+      if (reselected.length &amp;&amp; options._processedBy[this._pickyCid]) { return; }
+&nbsp;
+      if (!reselected.length) {
+        this.selected[model.cid] = model;
+        this.selectedLength = _.size(this.selected);
+      }
+      options._processedBy[this._pickyCid] = this;
+&nbsp;
+      if (!options._processedBy[model.cid]) model.select(stripLocalOptions(options));
+      triggerMultiSelectEvents(this, prevSelected, options, reselected);
+    },
+&nbsp;
+    // Deselect a specified model, make sure the
+    // model knows it has been deselected, and remove
+    // the model from the selected list.
+    deselect: function (model, options) {
+      var prevSelected = multiSelectionToArray(this.selected);
+&nbsp;
+      options || (options = {});
+      if (!this.selected[model.cid]) { return; }
+&nbsp;
+      delete this.selected[model.cid];
+      this.selectedLength = _.size(this.selected);
+&nbsp;
+      if (!options._skipModelCall) model.deselect(stripLocalOptions(options));
+      triggerMultiSelectEvents(this, prevSelected, options);
+    },
+&nbsp;
+    // Select all models in this collection
+    selectAll: function (options) {
+      var prevSelected = multiSelectionToArray(this.selected),
+          reselected = [];
+&nbsp;
+      options || (options = {});
+      options._processedBy || (options._processedBy = []);
+&nbsp;
+      this.selectedLength = 0;
+      this.each(function (model) {
+        this.selectedLength++;
+        if (this.selected[model.cid]) reselected.push(model);
+        this.select(model, _.extend({}, options, {_silentLocally: true}));
+      }, this);
+      options._processedBy[this._pickyCid] = this;
+&nbsp;
+      triggerMultiSelectEvents(this, prevSelected, options, reselected);
+    },
+&nbsp;
+    // Deselect all models in this collection
+    deselectAll: function (options) {
+      var prevSelected;
+&nbsp;
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (this.selectedLength === 0) { <span class="cstat-no" title="statement not covered" >return; </span>}
+      prevSelected = multiSelectionToArray(this.selected);
+&nbsp;
+      this.each(function (model) {
+        if (model.selected) this.selectedLength--;
+        this.deselect(model, _.extend({}, options, {_silentLocally: true}));
+      }, this);
+&nbsp;
+      this.selectedLength = 0;
+      triggerMultiSelectEvents(this, prevSelected, options);
+    },
+&nbsp;
+    selectNone: function (options) {
+      this.deselectAll(options);
+    },
+&nbsp;
+    // Toggle select all / none. If some are selected, it
+    // will select all. If all are selected, it will select 
+    // none. If none are selected, it will select all.
+    toggleSelectAll: function (options) {
+      if (this.selectedLength === this.length) {
+        this.deselectAll(options);
+      } else {
+        this.selectAll(options);
+      }
+    },
+&nbsp;
+    close: function () {
+      unregisterCollectionWithModels(this);
+      this.stopListening();
+    }
+  });
+&nbsp;
+  // Select.Selectable
+  // ----------------
+  // A selectable mixin for Backbone.Model, allowing a model to be selected,
+  // enabling it to work with Select.MultiSelect or on it's own
+&nbsp;
+  Select.Selectable = function (model) {
+    this.model = model;
+    this.trigger = trigger(model);
+  };
+&nbsp;
+  _.extend(Select.Selectable.prototype, {
+&nbsp;
+    // Select this model, and tell our
+    // collection that we're selected
+    select: function (options) {
+      var reselected = this.selected;
+&nbsp;
+      options || (options = {});
+      options._processedBy || (options._processedBy = []);
+&nbsp;
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (options._processedBy[this.cid]) { <span class="cstat-no" title="statement not covered" >return; </span>}
+&nbsp;
+      this.selected = true;
+      options._processedBy[this.cid] = this;
+&nbsp;
+      if (this._pickyCollections) {
+        // Model-sharing mode: notify collections with an event
+        this.trigger("_selected", this, stripLocalOptions(options));
+      } else if (this.collection) {
+        // Single collection only: no event listeners set up in collection, call
+        // it directly
+        if (!options._processedBy[this.collection._pickyCid]) this.collection.select(this, stripLocalOptions(options));
+      }
+&nbsp;
+      if (!(options.silent || options._silentLocally)) {
+        if (reselected) {
+          if (!options._silentReselect) this.trigger("reselected", this, stripInternalOptions(options));
+        } else {
+          this.trigger("selected", this, stripInternalOptions(options));
+        }
+      }
+    },
+&nbsp;
+    // Deselect this model, and tell our
+    // collection that we're deselected
+    deselect: function (options) {
+      options || (options = {});
+      if (!this.selected) { return; }
+&nbsp;
+      this.selected = false;
+&nbsp;
+      if (this._pickyCollections) {
+        // Model-sharing mode: notify collections with an event
+        this.trigger("_deselected", this, stripLocalOptions(options));
+      } else if (this.collection) {
+        // Single collection only: no event listeners set up in collection, call
+        // it directly
+        this.collection.deselect(this, stripLocalOptions(options));
+      }
+&nbsp;
+      if (!(options.silent || options._silentLocally)) this.trigger("deselected", this, stripInternalOptions(options));
+    },
+&nbsp;
+    // Change selected to the opposite of what
+    // it currently is
+    toggleSelected: function (options) {
+      if (this.selected) {
+        this.deselect(options);
+      } else {
+        this.select(options);
+      }
+    }
+  });
+&nbsp;
+  // Applying the mixin: class methods for setup
+  Select.Selectable.applyTo = function (hostObject) {
+    _.extend(hostObject, new Backbone.Select.Selectable(hostObject));
+  };
+&nbsp;
+  Select.SingleSelect.applyTo = function (hostObject, models) {
+    var singleSelect;
+&nbsp;
+    if (arguments.length &lt; 2) {
+      // standard mode
+      singleSelect =  new Backbone.Select.SingleSelect(hostObject);
+    } else {
+      // model-sharing mode
+      singleSelect =  new Backbone.Select.SingleSelect(hostObject, models);
+    }
+&nbsp;
+    _.extend(hostObject, singleSelect);
+  };
+&nbsp;
+  Select.MultiSelect.applyTo = function (hostObject, models) {
+    var multiSelect;
+&nbsp;
+    if (arguments.length &lt; 2) {
+      // standard mode
+      multiSelect =  new Backbone.Select.MultiSelect(hostObject);
+    } else {
+      // model-sharing mode
+      multiSelect =  new Backbone.Select.MultiSelect(hostObject, models);
+    }
+&nbsp;
+    _.extend(hostObject, multiSelect);
+  };
+&nbsp;
+  // Helper Methods
+  // --------------
+&nbsp;
+  // Trigger events from a multi-select collection based on the number of
+  // selected items.
+  var triggerMultiSelectEvents = function (collection, prevSelected, options, reselected) {
+    function mapCidsToModels (cids, collection, previousSelection) {
+      function mapper (cid) {
+        // Find the model in the collection. If not found, it has been removed,
+        // so get it from the array of previously selected models.
+        return collection.get(cid) || previousSelection[cid];
+      }
+      return _.map(cids, mapper);
+    }
+&nbsp;
+    options || (options = {});
+    if (options.silent || options._silentLocally) return;
+&nbsp;
+    var selectedLength = collection.selectedLength,
+        length = collection.length,
+        prevSelectedCids = _.keys(prevSelected),
+        selectedCids = _.keys(collection.selected),
+        addedCids = _.difference( selectedCids, prevSelectedCids ),
+        removedCids = _.difference( prevSelectedCids, selectedCids ),
+        unchanged = (selectedLength === prevSelectedCids.length &amp;&amp; addedCids.length === 0 &amp;&amp; removedCids.length === 0),
+        diff;
+&nbsp;
+    if (reselected &amp;&amp; reselected.length &amp;&amp; !options._silentReselect) {
+      collection.trigger("reselect:any", reselected, collection, stripInternalOptions(options));
+    }
+&nbsp;
+    if (unchanged) return;
+&nbsp;
+    diff = {
+      selected: mapCidsToModels(addedCids, collection, prevSelected),
+      deselected: mapCidsToModels(removedCids, collection, prevSelected)
+    };
+&nbsp;
+    if (selectedLength === length) {
+      collection.trigger("select:all", diff, collection, stripInternalOptions(options));
+      return;
+    }
+&nbsp;
+    if (selectedLength === 0) {
+      collection.trigger("select:none", diff, collection, stripInternalOptions(options));
+      return;
+    }
+&nbsp;
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (selectedLength &gt; 0 &amp;&amp; selectedLength &lt; length) {
+      collection.trigger("select:some", diff, collection, stripInternalOptions(options));
+      return;
+    }
+  };
+&nbsp;
+  function onAdd (model, collection) {
+    registerCollectionWithModel(model, collection);
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (model.selected) collection.select(model, {_silentReselect: true, _externalEvent: "add"});
+  }
+&nbsp;
+  function onRemove (model, collection, options) {
+    releaseModel(model, collection, _.extend({}, options, {_externalEvent: "remove"}));
+  }
+&nbsp;
+  function releaseModel (model, collection, options) {
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (model._pickyCollections) model._pickyCollections = _.without(model._pickyCollections, collection._pickyCid);
+    if (model.selected) {
+      if (model._pickyCollections &amp;&amp; model._pickyCollections.length === 0) {
+        collection.deselect(model, options);
+      } else {
+        collection.deselect(model, _.extend({}, options, {_skipModelCall: true}));
+      }
+    }
+  }
+&nbsp;
+  function onResetSingleSelect (collection, options) {
+    var selected,
+        excessiveSelections,
+        deselectOnRemove = _.find(options.previousModels, function (model) { return model.selected; });
+&nbsp;
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (deselectOnRemove) releaseModel(deselectOnRemove, collection, {_silentLocally: true});
+&nbsp;
+    selected = collection.filter(function (model) { return model.selected; });
+    excessiveSelections = _.initial(selected);
+    if (excessiveSelections.length) _.each(excessiveSelections, function (model) { model.deselect(); });
+    if (selected.length) collection.select(_.last(selected), {silent: true});
+  }
+&nbsp;
+  function onResetMultiSelect (collection, options) {
+    var select,
+        deselect = _.filter(options.previousModels, function (model) { return model.selected; });
+&nbsp;
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (deselect) _.each(deselect, function (model) { releaseModel(model, collection, {_silentLocally: true}); });
+&nbsp;
+    select = collection.filter(function (model) { return model.selected; });
+    if (select.length) _.each(select, function (model) { collection.select(model, {silent: true}); });
+  }
+&nbsp;
+  function registerCollectionWithModel (model, collection) {
+    model._pickyCollections || (model._pickyCollections = []);
+    model._pickyCollections.push(collection._pickyCid);
+  }
+&nbsp;
+  function unregisterCollectionWithModels (collection) {
+    collection.each(function (model) {
+      releaseModel(model, collection, {_silentLocally: true});
+    });
+  }
+&nbsp;
+  function stripLocalOptions (options) {
+    return _.omit(options, "_silentLocally", "_externalEvent");
+  }
+&nbsp;
+  function stripInternalOptions (options) {
+    return _.omit(options, "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy");
+  }
+&nbsp;
+  function multiSelectionToArray (selectionsHash) {
+    function mapper (value, key) {
+      selectedArr[key] = value;
+    }
+&nbsp;
+    var selectedArr = [];
+    _.each(selectionsHash, mapper);
+&nbsp;
+    return selectedArr;
+  }
+&nbsp;
+  // Creates a new trigger method which calls the predefined event handlers
+  // (onDeselect etc) as well as triggering the event.
+  //
+  // Adapted from Marionette.triggerMethod.
+  function trigger (context) {
+&nbsp;
+    // Take the event section ("section1:section2:section3")
+    // and turn it into an uppercase name
+    //noinspection JSUnusedLocalSymbols
+    function getEventName (match, prefix, eventName) {
+      return eventName.toUpperCase();
+    }
+&nbsp;
+    // Unifies event names for the method call:
+    // - (re, de)selected   =&gt; (re, de)select
+    // - (re, de)select:one =&gt; (re, de)select
+    // - reselect:any       =&gt; reselect
+    function unifyEventNames (eventName) {
+      if (eventName.slice(-2) === "ed" ) {
+        eventName = eventName.slice(0, -2);
+      } else if (eventName.slice(-4) === ":one" || eventName.slice(-4) === ":any") {
+        eventName = eventName.slice(0, -4);
+      }
+&nbsp;
+      return eventName;
+    }
+&nbsp;
+    var origTrigger = context.trigger,
+&nbsp;
+    // Split the event name on the ":"
+        splitter = /(^|:)(\w)/gi;
+&nbsp;
+    // Return an augmented trigger method implementation, in order to replace
+    // the original trigger method
+    return function (event, eventArgs) {
+      // get the method name from the event name
+      var unifiedEvent = unifyEventNames(event),
+          methodName = 'on' + unifiedEvent.replace(splitter, getEventName),
+          method = this[methodName];
+&nbsp;
+      // call the onMethodName if it exists
+      if (_.isFunction(method)) {
+        // pass all trigger arguments, except the event name
+        method.apply(this, _.tail(arguments));
+      }
+&nbsp;
+      // trigger the event
+      origTrigger.apply(this, arguments);
+      return this;
+&nbsp;
+    };
+  }
+&nbsp;
+  return Select;
+})(Backbone, _);
+&nbsp;</pre></td></tr>
+</table></pre>
+
+</div>
+<div class="footer">
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Feb 11 2014 13:53:45 GMT+0100 (Mitteleuropäische Zeit)</div>
+</div>
+
+<script src="../prettify.js"></script>
+
+<script src="http://yui.yahooapis.com/3.6.0/build/yui/yui-min.js"></script>
+<script>
+
+    YUI().use('datatable', function (Y) {
+
+        var formatters = {
+          pct: function (o) {
+              o.className += o.record.get('classes')[o.column.key];
+              try {
+                  return o.value.toFixed(2) + '%';
+              } catch (ex) { return o.value + '%'; }
+          },
+          html: function (o) {
+              o.className += o.record.get('classes')[o.column.key];
+              return o.record.get(o.column.key + '_html');
+          }
+        },
+          defaultFormatter = function (o) {
+              o.className += o.record.get('classes')[o.column.key];
+              return o.value;
+          };
+
+        function getColumns(theadNode) {
+            var colNodes = theadNode.all('tr th'),
+                cols = [],
+                col;
+            colNodes.each(function (colNode) {
+                col = {
+                    key: colNode.getAttribute('data-col'),
+                    label: colNode.get('innerHTML') || ' ',
+                    sortable: !colNode.getAttribute('data-nosort'),
+                    className: colNode.getAttribute('class'),
+                    type: colNode.getAttribute('data-type'),
+                    allowHTML: colNode.getAttribute('data-html') === 'true' || colNode.getAttribute('data-fmt') === 'html'
+                };
+                col.formatter = formatters[colNode.getAttribute('data-fmt')] || defaultFormatter;
+                cols.push(col);
+            });
+            return cols;
+        }
+
+        function getRowData(trNode, cols) {
+            var tdNodes = trNode.all('td'),
+                    i,
+                    row = { classes: {} },
+                    node,
+                    name;
+            for (i = 0; i < cols.length; i += 1) {
+                name = cols[i].key;
+                node = tdNodes.item(i);
+                row[name] = node.getAttribute('data-value') || node.get('innerHTML');
+                row[name + '_html'] = node.get('innerHTML');
+                row.classes[name] = node.getAttribute('class');
+                //Y.log('Name: ' + name + '; Value: ' + row[name]);
+                if (cols[i].type === 'number') { row[name] = row[name] * 1; }
+            }
+            //Y.log(row);
+            return row;
+        }
+
+        function getData(tbodyNode, cols) {
+            var data = [];
+            tbodyNode.all('tr').each(function (trNode) {
+                data.push(getRowData(trNode, cols));
+            });
+            return data;
+        }
+
+        function replaceTable(node) {
+            if (!node) { return; }
+            var cols = getColumns(node.one('thead')),
+                data = getData(node.one('tbody'), cols),
+                table,
+                parent = node.get('parentNode');
+
+            table = new Y.DataTable({
+                columns: cols,
+                data: data,
+                sortBy: 'file'
+            });
+            parent.set('innerHTML', '');
+            table.render(parent);
+        }
+
+        Y.on('domready', function () {
+            replaceTable(Y.one('div.coverage-summary table'));
+            if (typeof prettyPrint === 'function') {
+                prettyPrint();
+            }
+        });
+    });
+</script>
+</body>
+</html>
