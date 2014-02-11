@@ -8,36 +8,7 @@ Backbone.Select = (function (Backbone, _) {
   // model within the collection causes the previous model to be
   // deselected.
 
-  Select.One = function(collection, models, options){
-    this._pickyCid = _.uniqueId('singleSelect');
-    this.collection = collection;
-    this.trigger = trigger(collection);
-
-    if (options && options.enableModelSharing) {
-
-      // model-sharing mode
-      _.each(models || [], function (model) {
-        registerCollectionWithModel(model, this);
-        if (model.selected) {
-          if (this.selected) this.selected.deselect();
-          this.selected = model;
-        }
-      }, this);
-
-      this.collection.listenTo(this.collection, '_selected', this.select);
-      this.collection.listenTo(this.collection, '_deselected', this.deselect);
-
-      this.collection.listenTo(this.collection, 'reset', onResetSingleSelect);
-      this.collection.listenTo(this.collection, 'add', onAdd);
-      this.collection.listenTo(this.collection, 'remove', onRemove);
-
-      // Mode flag, undocumented, but part of the API (monitored by tests). Can
-      // be queried safely by other components. Use it read-only.
-      this._modelSharingEnabled = true;
-
-    }
-
-  };
+  Select.One = function(){};
 
   _.extend(Select.One.prototype, {
 
@@ -96,34 +67,7 @@ Backbone.Select = (function (Backbone, _) {
   // have multiple items selected, including `selectAll` and `deselectAll`
   // capabilities.
 
-  Select.Many = function (collection, models, options) {
-    this._pickyCid = _.uniqueId('multiSelect');
-    this.collection = collection;
-    this.selected = {};
-    this.trigger = trigger(collection);
-
-    if (options && options.enableModelSharing) {
-
-      // 'models' argument provided, model-sharing mode
-      _.each(models || [], function (model) {
-        registerCollectionWithModel(model, this);
-        if (model.selected) this.selected[model.cid] = model;
-      }, this);
-
-      this.collection.listenTo(this.collection, '_selected', this.select);
-      this.collection.listenTo(this.collection, '_deselected', this.deselect);
-
-      this.collection.listenTo(this.collection, 'reset', onResetMultiSelect);
-      this.collection.listenTo(this.collection, 'add', onAdd);
-      this.collection.listenTo(this.collection, 'remove', onRemove);
-
-      // Mode flag, undocumented, but part of the API (monitored by tests). Can
-      // be queried safely by other components. Use it read-only.
-      this._modelSharingEnabled = true;
-
-    }
-
-  };
+  Select.Many = function () {};
 
   _.extend(Select.Many.prototype, {
 
@@ -224,12 +168,9 @@ Backbone.Select = (function (Backbone, _) {
   // Select.Me
   // ----------------
   // A selectable mixin for Backbone.Model, allowing a model to be selected,
-  // enabling it to work with Select.Many or on it's own
+  // enabling it to work with Select.One or Select.Many, or on it's own.
 
-  Select.Me = function (model) {
-    this.model = model;
-    this.trigger = trigger(model);
-  };
+  Select.Me = function () {};
 
   _.extend(Select.Me.prototype, {
 
@@ -297,15 +238,72 @@ Backbone.Select = (function (Backbone, _) {
 
   // Applying the mixin: class methods for setup
   Select.Me.applyTo = function (hostObject) {
-    _.extend(hostObject, new Backbone.Select.Me(hostObject));
+    _.extend(hostObject, new Backbone.Select.Me());
+    hostObject.trigger = trigger(hostObject);
   };
 
   Select.One.applyTo = function (hostObject, models, options) {
-    _.extend(hostObject, new Backbone.Select.One(hostObject, models, options));
+
+    _.extend(hostObject, new Backbone.Select.One());
+
+    hostObject._pickyCid = _.uniqueId('singleSelect');
+    hostObject.trigger = trigger(hostObject);
+
+    if (options && options.enableModelSharing) {
+
+      // model-sharing mode
+      _.each(models || [], function (model) {
+        registerCollectionWithModel(model, hostObject);
+        if (model.selected) {
+          if (hostObject.selected) hostObject.selected.deselect();
+          hostObject.selected = model;
+        }
+      });
+
+      hostObject.listenTo(hostObject, '_selected', hostObject.select);
+      hostObject.listenTo(hostObject, '_deselected', hostObject.deselect);
+
+      hostObject.listenTo(hostObject, 'reset', onResetSingleSelect);
+      hostObject.listenTo(hostObject, 'add', onAdd);
+      hostObject.listenTo(hostObject, 'remove', onRemove);
+
+      // Mode flag, undocumented, but part of the API (monitored by tests). Can
+      // be queried safely by other components. Use it read-only.
+      hostObject._modelSharingEnabled = true;
+
+    }
+
   };
 
   Select.Many.applyTo = function (hostObject, models, options) {
-    _.extend(hostObject, new Backbone.Select.Many(hostObject, models, options));
+
+    _.extend(hostObject, new Backbone.Select.Many());
+
+    hostObject._pickyCid = _.uniqueId('multiSelect');
+    hostObject.selected = {};
+    hostObject.trigger = trigger(hostObject);
+
+    if (options && options.enableModelSharing) {
+
+      // model-sharing mode
+      _.each(models || [], function (model) {
+        registerCollectionWithModel(model, hostObject);
+        if (model.selected) hostObject.selected[model.cid] = model;
+      });
+
+      hostObject.listenTo(hostObject, '_selected', hostObject.select);
+      hostObject.listenTo(hostObject, '_deselected', hostObject.deselect);
+
+      hostObject.listenTo(hostObject, 'reset', onResetMultiSelect);
+      hostObject.listenTo(hostObject, 'add', onAdd);
+      hostObject.listenTo(hostObject, 'remove', onRemove);
+
+      // Mode flag, undocumented, but part of the API (monitored by tests). Can
+      // be queried safely by other components. Use it read-only.
+      hostObject._modelSharingEnabled = true;
+
+    }
+
   };
 
   // Helper Methods
