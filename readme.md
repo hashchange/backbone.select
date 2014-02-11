@@ -4,7 +4,9 @@ Selecting Backbone models, managing selections in Backbone collections.
 
 ## Source Code And Downloads
 
-You can download the raw source code from the "src" 
+The component is available with Bower: `bower install backbone.select`.
+
+Alternatively, you can download the raw source code from the "src"
 folder above, or grab one of the builds from the 
 "lib" folder. 
 
@@ -694,13 +696,13 @@ Backbone.Picky has a smaller feature set than Backbone.Select and doesn't handle
 - You can read the source of Backbone.Picky in minutes and understand every aspect of it.
 - Because it is easy to understand, it is also easy to tweak. If you adapt the code and make it fit your needs, you are unlikely to accidentally mess up the component.
 
-Conversely, you might want to go with Backbone.Select because there is less need to hack it.
+Simplicity is a virtue. If that is what you want, Picky is the better choice. Conversely, you might want to go with Backbone.Select because there is less need to hack it.
 
 - If you share models among multiple collections, by all means, choose Backbone.Select. It takes care of all the quirks, and there are many. Backbone.Picky doesn't support model sharing.
 - Additions, resets, and models passed in during instantiation are taken care of.
 - You get a richer set of events, more helpful data emitted by these events, a `silent` option, custom options pass-through, predefined event handlers (`onSelect` etc).
 - Better events make it less likely you ever need to touch the component itself. Your adaptations can go into event handlers, allowing for a clean design.
-- Backbone.Select is extremely well tested. Even though the code is (a little) more complex than Backbone.Picky, you can tweak it without hesitation. If you mess up, the unit test will tell you.
+- Backbone.Select is extremely well tested. Even though the code is (a little) more complex than Backbone.Picky, you can tweak it without hesitation. If you mess up, a unit test will tell you.
 
 ### Compatibility
 
@@ -763,7 +765,7 @@ see all of the specs for Backbone.Select
 
 ## Release Notes
 
-### pre v0.3.0
+### v1.0.0
 
 * Forked Backbone.Picky, renaming the project to Backbone.Select
 * Renamed components to Select.Me (former Selectable), Select.One (former SingleSelect), Select.Many (former MultiSelect)
@@ -803,9 +805,9 @@ see all of the specs for Backbone.Select
 
 ## Credits, Copyright, MIT License
 
-Special credits go to [Derick Bailey][muted-solutions], who created the original version of this component, called [Backbone.Picky][]. It is still around; see the [Backbone.Picky Compatibility section][compatibility] for the differences.
+Special credits go to [Derick Bailey][muted-solutions], who created the original version of this component, [Backbone.Picky][]. It is still around; see the [Backbone.Picky Compatibility section][compatibility] for the differences.
 
-Copyright (c) 2014 Michael Heim
+Copyright (c) 2014 Michael Heim<br>
 Copyright (c) 2013 Derick Bailey, Muted Solutions, LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -815,6 +817,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 [sharing]: #sharing-models-among-collections
-[compatibility]: #backbone-picky-compatibility
+[compatibility]: #backbone.picky-compatibility
 [muted-solutions]: http://mutedsolutions.com/ "Muted Solutions, LLC"
 [Backbone.Picky]: https://github.com/derickbailey/backbone.picky#readme "Backbone.Picky"

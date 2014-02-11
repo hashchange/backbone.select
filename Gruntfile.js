@@ -7,7 +7,8 @@ module.exports = function(grunt) {
     meta: {
       version: '<%= pkg.version %>',
       banner: '// Backbone.Select, v<%= meta.version %>\n' +
-        '// Copyright (c)<%= grunt.template.today("yyyy") %> Derick Bailey, Muted Solutions, LLC.\n' +
+        '// Copyright (c) <%= grunt.template.today("yyyy") %> Michael Heim\n' +
+        '//           (c) 2013 Derick Bailey, Muted Solutions, LLC.\n' +
         '// Distributed under MIT license\n' +
         '// http://github.com/hashchange/backbone.select\n' +
         '\n'
