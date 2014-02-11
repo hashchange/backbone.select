@@ -8,14 +8,14 @@ Backbone.Select = (function (Backbone, _) {
   // model within the collection causes the previous model to be
   // deselected.
 
-  Select.One = function(collection, models){
+  Select.One = function(collection, models, options){
     this._pickyCid = _.uniqueId('singleSelect');
     this.collection = collection;
     this.trigger = trigger(collection);
 
-    if (arguments.length > 1) {
+    if (options && options.enableModelSharing) {
 
-      // 'models' argument provided, model-sharing mode
+      // model-sharing mode
       _.each(models || [], function (model) {
         registerCollectionWithModel(model, this);
         if (model.selected) {
@@ -96,13 +96,13 @@ Backbone.Select = (function (Backbone, _) {
   // have multiple items selected, including `selectAll` and `deselectAll`
   // capabilities.
 
-  Select.Many = function (collection, models) {
+  Select.Many = function (collection, models, options) {
     this._pickyCid = _.uniqueId('multiSelect');
     this.collection = collection;
     this.selected = {};
     this.trigger = trigger(collection);
 
-    if (arguments.length > 1) {
+    if (options && options.enableModelSharing) {
 
       // 'models' argument provided, model-sharing mode
       _.each(models || [], function (model) {
@@ -300,32 +300,12 @@ Backbone.Select = (function (Backbone, _) {
     _.extend(hostObject, new Backbone.Select.Me(hostObject));
   };
 
-  Select.One.applyTo = function (hostObject, models) {
-    var singleSelect;
-
-    if (arguments.length < 2) {
-      // standard mode
-      singleSelect =  new Backbone.Select.One(hostObject);
-    } else {
-      // model-sharing mode
-      singleSelect =  new Backbone.Select.One(hostObject, models);
-    }
-
-    _.extend(hostObject, singleSelect);
+  Select.One.applyTo = function (hostObject, models, options) {
+    _.extend(hostObject, new Backbone.Select.One(hostObject, models, options));
   };
 
-  Select.Many.applyTo = function (hostObject, models) {
-    var multiSelect;
-
-    if (arguments.length < 2) {
-      // standard mode
-      multiSelect =  new Backbone.Select.Many(hostObject);
-    } else {
-      // model-sharing mode
-      multiSelect =  new Backbone.Select.Many(hostObject, models);
-    }
-
-    _.extend(hostObject, multiSelect);
+  Select.Many.applyTo = function (hostObject, models, options) {
+    _.extend(hostObject, new Backbone.Select.Many(hostObject, models, options));
   };
 
   // Helper Methods

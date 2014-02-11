@@ -221,8 +221,8 @@ SelectableModel = Backbone.Model.extend({
 SingleCollection = Backbone.Collection.extend({
   model: SelectableModel,
 
-  initialize: function(){
-    Backbone.Select.One.applyTo(this);
+  initialize: function(models){
+    Backbone.Select.One.applyTo(this, models);
   }
 });
 ```
@@ -231,21 +231,20 @@ Replace `Backbone.Collection` in the example above with whatever base type you
 work with.
 
 If you share models among multiple collections, Backbone.Select will handle the
-interaction for you. To turn on model-sharing mode, you must provide the models
-as a second argument during initialization:
+interaction for you. You must turn on model-sharing mode explicitly, with the
+`enableModelSharing` option:
 
 ```js
 SingleCollection = Backbone.Collection.extend({
   model: SelectableModel,
 
   initialize: function(models){
-    Backbone.Select.One.applyTo(this, models);
+    Backbone.Select.One.applyTo(this, models, { enableModelSharing: true });
   }
 });
 ```
 
-See the [section on model sharing][sharing], below,
-for more.
+See the [section on model sharing][sharing], below, for more.
 
 ### Backbone.Select.One Methods
 
@@ -375,8 +374,8 @@ SelectableModel = Backbone.Model.extend({
 MultiCollection = Backbone.Collection.extend({
   model: SelectableModel,
 
-  initialize: function(){
-    Backbone.Select.Many.applyTo(this);
+  initialize: function(models){
+    Backbone.Select.Many.applyTo(this, models);
   }
 });
 ```
@@ -385,21 +384,20 @@ Replace `Backbone.Collection` in the example above with whatever base type you
 work with.
 
 If you share models among different collections, Backbone.Select will handle the
-interaction for you. To turn on model-sharing mode, you must provide the models
-as a second argument during initialization:
+interaction for you. You must turn on model-sharing mode explicitly, with the
+`enableModelSharing` option:
 
 ```js
 MultiCollection = Backbone.Collection.extend({
   model: SelectableModel,
 
   initialize: function(models){
-    Backbone.Select.Many.applyTo(this, models);
+    Backbone.Select.Many.applyTo(this, models, { enableModelSharing: true });
   }
 });
 ```
 
-See the [section on model sharing][sharing], below,
-for more.
+See the [section on model sharing][sharing], below, for more.
 
 ### Backbone.Select.Many Methods
 
@@ -608,20 +606,13 @@ the same time. Backbone.Select handles all aspects of it:
 
 ### Enabling model sharing
 
-To enable model sharing, models passed in during instantiation must be passed on
-to the mixin constructor. Create the mixin with
+To enable model sharing, use the option `enableModelSharing`. Create the mixin
+with
 
-    Backbone.Select.One.applyTo(this, models)
+    Backbone.Select.One.applyTo(this, models, { enableModelSharing: true })
 
-instead of `Backbone.Select.One.applyTo(this)` (without the `models`
-argument).
-
-Do that even if you never populate your collection during instantiation, and the
-`models` argument evaluates to `undefined` all the time. The parameter must be
-specified regardless.
-
-Setting up the second parameter like this turns on the "model-sharing mode". See
-the Basic Usage sections of Backbone.Select.One and Backbone.Select.Many.
+and likewise for Backbone.Select.Many. See the Basic Usage sections of
+Backbone.Select.One and Backbone.Select.Many.
 
 ### Restrictions when sharing models
 
@@ -713,27 +704,37 @@ Conversely, you might want to go with Backbone.Select because there is less need
 
 ### Compatibility
 
-Backbone.Select is fully compatible to Backbone.Picky once you have instantiated it. All you have to change is the way the mixin is applied.
+Backbone.Select is fully compatible to Backbone.Picky once you have instantiated it. You only have to change the way the mixin is created and applied to an object.
 
-For Picky.Selectable, the former instantiation of
+Picky.Selectable was applied like this:
 
     initialize: function () {
         var selectable = new Backbone.Picky.Selectable(this);
         _.extend(this, selectable);
     }
 
-becomes
+Now, it becomes
 
     initialize: function () {
         Backbone.Select.Me.applyTo(this);
     }
 
-Likewise, when replacing Picky.SingleSelect and Picky.MultiSelect, use
+Similarly, the initialization of Picky.SingleSelect
 
-    Backbone.Select.One.applyTo(this);
-    Backbone.Select.Many.applyTo(this);
+    initialize: function () {
+        var singleSelect = new Backbone.Picky.SingleSelect(this);
+        _.extend(this, singleSelect);
+    }
 
-If you want to [enable model sharing][sharing], you need to pass in a `models` argument as well, [see above][sharing].
+is replaced by
+
+    initialize: function (models) {
+        Backbone.Select.One.applyTo(this, models);
+    }
+
+Picky.MultiSelect is treated the same way. Use `Backbone.Select.Many.applyTo(this, models)`.
+
+If you want to [enable model sharing][sharing] in a Select.One or Select.Many collection, you need to pass in an options hash as the third argument: `{ enableModelSharing: true }`. [See above][sharing].
 
 ## Building Backbone.Select
 

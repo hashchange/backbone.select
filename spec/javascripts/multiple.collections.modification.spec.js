@@ -10,7 +10,7 @@ describe("models shared between multiple collections", function(){
     model: Model,
 
     initialize: function(models){
-      Backbone.Select.One.applyTo(this, models);
+      Backbone.Select.One.applyTo(this, models, { enableModelSharing: true });
     }
   });
 
@@ -18,7 +18,7 @@ describe("models shared between multiple collections", function(){
     model: Model,
 
     initialize: function(models){
-      Backbone.Select.Many.applyTo(this, models);
+      Backbone.Select.Many.applyTo(this, models, { enableModelSharing: true });
     }
   });
 

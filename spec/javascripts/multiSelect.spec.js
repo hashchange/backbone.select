@@ -8,8 +8,8 @@ describe("multi-select collection: general", function(){
   var Collection = Backbone.Collection.extend({
     model: Model,
 
-    initialize: function(){
-      Backbone.Select.Many.applyTo(this);
+    initialize: function(models){
+      Backbone.Select.Many.applyTo(this, models);
     }
   });
 
@@ -79,7 +79,7 @@ describe("multi-select collection: general", function(){
       beforeEach(function () {
         SharingCollection = Backbone.Collection.extend({
           initialize: function(models){
-            Backbone.Select.Many.applyTo(this, models);
+            Backbone.Select.Many.applyTo(this, models, { enableModelSharing: true });
           }
         });
       });
@@ -148,7 +148,7 @@ describe("multi-select collection: general", function(){
           model: Model,
 
           initialize: function(models){
-            Backbone.Select.Many.applyTo(this, models);
+            Backbone.Select.Many.applyTo(this, models, { enableModelSharing: true });
           }
         });
 

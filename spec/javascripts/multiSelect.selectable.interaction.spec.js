@@ -8,8 +8,8 @@ describe("multi-select collection: interaction with selectable models", function
   var Collection = Backbone.Collection.extend({
     model: Model,
 
-      initialize: function(){
-        Backbone.Select.Many.applyTo(this);
+      initialize: function(models){
+        Backbone.Select.Many.applyTo(this, models);
       }
   });
 
