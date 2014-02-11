@@ -1,7 +1,7 @@
 describe("multi-select collection: interaction with selectable models", function(){
   var Model = Backbone.Model.extend({
     initialize: function(){
-      Backbone.Picky.Selectable.applyTo(this);
+      Backbone.Select.Selectable.applyTo(this);
     }
   });
 
@@ -9,7 +9,7 @@ describe("multi-select collection: interaction with selectable models", function
     model: Model,
 
       initialize: function(){
-        Backbone.Picky.MultiSelect.applyTo(this);
+        Backbone.Select.MultiSelect.applyTo(this);
       }
   });
 

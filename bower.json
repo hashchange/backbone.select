@@ -1,14 +1,20 @@
 {
-  "name": "backbone.picky",
+  "name": "backbone.select",
   "version": "0.2.0",
-  "homepage": "https://github.com/derickbailey/backbone.picky",
+  "homepage": "https://github.com/hashchange/backbone.select",
   "authors": [
+    "Michael Heim <heim@zeilenwechsel.de>",
     "Derick Bailey <derickbailey@gmail.com>"
   ],
-  "description": "selectable entities as mixins for Backbone.Model and Backbone.Collection",
-  "main": "lib/backbone.picky.js",
+  "description": "Selecting Backbone models, managing selections in Backbone collections.",
+  "main": "lib/backbone.select.js",
   "keywords": [
-    "backbone"
+    "backbone",
+    "picky",
+    "selection",
+    "select",
+    "models",
+    "collections"
   ],
   "license": "MIT",
   "ignore": [

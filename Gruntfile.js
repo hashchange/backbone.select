@@ -6,10 +6,10 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     meta: {
       version: '<%= pkg.version %>',
-      banner: '// Backbone.Picky, v<%= meta.version %>\n' +
+      banner: '// Backbone.Select, v<%= meta.version %>\n' +
         '// Copyright (c)<%= grunt.template.today("yyyy") %> Derick Bailey, Muted Solutions, LLC.\n' +
         '// Distributed under MIT license\n' +
-        '// http://github.com/derickbailey/backbone.picky\n' +
+        '// http://github.com/hashchange/backbone.select\n' +
         '\n'
     },
 
@@ -17,12 +17,12 @@ module.exports = function(grunt) {
       // Currently works as a copy
       build: {
         files: {
-          'lib/backbone.picky.js' : 'src/backbone.picky.js'
+          'lib/backbone.select.js' : 'src/backbone.select.js'
         }
       },
       amd: {
         files: {
-          'lib/amd/backbone.picky.js' : 'src/amd.js'
+          'lib/amd/backbone.select.js' : 'src/amd.js'
         }
       }
     },
@@ -32,12 +32,12 @@ module.exports = function(grunt) {
         banner: "<%= meta.banner %>"
       },
       build: {
-        src: 'lib/backbone.picky.js',
-        dest: 'lib/backbone.picky.js'
+        src: 'lib/backbone.select.js',
+        dest: 'lib/backbone.select.js'
       },
       amd_banner: {
-        src: 'lib/amd/backbone.picky.js',
-        dest: 'lib/amd/backbone.picky.js'
+        src: 'lib/amd/backbone.select.js',
+        dest: 'lib/amd/backbone.select.js'
       }
     },
 
@@ -46,15 +46,15 @@ module.exports = function(grunt) {
         banner: "<%= meta.banner %>"
       },
       amd : {
-        src : 'lib/amd/backbone.picky.js',
-        dest : 'lib/amd/backbone.picky.min.js',
+        src : 'lib/amd/backbone.select.js',
+        dest : 'lib/amd/backbone.select.min.js',
       },
       core : {
-        src : 'lib/backbone.picky.js',
-        dest : 'lib/backbone.picky.min.js',
+        src : 'lib/backbone.select.js',
+        dest : 'lib/backbone.select.min.js',
         options : {
-          sourceMap : 'lib/backbone.picky.map',
-          sourceMappingURL : 'backbone.picky.map',
+          sourceMap : 'lib/backbone.select.map',
+          sourceMappingURL : 'backbone.select.map',
           sourceMapPrefix : 1
         }
       }
@@ -70,7 +70,7 @@ module.exports = function(grunt) {
         ],
       },
       coverage : {
-        src : 'src/backbone.picky.js',
+        src : 'src/backbone.select.js',
         options : {
           template : require('grunt-template-jasmine-istanbul'),
           templateOptions: {
@@ -85,11 +85,11 @@ module.exports = function(grunt) {
       options: {
         jshintrc : '.jshintrc'
       },
-      picky : 'src/backbone.picky.js'
+      component : 'src/backbone.select.js'
     },
 
     plato: {
-      picky : {
+      component : {
         src : 'src/*.js',
         dest : 'reports',
         options : {

@@ -16,7 +16,7 @@ module.exports = function(config) {
     files: [
       '../../../public/javascripts/underscore.js',
       '../../../public/javascripts/backbone.js',
-      '../../../src/backbone.picky.js',
+      '../../../src/backbone.select.js',
       '../helpers/*.js',
       '../*.spec.js'
     ],

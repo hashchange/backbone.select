@@ -1,14 +1,14 @@
-Backbone.Picky = (function (Backbone, _) {
-  var Picky = {};
+Backbone.Select = (function (Backbone, _) {
+  var Select = {};
 
-  // Picky.SingleSelect
+  // Select.SingleSelect
   // ------------------
   // A single-select mixin for Backbone.Collection, allowing a single
   // model to be selected within a collection. Selection of another
   // model within the collection causes the previous model to be
   // deselected.
 
-  Picky.SingleSelect = function(collection, models){
+  Select.SingleSelect = function(collection, models){
     this._pickyCid = _.uniqueId('singleSelect');
     this.collection = collection;
     this.trigger = trigger(collection);
@@ -39,7 +39,7 @@ Backbone.Picky = (function (Backbone, _) {
 
   };
 
-  _.extend(Picky.SingleSelect.prototype, {
+  _.extend(Select.SingleSelect.prototype, {
 
     // Select a model, deselecting any previously
     // selected model
@@ -90,13 +90,13 @@ Backbone.Picky = (function (Backbone, _) {
 
   });
 
-  // Picky.MultiSelect
+  // Select.MultiSelect
   // -----------------
   // A multi-select mixin for Backbone.Collection, allowing a collection to
   // have multiple items selected, including `selectAll` and `deselectAll`
   // capabilities.
 
-  Picky.MultiSelect = function (collection, models) {
+  Select.MultiSelect = function (collection, models) {
     this._pickyCid = _.uniqueId('multiSelect');
     this.collection = collection;
     this.selected = {};
@@ -125,7 +125,7 @@ Backbone.Picky = (function (Backbone, _) {
 
   };
 
-  _.extend(Picky.MultiSelect.prototype, {
+  _.extend(Select.MultiSelect.prototype, {
 
     // Select a specified model, make sure the
     // model knows it's selected, and hold on to
@@ -221,17 +221,17 @@ Backbone.Picky = (function (Backbone, _) {
     }
   });
 
-  // Picky.Selectable
+  // Select.Selectable
   // ----------------
   // A selectable mixin for Backbone.Model, allowing a model to be selected,
-  // enabling it to work with Picky.MultiSelect or on it's own
+  // enabling it to work with Select.MultiSelect or on it's own
 
-  Picky.Selectable = function (model) {
+  Select.Selectable = function (model) {
     this.model = model;
     this.trigger = trigger(model);
   };
 
-  _.extend(Picky.Selectable.prototype, {
+  _.extend(Select.Selectable.prototype, {
 
     // Select this model, and tell our
     // collection that we're selected
@@ -296,33 +296,33 @@ Backbone.Picky = (function (Backbone, _) {
   });
 
   // Applying the mixin: class methods for setup
-  Picky.Selectable.applyTo = function (hostObject) {
-    _.extend(hostObject, new Backbone.Picky.Selectable(hostObject));
+  Select.Selectable.applyTo = function (hostObject) {
+    _.extend(hostObject, new Backbone.Select.Selectable(hostObject));
   };
 
-  Picky.SingleSelect.applyTo = function (hostObject, models) {
+  Select.SingleSelect.applyTo = function (hostObject, models) {
     var singleSelect;
 
     if (arguments.length < 2) {
       // standard mode
-      singleSelect =  new Backbone.Picky.SingleSelect(hostObject);
+      singleSelect =  new Backbone.Select.SingleSelect(hostObject);
     } else {
       // model-sharing mode
-      singleSelect =  new Backbone.Picky.SingleSelect(hostObject, models);
+      singleSelect =  new Backbone.Select.SingleSelect(hostObject, models);
     }
 
     _.extend(hostObject, singleSelect);
   };
 
-  Picky.MultiSelect.applyTo = function (hostObject, models) {
+  Select.MultiSelect.applyTo = function (hostObject, models) {
     var multiSelect;
 
     if (arguments.length < 2) {
       // standard mode
-      multiSelect =  new Backbone.Picky.MultiSelect(hostObject);
+      multiSelect =  new Backbone.Select.MultiSelect(hostObject);
     } else {
       // model-sharing mode
-      multiSelect =  new Backbone.Picky.MultiSelect(hostObject, models);
+      multiSelect =  new Backbone.Select.MultiSelect(hostObject, models);
     }
 
     _.extend(hostObject, multiSelect);
@@ -508,5 +508,5 @@ Backbone.Picky = (function (Backbone, _) {
     };
   }
 
-  return Picky;
+  return Select;
 })(Backbone, _);

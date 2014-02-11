@@ -1,7 +1,7 @@
 describe("multi-select collection: general", function(){
   var Model = Backbone.Model.extend({
     initialize: function(){
-      Backbone.Picky.Selectable.applyTo(this);
+      Backbone.Select.Selectable.applyTo(this);
     }
   });
   
@@ -9,7 +9,7 @@ describe("multi-select collection: general", function(){
     model: Model,
 
     initialize: function(){
-      Backbone.Picky.MultiSelect.applyTo(this);
+      Backbone.Select.MultiSelect.applyTo(this);
     }
   });
 
@@ -79,7 +79,7 @@ describe("multi-select collection: general", function(){
       beforeEach(function () {
         SharingCollection = Backbone.Collection.extend({
           initialize: function(models){
-            Backbone.Picky.MultiSelect.applyTo(this, models);
+            Backbone.Select.MultiSelect.applyTo(this, models);
           }
         });
       });
@@ -148,7 +148,7 @@ describe("multi-select collection: general", function(){
           model: Model,
 
           initialize: function(models){
-            Backbone.Picky.MultiSelect.applyTo(this, models);
+            Backbone.Select.MultiSelect.applyTo(this, models);
           }
         });
 

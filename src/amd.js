@@ -14,8 +14,8 @@
 }(this, function (_, Backbone) {
   "option strict";
 
-  // @include backbone.picky.js
-  return Backbone.Picky;
+  // @include backbone.select.js
+  return Backbone.Select;
 
 }));
 

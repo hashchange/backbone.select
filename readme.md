@@ -1,6 +1,6 @@
-# Backbone.Picky
+# Backbone.Select
 
-Selectable entities as mixins for Backbone.Model and Backbone.Collection!
+Selecting Backbone models, managing selections in Backbone collections.
 
 ## Source Code And Downloads
 
@@ -13,43 +13,29 @@ which point to the 'master' branch's builds:
 
 ### Standard Builds
 
-Development: [backbone.picky.js](https://raw.github.com/derickbailey/backbone.picky/master/lib/backbone.picky.js)
+Development: [backbone.select.js](https://raw.github.com/hashchange/backbone.select/master/lib/backbone.select.js)
 
-Production: [backbone.picky.min.js](https://raw.github.com/derickbailey/backbone.picky/master/lib/backbone.picky.min.js)
+Production: [backbone.select.min.js](https://raw.github.com/hashchange/backbone.select/master/lib/backbone.select.min.js)
 
 ### AMD/RequireJS Builds
 
-Development: [backbone.picky.js](https://raw.github.com/derickbailey/backbone.picky/master/lib/amd/backbone.picky.js)
+Development: [backbone.select.js](https://raw.github.com/hashchange/backbone.select/master/lib/amd/backbone.select.js)
 
-Production: [backbone.picky.min.js](https://raw.github.com/derickbailey/backbone.picky/master/lib/amd/backbone.picky.min.js)
-
-## Documentation
-
-This readme file contains basic usage examples and 
-details on the full API, including methods, 
-properties and events.
-
-### Annotated Source Code
-
-Picky has annotated source code using the Docco tool to turn
-comments in to documentation. This provides an in-depth look
-at what each section of is doing.
-
-##### [View The Annotated Source Code](http://derickbailey.github.com/backbone.picky/docs/backbone.picky.html)
+Production: [backbone.select.min.js](https://raw.github.com/hashchange/backbone.select/master/lib/amd/backbone.select.min.js)
 
 ## Requirements
 
-Backbone.Picky requires Backbone 0.9.9 or later.
+Backbone.Backbone.Select requires Backbone 0.9.9 or later.
 
 ## Method Name Overrides
 
 #### IMPORTANT NOTE ABOUT METHOD NAME "select"
 
-The Picky collections override the method `select` on collections. At this
+The Backbone.Select collections override the method `select` on collections. At this
 point, I can't think of a better name for specifying a model has been
 selected. Once I find a better name, the API will change. But for now,
 you will not be able to use the standard `select` method on any
-collection that has a Picky collection mixin.
+collection that has a Backbone.Select collection mixin.
 
 ## Model and Collection Interactions
 
@@ -75,17 +61,17 @@ col = new MyCollection([model]);
 col.select(model);
 ```
 
-### Model Requirements For Picky Collections
+### Model Requirements For Backbone.Select Collections
 
-Your model for a Picky collection must extend `Selectable`.
+Your model for a Backbone.Select collection must extend `Selectable`.
 
-## Components of Backbone.Picky:
+## Components of Backbone.Select:
 
-* **Picky.Selectable:** Creates select / deselect capabilities for a model
-* **Picky.MultiSelect:** Allows a collection to know about the selection of multiple models, including select all / deselect all
-* **Picky.SingleSelect:** Allow a collection to have an exclusively selected model
+* **Backbone.Select.Selectable:** Creates select / deselect capabilities for a model
+* **Backbone.Select.MultiSelect:** Allows a collection to know about the selection of multiple models, including select all / deselect all
+* **Backbone.Select.SingleSelect:** Allow a collection to have an exclusively selected model
 
-## Picky.Selectable
+## Backbone.Select.Selectable
 
 Creates selectable capabilities for a model, including tracking whether or
 not the model is selected, and raising events when selection changes.
@@ -98,7 +84,7 @@ Assuming your base type is `Backbone.Model`, augment it with
 ```js
 SelectableModel = Backbone.Model.extend({
   initialize: function(){
-    Backbone.Picky.Selectable.applyTo(this);
+    Backbone.Select.Selectable.applyTo(this);
   }
 });
 ```
@@ -186,7 +172,7 @@ currently selected.
 ### Selectable Events
 
 The events listed below are are triggered from Selectable models. Events can be
-prevented from firing when Backbone.Picky methods are called with the `silent`
+prevented from firing when Backbone.Select methods are called with the `silent`
 option, as in `myModel.select({silent: true})`.
 
 Event handlers with standard names are invoked automatically. Standard names are
@@ -214,7 +200,7 @@ Triggers when a model, which is already selected, is selected again. Provides
 the re-selected model as the first parameter. Runs the `onReselect` event
 handler if the method exists on the model.
 
-## Picky.SingleSelect
+## Backbone.Select.SingleSelect
 
 Creates single-select capabilities for a `Backbone.Collection`, allowing
 a single model to be exclusively selected within the collection. Selecting
@@ -228,7 +214,7 @@ method. Assuming your base type is `Backbone.Collection`, augment it with
 ```js
 SelectableModel = Backbone.Model.extend({
   initialize: function(){
-    Backbone.Picky.Selectable.applyTo(this);
+    Backbone.Select.Selectable.applyTo(this);
   }
 });
 
@@ -236,7 +222,7 @@ SingleCollection = Backbone.Collection.extend({
   model: SelectableModel,
 
   initialize: function(){
-    Backbone.Picky.SingleSelect.applyTo(this);
+    Backbone.Select.SingleSelect.applyTo(this);
   }
 });
 ```
@@ -244,7 +230,7 @@ SingleCollection = Backbone.Collection.extend({
 Replace `Backbone.Collection` in the example above with whatever base type you
 work with.
 
-If you share models among multiple collections, Backbone.Picky will handle the
+If you share models among multiple collections, Backbone.Select will handle the
 interaction for you. To turn on model-sharing mode, you must provide the models
 as a second argument during initialization:
 
@@ -253,12 +239,12 @@ SingleCollection = Backbone.Collection.extend({
   model: SelectableModel,
 
   initialize: function(models){
-    Backbone.Picky.SingleSelect.applyTo(this, models);
+    Backbone.Select.SingleSelect.applyTo(this, models);
   }
 });
 ```
 
-See the [section on model sharing](#sharing-models-among-collections), below,
+See the [section on model sharing][sharing], below,
 for more.
 
 ### SingleSelect Methods
@@ -337,7 +323,7 @@ myCol.selected; //=> model
 ### SingleSelect Events
 
 The events listed below are triggered by the SingleSelect based on changes in
-selection. Events can be prevented from firing when Backbone.Picky methods are
+selection. Events can be prevented from firing when Backbone.Select methods are
 called with the `silent` option, as in `myCol.select(myModel, {silent: true})`.
 
 Event handlers with standard names are invoked automatically. Standard names are
@@ -368,10 +354,10 @@ Triggered when a model, which is already selected, is selected again. Provides
 the selected model as the first parameter, and the collection as the second.
 Runs the `onReselect` event handler if the method exists on the collection.
 
-## Picky.MultiSelect
+## Backbone.Select.MultiSelect
 
 Creates multi-select capabilities for a `Backbone.Collection`, allowing one or
-more models to be selected in a collection. Picky.MultiSelect also provides
+more models to be selected in a collection. Backbone.Select.MultiSelect also provides
 "select all", "select none" and "select some" features.
 
 ### Basic Usage
@@ -382,7 +368,7 @@ method. Assuming your base type is `Backbone.Collection`, augment it with
 ```js
 SelectableModel = Backbone.Model.extend({
   initialize: function(){
-    Backbone.Picky.Selectable.applyTo(this);
+    Backbone.Select.Selectable.applyTo(this);
   }
 });
 
@@ -390,7 +376,7 @@ MultiCollection = Backbone.Collection.extend({
   model: SelectableModel,
 
   initialize: function(){
-    Backbone.Picky.MultiSelect.applyTo(this);
+    Backbone.Select.MultiSelect.applyTo(this);
   }
 });
 ```
@@ -398,7 +384,7 @@ MultiCollection = Backbone.Collection.extend({
 Replace `Backbone.Collection` in the example above with whatever base type you
 work with.
 
-If you share models among different collections, Backbone.Picky will handle the
+If you share models among different collections, Backbone.Select will handle the
 interaction for you. To turn on model-sharing mode, you must provide the models
 as a second argument during initialization:
 
@@ -407,12 +393,12 @@ MultiCollection = Backbone.Collection.extend({
   model: SelectableModel,
 
   initialize: function(models){
-    Backbone.Picky.MultiSelect.applyTo(this, models);
+    Backbone.Select.MultiSelect.applyTo(this, models);
   }
 });
 ```
 
-See the [section on model sharing](#sharing-models-among-collections), below,
+See the [section on model sharing][sharing], below,
 for more.
 
 ### MultiSelect Methods
@@ -539,7 +525,7 @@ myCol.selectedLength; //=> 1
 ### MultiSelect Events
 
 The events below are triggered by the MultiSelect based on changes in selection.
-Events can be prevented from firing when Backbone.Picky methods are called with
+Events can be prevented from firing when Backbone.Select methods are called with
 the `silent` option, as in `myCol.select(myModel, {silent: true})`.
 
 MultiSelect events, with the exception of `reselect:any`, pass a "diff" hash to
@@ -591,7 +577,7 @@ event; the re-selection of all items in the collection is also covered by
 
 ## Sharing models among collections
 
-Models can be part of more than one collection, and Backbone.Picky still manages
+Models can be part of more than one collection, and Backbone.Select still manages
 selections correctly. You must enable model sharing explicitly, though, and play
 by a few rules.
 
@@ -599,7 +585,7 @@ by a few rules.
 
 When sharing models among collections, the collections don't have to be of the
 same type. A model can be part of single-select and multi-select collections at
-the same time. Backbone.Picky handles all aspects of it:
+the same time. Backbone.Select handles all aspects of it:
 
 - Suppose you have selected a model (or models) in one collection, and then you
   create another one with these models. The new collection will pick up the
@@ -616,7 +602,7 @@ the same time. Backbone.Picky handles all aspects of it:
 
 - Edge cases are covered as well. Suppose a number of models are selected in a
   multi-select collection. You then proceed to add them to a single-select
-  collection. Only one model can be selected there, so Backbone.Picky will
+  collection. Only one model can be selected there, so Backbone.Select will
   deselect all but one of them. The last model added to the single-select
   collection "wins", ie its `selected` status survives.
 
@@ -625,9 +611,9 @@ the same time. Backbone.Picky handles all aspects of it:
 To enable model sharing, models passed in during instantiation must be passed on
 to the mixin constructor. Create the mixin with
 
-    Backbone.Picky.SingleSelect.applyTo(this, models)
+    Backbone.Select.SingleSelect.applyTo(this, models)
 
-instead of `Backbone.Picky.SingleSelect.applyTo(this)` (without the `models`
+instead of `Backbone.Select.SingleSelect.applyTo(this)` (without the `models`
 argument).
 
 Do that even if you never populate your collection during instantiation, and the
@@ -664,7 +650,7 @@ and keep yourself out of trouble.
         myCol.close();
         myCol = new MySelectableCollection([myModel]);
 
-  Note that you don't need to call `close()` if you use Backbone.Picky in
+  Note that you don't need to call `close()` if you use Backbone.Select in
   "single-collection mode", without sharing models among collections.
 
 ### Events
@@ -686,7 +672,7 @@ If you are working with events a lot, there are a few details which may help.
 
 With custom options, you can send additional information to event handlers. Just
 pass an arbitrary, custom option (or a whole bunch of them) to any method. The
-option doesn't affect the operation of Backbone.Picky, but it is passed on to
+option doesn't affect the operation of Backbone.Select, but it is passed on to
 the event handlers as the last argument.
 
 ```js
@@ -706,9 +692,46 @@ pick up an option passed to the `select` method of the model, for instance.
 myModel.select({foo: "baz"});    // prints "Selected while foo=baz"
 ```
 
-## Building Backbone.Picky
+## Backbone.Picky Compatibility
 
-If you wish to build Backbone.Picky on your system, you will
+This component started off as a series of PRs for [Backbone.Picky][] and eventually turned into an independent fork.
+
+### Picky vs Select: When to choose which
+
+Backbone.Picky has a smaller feature set than Backbone.Select and doesn't handle edge cases nearly as well. Picky provides a bare-bones implementation which leaves the details up to you. But guess what? This is exactly why you might want to choose it over Backbone.Select.
+
+- You can read the source of Backbone.Picky in minutes and understand every aspect of it.
+- Because it is easy to understand, it is also easy to tweak. If you adapt the code and make it fit your needs, you are unlikely to accidentally mess up the component.
+
+Conversely, you might want to go with Backbone.Select because there is less need to hack it.
+
+- If you share models among multiple collections, by all means, choose Backbone.Select. It takes care of all the quirks, and there are many. Backbone.Picky doesn't support model sharing.
+- Additions, resets, and models passed in during instantiation are taken care of.
+- You get a richer set of events, more helpful data emitted by these events, a `silent` option, custom options pass-through, predefined event handlers (`onSelect` etc).
+- Better events make it less likely you ever need to touch the component itself. Your adaptations can go into event handlers, allowing for a clean design.
+- Backbone.Select is extremely well tested. Even though the code is (a little) more complex than Backbone.Picky, you can tweak it without hesitation. If you mess up, the unit test will tell you.
+
+### Compatibility
+
+Backbone.Select is fully compatible to Backbone.Picky once you have instantiated it. All you have to change is the way the mixin is applied.
+
+For Picky.Selectable,
+
+    var selectable = new Backbone.Picky.Selectable(this);
+    _.extend(this, selectable);
+
+becomes `Backbone.Select.Selectable.applyTo(this);`.
+
+Likewise, for Picky.SingleSelect and Picky.MultiSelect, use
+
+    Backbone.Select.SingleSelect.applyTo(this);
+    Backbone.Select.MultiSelect.applyTo(this);
+
+If you want to [enable model sharing][sharing], you need to pass in a `models` argument as well, [see above][sharing].
+
+## Building Backbone.Select
+
+If you wish to build Backbone.Select on your system, you will
 need Ruby to run the Jasmine specs, and NodeJS to run the
 grunt build. 
 
@@ -721,7 +744,7 @@ run `bundle install` from the project folder
 Jasmine server
 
 3. Point your browser at `http://localhost:8888` and you will
-see all of the specs for Backbone.Picky
+see all of the specs for Backbone.Select
 
 ### To Build The Packages
 
@@ -737,7 +760,7 @@ see all of the specs for Backbone.Picky
 
 * Added `options._externalEvent`, available when the selection in a collection is altered during an `add` or `remove` action
 * Added `applyTo` class methods for setup
-* Removed support for creating new Picky objects solely with the constructor
+* Removed support for creating new Backbone.Select objects solely with the constructor
 * Event handlers with standard names are invoked automatically if they exist (`onSelect`, `onDeselect`, `onReselect`, `onSelectNone`, `onSelectSome`, `onSelectAll`)
 * Options - including arbitrary, custom ones - are passed on to event handlers
 * The collection is also passed to event handlers (single-select collection)
@@ -769,12 +792,20 @@ see all of the specs for Backbone.Picky
 * Basic "Selectable" mixin for models
 * Basic "MultiSelect" mixin for collections
 
-## Legal Mumbo Jumbo (MIT License)
+## Credits, Copyright, MIT License
 
-Copyright (c) 2012 Derick Bailey, Muted Solutions, LLC
+Special credits go to [Derick Bailey][muted-solutions], who created the original version of this component, called [Backbone.Picky][]. It is still around; see the [Backbone.Picky Compatibility section][compatibility] for the differences.
+
+Copyright (c) 2014 Michael Heim
+Copyright (c) 2013 Derick Bailey, Muted Solutions, LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[sharing]: #sharing-models-among-collections
+[compatibility]: #backbone-picky-compatibility
+[muted-solutions]: http://mutedsolutions.com/ "Muted Solutions, LLC"
+[Backbone.Picky]: https://github.com/derickbailey/backbone.picky#readme "Backbone.Picky"

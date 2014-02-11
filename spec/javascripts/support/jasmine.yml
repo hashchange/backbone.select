@@ -13,7 +13,7 @@
 src_files:
     - public/javascripts/underscore.js
     - public/javascripts/backbone.js
-    - src/backbone.picky.js
+    - src/backbone.select.js
     - spec/javascripts/helpers/*.js
     - src/**/*.js
 
