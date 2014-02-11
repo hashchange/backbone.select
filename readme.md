@@ -1,6 +1,6 @@
 # Backbone.Select
 
-Selecting Backbone models, managing selections in Backbone collections.
+Selecting Backbone models; handling selections in Backbone collections.
 
 ## Source Code And Downloads
 
@@ -700,7 +700,7 @@ Simplicity is a virtue. If that is what you want, Picky is the better choice. Co
 
 - If you share models among multiple collections, by all means, choose Backbone.Select. It takes care of all the quirks, and there are many. Backbone.Picky doesn't support model sharing.
 - Additions, resets, and models passed in during instantiation are taken care of.
-- You get a richer set of events, more helpful data emitted by these events, a `silent` option, custom options pass-through, predefined event handlers (`onSelect` etc).
+- You get a richer set of events, more helpful data emitted by these events, a `silent` option, custom options pass-through, and predefined event handlers like `onSelect`.
 - Better events make it less likely you ever need to touch the component itself. Your adaptations can go into event handlers, allowing for a clean design.
 - Backbone.Select is extremely well tested. Even though the code is (a little) more complex than Backbone.Picky, you can tweak it without hesitation. If you mess up, a unit test will tell you.
 
@@ -715,7 +715,7 @@ Picky.Selectable was applied like this:
         _.extend(this, selectable);
     }
 
-Now, it becomes
+In Backbone.Select, it has become
 
     initialize: function () {
         Backbone.Select.Me.applyTo(this);
@@ -780,7 +780,7 @@ see all of the specs for Backbone.Select
 * Multi-select events no longer fire when `selectAll`, `deselectAll` actions are a no-op (change in spec)
 * Added support for sharing models among collections
 * Added a `silent` option
-* Improved events, now firing when model and collection are in a consistent state (issue #18)
+* Improved events, now firing when model and collection are in a consistent state (Picky issue #18)
 * Added `deselectAll`, while keeping `selectNone` around as an alias
 * More comprehensive testing
 * Added config file for the Karma test runner
@@ -817,6 +817,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 [sharing]: #sharing-models-among-collections
-[compatibility]: #backbone.picky-compatibility
+[compatibility]: #backbonepicky-compatibility
 [muted-solutions]: http://mutedsolutions.com/ "Muted Solutions, LLC"
 [Backbone.Picky]: https://github.com/derickbailey/backbone.picky#readme "Backbone.Picky"

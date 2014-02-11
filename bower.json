@@ -1,12 +1,12 @@
 {
   "name": "backbone.select",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/hashchange/backbone.select",
   "authors": [
     "Michael Heim <heim@zeilenwechsel.de>",
     "Derick Bailey <derickbailey@gmail.com>"
   ],
-  "description": "Selecting Backbone models, managing selections in Backbone collections.",
+  "description": "Selecting Backbone models; handling selections in Backbone collections.",
   "main": "lib/backbone.select.js",
   "keywords": [
     "backbone",
