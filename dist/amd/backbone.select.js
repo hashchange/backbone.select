@@ -1,4 +1,4 @@
-// Backbone.Select, v1.0.1
+// Backbone.Select, v1.1.0
 // Copyright (c) 2014 Michael Heim
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
@@ -262,6 +262,10 @@
     Select.Me.applyTo = function (hostObject) {
       _.extend(hostObject, new Backbone.Select.Me());
       hostObject.trigger = trigger(hostObject);
+  
+      // Type indicator, undocumented, but part of the API (monitored by tests).
+      // Can be queried safely by other components. Use it read-only.
+      hostObject._pickyType = "Backbone.Select.Me";
     };
   
     Select.One.applyTo = function (hostObject, models, options) {
@@ -270,6 +274,10 @@
   
       hostObject._pickyCid = _.uniqueId('singleSelect');
       hostObject.trigger = trigger(hostObject);
+  
+      // Type indicator, undocumented, but part of the API (monitored by tests).
+      // Can be queried safely by other components. Use it read-only.
+      hostObject._pickyType = "Backbone.Select.One";
   
       if (options && options.enableModelSharing) {
   
@@ -304,6 +312,10 @@
       hostObject._pickyCid = _.uniqueId('multiSelect');
       hostObject.selected = {};
       hostObject.trigger = trigger(hostObject);
+  
+      // Type indicator, undocumented, but part of the API (monitored by tests).
+      // Can be queried safely by other components. Use it read-only.
+      hostObject._pickyType = "Backbone.Select.Many";
   
       if (options && options.enableModelSharing) {
   
