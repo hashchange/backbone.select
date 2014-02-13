@@ -7,17 +7,8 @@ requirejs.config({
     'underscore': 'underscore/underscore',
     'backbone': 'backbone/backbone',
     'backbone.select': '/dist/amd/backbone.select'
-  },
-
-  shim: {
-    'backbone': {
-      deps: ['underscore', 'jquery'],
-      exports: 'Backbone'
-    },
-    'underscore': {
-      exports: '_'
-    }
   }
+
 });
 
 require([

@@ -25,6 +25,6 @@
     "requirejs": "~2.1.10",
     "foundation": "~5.1.1",
     "backbone.picky": "~0.2.0",
-    "backbone.cycle": "~1.0.1"
+    "backbone.cycle": "^1.0.1"
   }
 }
