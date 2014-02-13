@@ -18,6 +18,10 @@ Backbone.Select = (function (Backbone, _) {
 
   _.extend(Select.One.prototype, {
 
+    // Type indicator, undocumented, but part of the API (monitored by tests).
+    // Can be queried safely by other components. Use it read-only.
+    _pickyType: "Backbone.Select.One",
+
     // Select a model, deselecting any previously
     // selected model
     select: function(model, options){
@@ -76,6 +80,10 @@ Backbone.Select = (function (Backbone, _) {
   Select.Many = function () {};
 
   _.extend(Select.Many.prototype, {
+
+    // Type indicator, undocumented, but part of the API (monitored by tests).
+    // Can be queried safely by other components. Use it read-only.
+    _pickyType: "Backbone.Select.Many",
 
     // Select a specified model, make sure the
     // model knows it's selected, and hold on to
@@ -180,6 +188,10 @@ Backbone.Select = (function (Backbone, _) {
 
   _.extend(Select.Me.prototype, {
 
+    // Type indicator, undocumented, but part of the API (monitored by tests).
+    // Can be queried safely by other components. Use it read-only.
+    _pickyType: "Backbone.Select.Me",
+
     // Select this model, and tell our
     // collection that we're selected
     select: function (options) {
@@ -246,10 +258,6 @@ Backbone.Select = (function (Backbone, _) {
   Select.Me.applyTo = function (hostObject) {
     _.extend(hostObject, new Backbone.Select.Me());
     hostObject.trigger = trigger(hostObject);
-
-    // Type indicator, undocumented, but part of the API (monitored by tests).
-    // Can be queried safely by other components. Use it read-only.
-    hostObject._pickyType = "Backbone.Select.Me";
   };
 
   Select.One.applyTo = function (hostObject, models, options) {
@@ -258,10 +266,6 @@ Backbone.Select = (function (Backbone, _) {
 
     hostObject._pickyCid = _.uniqueId('singleSelect');
     hostObject.trigger = trigger(hostObject);
-
-    // Type indicator, undocumented, but part of the API (monitored by tests).
-    // Can be queried safely by other components. Use it read-only.
-    hostObject._pickyType = "Backbone.Select.One";
 
     if (options && options.enableModelSharing) {
 
@@ -296,10 +300,6 @@ Backbone.Select = (function (Backbone, _) {
     hostObject._pickyCid = _.uniqueId('multiSelect');
     hostObject.selected = {};
     hostObject.trigger = trigger(hostObject);
-
-    // Type indicator, undocumented, but part of the API (monitored by tests).
-    // Can be queried safely by other components. Use it read-only.
-    hostObject._pickyType = "Backbone.Select.Many";
 
     if (options && options.enableModelSharing) {
 
