@@ -69,10 +69,10 @@ require([
       selectOneNum = new SingleSelectCollection(modelsNumeric),
       selectOneAlphaLC = new SingleSelectCollection(modelsAlphaLC),
       selectOneAlphaUC = new SingleSelectCollection(modelsAlphaUC),
-      selectOneLast = new SingleSelectCollection([
-        selectOneNum.last(),
-        selectOneAlphaLC.last(),
-        selectOneAlphaUC.last()
+      selectOneFirst = new SingleSelectCollection([
+        selectOneNum.first(),
+        selectOneAlphaLC.first(),
+        selectOneAlphaUC.first()
       ]),
       selectMany = new MultiSelectCollection(
           modelsNumeric.concat(modelsAlphaLC, modelsAlphaUC)
@@ -124,11 +124,11 @@ require([
           }, this);
 
           // Mark up selected elements
-          if (this.collection instanceof Backbone.Select.One && this.collection.selected) {
+          if (this.collection._pickyType === "Backbone.Select.One" && this.collection.selected) {
 
             this.onSelect(this.collection.selected);
 
-          } else if (this.collection instanceof Backbone.Select.Many && _.size(this.collection.selected)) {
+          } else if (this.collection._pickyType === "Backbone.Select.Many" && _.size(this.collection.selected)) {
 
             _.each(this.collection.selected, function (model) {
               this.onSelect(model);
@@ -138,11 +138,13 @@ require([
         }
       });
 
-  selectOneLast.last().select();
+  // Initial selection
+  selectOneFirst.first().select();
+
   new ListView({ collection: selectOneNum, el: "#numList" });
   new ListView({ collection: selectOneAlphaLC, el: "#alphaLcList" });
   new ListView({ collection: selectOneAlphaUC, el: "#alphaUcList" });
-  new ListView({ collection: selectOneLast, el: "#lastList" });
+  new ListView({ collection: selectOneFirst, el: "#firstList" });
   new ListView({ collection: selectMany, el: "#multiList" });
 
 });

@@ -6,11 +6,25 @@ describe("multi-select collection: general", function(){
   });
   
   var Collection = Backbone.Collection.extend({
-    model: Model,
-
     initialize: function(models){
       Backbone.Select.Many.applyTo(this, models);
     }
+  });
+
+  describe('A Select.Many collection instance should identify itself', function () {
+    var collection;
+
+    beforeEach(function(){
+      collection = new Collection();
+    });
+
+    it("as an instance of Backbone.Collection", function(){
+      expect(collection instanceof Backbone.Collection).toBe(true);
+    });
+
+    it("as 'Backbone.Select.Many' with the _pickyType property", function(){
+      expect(collection._pickyType).toBe("Backbone.Select.Many");
+    });
   });
 
   describe('automatic invocation of onSelectNone, onSelectSome, onSelectAll, onReselect handlers', function () {

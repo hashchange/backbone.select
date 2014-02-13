@@ -6,8 +6,6 @@ describe("multi-select collection: toggleSelectAll", function(){
   });
   
   var Collection = Backbone.Collection.extend({
-    model: Model,
-
     initialize: function(models){
       Backbone.Select.Many.applyTo(this, models);
     }

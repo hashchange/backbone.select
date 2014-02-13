@@ -7,11 +7,25 @@ describe("single-select collection", function(){
   });
 
   var Collection = Backbone.Collection.extend({
-    model: Model,
-
     initialize: function(models){
      Backbone.Select.One.applyTo(this, models);
     }
+  });
+
+  describe('A Select.One collection instance should identify itself', function () {
+    var collection;
+
+    beforeEach(function(){
+      collection = new Collection();
+    });
+
+    it("as an instance of Backbone.Collection", function(){
+      expect(collection instanceof Backbone.Collection).toBe(true);
+    });
+
+    it("as 'Backbone.Select.One' with the _pickyType property", function(){
+      expect(collection._pickyType).toBe("Backbone.Select.One");
+    });
   });
 
   describe("when selecting a model via the model's select", function(){

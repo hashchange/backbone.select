@@ -5,6 +5,22 @@ describe("selectable model", function(){
     }
   });
 
+  describe('A selectable model instance should identify itself', function () {
+    var model;
+
+    beforeEach(function(){
+      model = new Model();
+    });
+
+    it("as an instance of Backbone.Model", function(){
+      expect(model instanceof Backbone.Model).toBe(true);
+    });
+
+    it("as 'Backbone.Select.Me' with the _pickyType property", function(){
+      expect(model._pickyType).toBe("Backbone.Select.Me");
+    });
+  });
+
   describe("when selecting a model", function(){
     var model;
 

@@ -6,11 +6,9 @@ describe("multi-select collection: interaction with selectable models", function
   });
 
   var Collection = Backbone.Collection.extend({
-    model: Model,
-
-      initialize: function(models){
-        Backbone.Select.Many.applyTo(this, models);
-      }
+    initialize: function (models) {
+      Backbone.Select.Many.applyTo(this, models);
+    }
   });
 
   describe("select / deselect the model directly", function(){

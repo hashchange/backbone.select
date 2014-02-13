@@ -7,16 +7,12 @@ describe("models shared between multiple collections", function(){
   });
 
   var SingleSelectCollection = Backbone.Collection.extend({
-    model: Model,
-
     initialize: function(models){
       Backbone.Select.One.applyTo(this, models, { enableModelSharing: true });
     }
   });
 
   var MultiSelectCollection = Backbone.Collection.extend({
-    model: Model,
-
     initialize: function(models){
       Backbone.Select.Many.applyTo(this, models, { enableModelSharing: true });
     }
