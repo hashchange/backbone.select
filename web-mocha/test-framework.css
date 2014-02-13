@@ -1,0 +1,12 @@
+@charset "utf-8";
+
+.aux {
+    padding-left: 9px;
+    font-family: Monaco, "Lucida Console", monospace;
+    font-size: 11px;
+    line-height: 14px;
+}
+
+.aux, .aux a {
+    color: #aaaaaa;
+}

@@ -7,7 +7,7 @@
     "Derick Bailey <derickbailey@gmail.com>"
   ],
   "description": "Selecting Backbone models; handling selections in Backbone collections.",
-  "main": "lib/backbone.select.js",
+  "main": "dist/backbone.select.js",
   "keywords": [
     "backbone",
     "picky",
@@ -18,14 +18,27 @@
   ],
   "license": "MIT",
   "ignore": [
-    "Gruntfile.js",
+    "**/.*",
     "node_modules",
     "bower_components",
     "test",
+    "tests",
     "public",
     "reports",
+    "demo",
+    "lib-other",
+    "web-mocha",
     "spec",
     "src",
-    "tests"
-  ]
+    "Gruntfile.js",
+    "karma.conf.js",
+    "package.json"
+  ],
+  "devDependencies": {
+    "jasmine": "~1.3.1"
+  },
+  "dependencies": {
+    "underscore": "~1.5.2",
+    "backbone": "~1.1.0"
+  }
 }

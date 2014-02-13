@@ -4,6 +4,10 @@
 *.orig
 tmp/
 ext/
-node_modules
+node_modules/
+bower_components/
 _SpecRunner.html
 .idea/
+web-mocha/index.html
+reports/
+demo/bower_demo_components/

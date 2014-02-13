@@ -8,22 +8,22 @@ The component is available with Bower: `bower install backbone.select`.
 
 Alternatively, you can download the raw source code from the "src"
 folder above, or grab one of the builds from the 
-"lib" folder. 
+"dist" folder.
 
 To get the latest stable release, use these links 
 which point to the 'master' branch's builds:
 
 ### Standard Builds
 
-Development: [backbone.select.js](https://raw.github.com/hashchange/backbone.select/master/lib/backbone.select.js)
+Development: [backbone.select.js](https://raw.github.com/hashchange/backbone.select/master/dist/backbone.select.js)
 
-Production: [backbone.select.min.js](https://raw.github.com/hashchange/backbone.select/master/lib/backbone.select.min.js)
+Production: [backbone.select.min.js](https://raw.github.com/hashchange/backbone.select/master/dist/backbone.select.min.js)
 
 ### AMD/RequireJS Builds
 
-Development: [backbone.select.js](https://raw.github.com/hashchange/backbone.select/master/lib/amd/backbone.select.js)
+Development: [backbone.select.js](https://raw.github.com/hashchange/backbone.select/master/dist/amd/backbone.select.js)
 
-Production: [backbone.select.min.js](https://raw.github.com/hashchange/backbone.select/master/lib/amd/backbone.select.min.js)
+Production: [backbone.select.min.js](https://raw.github.com/hashchange/backbone.select/master/dist/amd/backbone.select.min.js)
 
 ## Requirements
 
@@ -738,30 +738,44 @@ Picky.MultiSelect is treated the same way. Use `Backbone.Select.Many.applyTo(thi
 
 If you want to [enable model sharing][sharing] in a Select.One or Select.Many collection, you need to pass in an options hash as the third argument: `{ enableModelSharing: true }`. [See above][sharing].
 
-## Building Backbone.Select
+## Build process and tests
 
-If you wish to build Backbone.Select on your system, you will
-need Ruby to run the Jasmine specs, and NodeJS to run the
-grunt build. 
+### Setup
 
-### To Run The Jasmine Specs
+[npm][] and [Bower][] set up the environment for you.
 
-1. Be sure you have Bundler installed in your Ruby Gems. Then
-run `bundle install` from the project folder
+- The only thing you've got to have on your machine is [Node.js]. Download the installer [here][Node.js].
+- Open a command prompt in the project directory.
+- Run `npm install`. (Creates the environment.)
+- Run `bower install`. (Fetches the dependencies of the script.)
 
-2. Once this is done, you can run `rake jasmine` to run the 
-Jasmine server
+Your test and build environment is ready now. If you want to test against specific versions of Backbone, edit `bower.json` first.
 
-3. Point your browser at `http://localhost:8888` and you will
-see all of the specs for Backbone.Select
+### Running tests, creating a new build
 
-### To Build The Packages
+The test tool chain: [Grunt][] (task runner), [Karma][] (test runner), [Jasmine][] (test framework). But you don't really need to worry about any of this.
 
-1. Be sure you have NodeJS and NPM installed on your system
+A handful of commands manage everything for you:
 
-2. Run `npm install -g grunt` to install the grunt build system
+- Run the tests in a terminal with `grunt test`.
+- Run the tests in a browser interactively, live-reloading the page when the source or the tests change: `grunt interactive`.
+- Build the dist files (also running tests and linter) with `grunt build`, or just `grunt`.
+- Build continuously on every save with `grunt ci`.
+- Change the version number throughout the project with `grunt setver --to=1.2.3`. (Remember to rebuild the project with `grunt` afterwards.)
 
-3. From the project folder, run `grunt` to produce a build
+Finally, if need be, you can set up a quick demo page to play with the code. First, edit the files in the `demo` directory. Then display `demo/index.html`, live-reloading your changes to the code or the page, with `grunt demo`. Libraries needed for the demo/playground should go into the Bower dev dependencies, in the project-wide `bower.json`, or else be managed by the dedicated `bower.json` in the demo directory.
+
+_The `grunt interactive` and `grunt demo` commands spin up a web server, opening up the **whole project** to access via http. By default, that access is restricted to localhost. You can relax the restriction in `Gruntfile.js`, but be aware of the security implications._
+
+### Changing the tool chain configuration
+
+In case anything about the test and build process needs to be changed, have a look at the following config files:
+
+- `karma.conf.js` (changes to dependencies, additional test frameworks)
+- `Gruntfile.js`  (changes to the whole process)
+- `web-mocha/_index.html` (changes to dependencies, additional test frameworks)
+
+New test files in the `spec` directory are picked up automatically, no need to edit the configuration for that.
 
 ## Release Notes
 
@@ -815,6 +829,15 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[Backbone]: http://backbonejs.org/ "Backbone.js"
+[Node.js]: http://nodejs.org/ "Node.js"
+[Bower]: http://bower.io/ "Bower: a package manager for the web"
+[npm]: https://npmjs.org/ "npm: Node Packaged Modules"
+[Grunt]: http://gruntjs.com/ "Grunt: The JavaScript Task Runner"
+[Karma]: http://karma-runner.github.io/ "Karma - Spectacular Test Runner for Javascript"
+[Jasmine]: http://pivotal.github.io/jasmine/ "Jasmine, a behavior-driven development framework"
+[JSHint]: http://www.jshint.com/ "JSHint, a JavaScript Code Quality Tool"
 
 [sharing]: #sharing-models-among-collections
 [compatibility]: #backbonepicky-compatibility

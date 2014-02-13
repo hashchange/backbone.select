@@ -1,0 +1,30 @@
+@charset "utf-8";
+
+body {
+    margin: 0.25rem;
+}
+
+label.disabled {
+    color: #acacac;
+}
+
+.row input[type="checkbox"]{
+    margin-left: 0.5rem;
+}
+
+/* min-width 641px and max-width 1024px, medium screens in Foundation */
+@media only screen and (min-width: 40.063em) and (max-width: 64em) {
+    #runMemtest {
+        margin-top: 1.75rem;
+    }
+    #testTypes label {
+        margin-right: 0.5rem;
+    }
+}
+
+/* min-width 1025px, large screens in Foundation */
+@media only screen and (min-width: 64.063em) {
+    #runMemtest {
+        margin-top: 3.75rem;
+    }
+}

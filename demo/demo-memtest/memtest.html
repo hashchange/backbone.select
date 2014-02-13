@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Memory Leak Test - Demos and Playground</title>
+
+    <!-- ATTN Foundation loaded without JS - stay clear of JS-driven widgets, or add the JS setup -->
+    <link rel="stylesheet" href="../bower_demo_components/foundation/css/normalize.css">
+    <link rel="stylesheet" href="../bower_demo_components/foundation/css/foundation.css">
+
+    <link rel="stylesheet" href="memtest.css">
+</head>
+<body>
+    <!-- check that 'bower install' has been run in the demo dir if bower.json isn't empty -->
+    <script src="../bower-check.js"></script>
+
+    <!-- body content here... -->
+    <section>
+        <h1 class="row">Memory leak test</h1>
+        <p class="row">Enable memory profiling in the browser, then run one of these tests:</p>
+        <form id="memtest">
+
+            <div class="row">
+
+                <fieldset id="testTypes" class="large-3 medium-4 columns">
+                    <legend>Component</legend>
+                    <div><input type="radio" id="backboneTest" name="testType" value="backbone"><label for="backboneTest">Backbone</label></div>
+                    <div><input type="radio" id="pickyTest" name="testType" value="picky"><label for="pickyTest">Backbone.Picky</label></div>
+                    <div><input type="radio" id="selectTest" name="testType" value="select" checked><label for="selectTest">Backbone.Select</label></div>
+                    <div><input type="radio" id="cycleTest" name="testType" value="cycle"><label for="cycleTest">Backbone.Cycle</label></div>
+                </fieldset>
+
+                <fieldset id="repetition" class="large-8 medium-7 columns">
+                    <legend>Repetition</legend>
+                    <div class="row">
+                        <div class="large-3 columns">
+                            <label for="modelSetSize">models per set</label>
+                            <input id="modelSetSize" type="number" min="1" max="10000" step="1" value="10000">
+                        </div>
+                        <div class="large-3 columns">
+                            <label for="modelLoop">sets generated *</label>
+                            <input id="modelLoop" type="number" min="1" max="10000" step="1" value="1">
+                        </div>
+                        <div class="large-5 columns">
+                            <label for="collectionLoop">collections generated *</label>
+                            <input id="collectionLoop" type="number" min="1" max="500" step="1" value="100">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="large-12 columns"><small>* reference released immediately, only one instance kept around</small></div>
+                    </div>
+                </fieldset>
+
+            </div>
+
+            <div class="row">
+
+                <fieldset id="collectionBehavior" class="large-8 medium-7 medium-push-5 large-reset-order columns">
+                    <legend>Collection behaviour</legend>
+                    <div class="row">
+
+                        <div class="large-4 columns">
+                            <label for="optInitialSelection">initial selection</label>
+                            <select id="optInitialSelection">
+                                <option value="none">none</option>
+                                <option value="first">first</option>
+                            </select>
+                        </div>
+
+                        <div class="large-6 columns">
+                            <div class="row">
+                                <input id="optModelSharingMode" type="checkbox" value="modelSharing">
+                                <label for="optModelSharingMode" class="inline">enable model-sharing mode</label>
+                            </div>
+                            <div class="row">
+                                <input id="closeCollection" type="checkbox" value="">
+                                <label for="closeCollection" class="inline">call close before releasing the reference</label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="large-3 medium-5 medium-pull-7 large-reset-order columns">
+                    <button id="runMemtest" type="submit">Run script for profiling</button>
+                </div>
+
+            </div>
+
+        </form>
+        <div class="row">
+            <h2><small>Script output</small></h2>
+            <pre id="log"></pre>
+        </div>
+    </section>
+    
+    <!-- libraries --><!-- edit and replace with your project libraries as needed -->
+    <script src="../bower_demo_components/jquery/jquery.js"></script>
+    <script src="../../bower_components/underscore/underscore.js"></script>
+    <script src="../../bower_components/backbone/backbone.js"></script>
+    <script src="../bower_demo_components/backbone.picky/lib/backbone.picky.js"></script>
+
+    <!-- include project source files here... -->
+    <script src="../../src/backbone.select.js"></script>
+
+    <!-- other -->
+    <script src="../bower_demo_components/backbone.cycle/dist/backbone.cycle.js"></script>
+
+    <!-- demo js here... -->
+    <script src="memtest.js"></script>
+
+</body>
+</html>

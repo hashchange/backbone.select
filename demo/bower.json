@@ -1,0 +1,30 @@
+{
+  "name": "demo",
+  "main": "index.html",
+  "version": "0.0.0",
+  "homepage": "https://github.com/hashchange/backbone.cycle",
+  "authors": [
+    "hashchange <heim@zeilenwechsel.de>"
+  ],
+  "description": "Backbone.Cycle demo and playground",
+  "keywords": [
+    "demo"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "bower_demo_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.0",
+    "requirejs": "~2.1.10",
+    "foundation": "~5.1.1",
+    "backbone.picky": "~0.2.0",
+    "backbone.cycle": "~1.0.1"
+  }
+}

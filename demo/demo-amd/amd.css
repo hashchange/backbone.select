@@ -1,0 +1,30 @@
+@charset "utf-8";
+
+body {
+    margin: 0.25rem;
+}
+
+#header {
+    margin-bottom: 2rem;
+}
+
+.list {
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.item a {
+    display: inline-block;
+    width: 100%;
+    border: 0.2rem solid #008cba;
+}
+
+.item a:hover,
+.item a:active {
+    border: 0.2rem solid #007b9f;
+}
+
+.item a.selected {
+    background-color:rgba( 0, 123, 159, 0.2 );
+}

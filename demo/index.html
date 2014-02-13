@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Demo and Playground</title>
+
+    <!-- ATTN Foundation loaded without JS - stay clear of JS-driven widgets, or add the JS setup -->
+    <link rel="stylesheet" href="bower_demo_components/foundation/css/normalize.css">
+    <link rel="stylesheet" href="bower_demo_components/foundation/css/foundation.css">
+
+    <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+    <!-- check that 'bower install' has been run in the demo dir if bower.json isn't empty -->
+    <script src="bower-check.js"></script>
+
+    <!-- body content here... -->
+    <section>
+        <h1 class="row">Demos</h1>
+        <div class="row">
+            <ul>
+                <li><a href="demo-amd/amd.html">AMD demo and test, example app</a></li>
+                <li><a href="demo-memtest/memtest.html">Memory leak test</a></li>
+            </ul>
+        </div>
+    </section>
+    
+    <!-- libraries --><!-- edit and replace with your project libraries as needed -->
+    <script src="bower_demo_components/jquery/jquery.js"></script>
+    <script src="../bower_components/underscore/underscore.js"></script>
+    <script src="../bower_components/backbone/backbone.js"></script>
+
+    <!-- include project source files here... -->
+    <script src="../src/backbone.select.js"></script>
+
+    <!-- demo js here... -->
+    <script src="demo.js"></script>
+
+</body>
+</html>
