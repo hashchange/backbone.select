@@ -398,7 +398,13 @@ Backbone.Select = (function (Backbone, _) {
         deselectOnRemove = _.find(options.previousModels, function (model) { return model.selected; });
 
     if (deselectOnRemove) releaseModel(deselectOnRemove, collection, {_silentLocally: true});
+    _.each(options.previousModels, function (model) {
+      if (model._pickyCollections) model._pickyCollections = _.without(model._pickyCollections, collection._pickyCid);
+    });
 
+    collection.each(function (model) {
+      registerCollectionWithModel(model, collection);
+    });
     selected = collection.filter(function (model) { return model.selected; });
     excessiveSelections = _.initial(selected);
     if (excessiveSelections.length) _.each(excessiveSelections, function (model) { model.deselect(); });
@@ -411,6 +417,13 @@ Backbone.Select = (function (Backbone, _) {
 
     if (deselect) _.each(deselect, function (model) { releaseModel(model, collection, {_silentLocally: true}); });
 
+    _.each(options.previousModels, function (model) {
+      if (model._pickyCollections) model._pickyCollections = _.without(model._pickyCollections, collection._pickyCid);
+    });
+
+    collection.each(function (model) {
+      registerCollectionWithModel(model, collection);
+    });
     select = collection.filter(function (model) { return model.selected; });
     if (select.length) _.each(select, function (model) { collection.select(model, {silent: true}); });
   }

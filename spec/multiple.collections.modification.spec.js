@@ -905,4 +905,155 @@ describe("models shared between multiple collections", function(){
     // handler.
 
   });
+
+  describe('registering and unregistering a collection with models', function () {
+
+    describe('A single-select collection in model-sharing mode', function () {
+
+      var model1, model2, model3, models, collection;
+
+      beforeEach(function () {
+        model1 = new Model();
+        model2 = new Model();
+        model3 = new Model();
+
+        models = [ model1, model2, model3];
+
+        model2.select();
+
+        collection = new SingleSelectCollection();
+      });
+
+      describe('is registered with a set of models', function () {
+
+        it('when the models are passed in at instantiation', function () {
+          collection = new SingleSelectCollection(models);
+
+          expect(model1._pickyCollections).toContain(collection._pickyCid);
+          expect(model2._pickyCollections).toContain(collection._pickyCid);
+          expect(model3._pickyCollections).toContain(collection._pickyCid);
+        });
+
+        it('when the models are added', function () {
+          collection.add(models);
+
+          expect(model1._pickyCollections).toContain(collection._pickyCid);
+          expect(model2._pickyCollections).toContain(collection._pickyCid);
+          expect(model3._pickyCollections).toContain(collection._pickyCid);
+        });
+
+        it('when the models are passed in with a reset', function () {
+          collection.reset(models);
+
+          expect(model1._pickyCollections).toContain(collection._pickyCid);
+          expect(model2._pickyCollections).toContain(collection._pickyCid);
+          expect(model3._pickyCollections).toContain(collection._pickyCid);
+        });
+
+        it('when the models are passed in with a reset, even if they had been part of the collection before', function () {
+          collection.add(models);
+          collection.reset(models);
+
+          expect(model1._pickyCollections).toContain(collection._pickyCid);
+          expect(model2._pickyCollections).toContain(collection._pickyCid);
+          expect(model3._pickyCollections).toContain(collection._pickyCid);
+        });
+      });
+
+      describe('is unregistered with a set of models', function () {
+
+        it('when the models are removed', function () {
+          collection.add(models);
+          collection.remove(models);
+
+          expect(model1._pickyCollections).not.toContain(collection._pickyCid);
+          expect(model2._pickyCollections).not.toContain(collection._pickyCid);
+          expect(model3._pickyCollections).not.toContain(collection._pickyCid);
+        });
+
+        it('when the collection is reset', function () {
+          collection.add(models);
+          collection.reset();
+
+          expect(model1._pickyCollections).not.toContain(collection._pickyCid);
+          expect(model2._pickyCollections).not.toContain(collection._pickyCid);
+          expect(model3._pickyCollections).not.toContain(collection._pickyCid);
+        });
+      });
+    });
+
+    describe('A multi-select collection in model-sharing mode', function () {
+
+      var model1, model2, model3, models, collection;
+
+      beforeEach(function () {
+        model1 = new Model();
+        model2 = new Model();
+        model3 = new Model();
+
+        models = [ model1, model2, model3];
+
+        model2.select();
+
+        collection = new MultiSelectCollection();
+      });
+
+      describe('is registered with a set of models', function () {
+
+        it('when the models are passed in at instantiation', function () {
+          collection = new MultiSelectCollection(models);
+
+          expect(model1._pickyCollections).toContain(collection._pickyCid);
+          expect(model2._pickyCollections).toContain(collection._pickyCid);
+          expect(model3._pickyCollections).toContain(collection._pickyCid);
+        });
+
+        it('when the models are added', function () {
+          collection.add(models);
+
+          expect(model1._pickyCollections).toContain(collection._pickyCid);
+          expect(model2._pickyCollections).toContain(collection._pickyCid);
+          expect(model3._pickyCollections).toContain(collection._pickyCid);
+        });
+
+        it('when the models are passed in with a reset', function () {
+          collection.reset(models);
+
+          expect(model1._pickyCollections).toContain(collection._pickyCid);
+          expect(model2._pickyCollections).toContain(collection._pickyCid);
+          expect(model3._pickyCollections).toContain(collection._pickyCid);
+        });
+
+        it('when the models are passed in with a reset, even if they had been part of the collection before', function () {
+          collection.add(models);
+          collection.reset(models);
+
+          expect(model1._pickyCollections).toContain(collection._pickyCid);
+          expect(model2._pickyCollections).toContain(collection._pickyCid);
+          expect(model3._pickyCollections).toContain(collection._pickyCid);
+        });
+      });
+
+      describe('is unregistered with a set of models', function () {
+
+        it('when the models are removed', function () {
+          collection.add(models);
+          collection.remove(models);
+
+          expect(model1._pickyCollections).not.toContain(collection._pickyCid);
+          expect(model2._pickyCollections).not.toContain(collection._pickyCid);
+          expect(model3._pickyCollections).not.toContain(collection._pickyCid);
+        });
+
+        it('when the collection is reset', function () {
+          collection.add(models);
+          collection.reset();
+
+          expect(model1._pickyCollections).not.toContain(collection._pickyCid);
+          expect(model2._pickyCollections).not.toContain(collection._pickyCid);
+          expect(model3._pickyCollections).not.toContain(collection._pickyCid);
+        });
+      });
+    });
+  });
 });
