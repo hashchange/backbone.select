@@ -764,7 +764,12 @@ describe("single-select collection", function(){
       EventHandlingCollection = Collection.extend({
         onSelect:   function () {},
         onDeselect: function () {},
-        onReselect: function () {}
+        onReselect: function () {},
+
+        // Pseudo event handlers modeled on internal events `_selected`,
+        // `_deselected`; should not be invoked automatically
+        on_select: function () {},
+        on_deselect: function () {}
       });
 
       model = new Model();
@@ -773,6 +778,9 @@ describe("single-select collection", function(){
       spyOn(collection, "onSelect").andCallThrough();
       spyOn(collection, "onDeselect").andCallThrough();
       spyOn(collection, "onReselect").andCallThrough();
+
+      spyOn(collection, "on_select").andCallThrough();
+      spyOn(collection, "on_deselect").andCallThrough();
     });
 
     it('calls the onSelect handler when triggering a select:one event', function () {
@@ -788,6 +796,16 @@ describe("single-select collection", function(){
     it('calls the onReselect handler when triggering a reselect:one event', function () {
       collection.trigger("reselect:one", model, collection, {foo: "bar"});
       expect(collection.onReselect).toHaveBeenCalledWith(model, collection, {foo: "bar"});
+    });
+
+    it('does not call an event handler accidentally named after the internal _selected event', function () {
+      model.trigger("_selected", model);
+      expect(collection.on_select).not.toHaveBeenCalled();
+    });
+
+    it('does not call an event handler accidentally named after the internal _deselected event', function () {
+      model.trigger("_deselected", model);
+      expect(collection.on_deselect).not.toHaveBeenCalled();
     });
   });
 

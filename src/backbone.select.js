@@ -495,11 +495,12 @@ Backbone.Select = (function (Backbone, _) {
     return function (event, eventArgs) {
       // get the method name from the event name
       var unifiedEvent = unifyEventNames(event),
+          internalEvent = (unifiedEvent.charAt(0) === "_"),
           methodName = 'on' + unifiedEvent.replace(splitter, getEventName),
           method = this[methodName];
 
       // call the onMethodName if it exists
-      if (_.isFunction(method)) {
+      if (!internalEvent && _.isFunction(method)) {
         // pass all trigger arguments, except the event name
         method.apply(this, _.tail(arguments));
       }

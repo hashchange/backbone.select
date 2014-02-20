@@ -303,7 +303,12 @@ describe("selectable model", function(){
       EventHandlingModel = Model.extend({
         onSelect:   function () {},
         onDeselect: function () {},
-        onReselect: function () {}
+        onReselect: function () {},
+
+        // Pseudo event handlers modeled on internal events `_selected`,
+        // `_deselected`; should not be invoked automatically
+        on_select: function () {},
+        on_deselect: function () {}
       });
 
       model = new EventHandlingModel();
@@ -311,6 +316,9 @@ describe("selectable model", function(){
       spyOn(model, "onSelect").andCallThrough();
       spyOn(model, "onDeselect").andCallThrough();
       spyOn(model, "onReselect").andCallThrough();
+
+      spyOn(model, "on_select").andCallThrough();
+      spyOn(model, "on_deselect").andCallThrough();
     });
 
     it('calls the onSelect handler when triggering a selected event on the model', function () {
@@ -326,6 +334,16 @@ describe("selectable model", function(){
     it('calls the onReselect handler when triggering a reselected event on the model', function () {
       model.trigger("reselected", model, {foo: "bar"});
       expect(model.onReselect).toHaveBeenCalledWith(model, {foo: "bar"});
+    });
+
+    it('does not call an event handler accidentally named after the internal _selected event', function () {
+      model.trigger("_selected", model);
+      expect(model.on_select).not.toHaveBeenCalled();
+    });
+
+    it('does not call an event handler accidentally named after the internal _deselected event', function () {
+      model.trigger("_deselected", model);
+      expect(model.on_deselect).not.toHaveBeenCalled();
     });
   });
 
