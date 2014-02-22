@@ -31,17 +31,19 @@ Backbone.Select = (function (Backbone, _) {
       options._processedBy[this._pickyCid] = { done: false };
 
       if (!options._processedBy[this.selected.cid]) this.selected.select(stripLocalOptions(options));
-      options._processedBy[this._pickyCid].done = true;
 
       if (!(options.silent || options._silentLocally)) {
 
         if (reselected) {
-          if (!options._silentReselect) this.trigger("reselect:one", model, this, stripInternalOptions(options));
+          if (!options._silentReselect) queueEvent(options, this, [ "reselect:one", model, this, stripInternalOptions(options) ]);
         } else {
-          this.trigger("select:one", model, this, stripInternalOptions(options));
+          queueEvent(options, this, [ "select:one", model, this, stripInternalOptions(options) ]);
         }
 
       }
+
+      options._processedBy[this._pickyCid].done = true;
+      processEventQueue(options);
     },
 
     // Deselect a model, resulting in no model
@@ -59,9 +61,10 @@ Backbone.Select = (function (Backbone, _) {
 
       delete this.selected;
       if (!options._skipModelCall) model.deselect(stripLocalOptions(options));
-      options._processedBy[this._pickyCid].done = true;
+      if (!(options.silent || options._silentLocally)) queueEvent(options, this, [ "deselect:one", model, this, stripInternalOptions(options) ]);
 
-      if (!(options.silent || options._silentLocally)) this.trigger("deselect:one", model, this, stripInternalOptions(options));
+      options._processedBy[this._pickyCid].done = true;
+      processEventQueue(options);
     },
 
     close: function () {
@@ -103,9 +106,10 @@ Backbone.Select = (function (Backbone, _) {
       options._processedBy[this._pickyCid] = { done: false };
 
       if (!options._processedBy[model.cid]) model.select(stripLocalOptions(options));
-      options._processedBy[this._pickyCid].done = true;
-
       triggerMultiSelectEvents(this, prevSelected, options, reselected);
+
+      options._processedBy[this._pickyCid].done = true;
+      processEventQueue(options);
     },
 
     // Deselect a specified model, make sure the
@@ -125,9 +129,10 @@ Backbone.Select = (function (Backbone, _) {
       this.selectedLength = _.size(this.selected);
 
       if (!options._skipModelCall) model.deselect(stripLocalOptions(options));
-      options._processedBy[this._pickyCid].done = true;
-
       triggerMultiSelectEvents(this, prevSelected, options);
+
+      options._processedBy[this._pickyCid].done = true;
+      processEventQueue(options);
     },
 
     // Select all models in this collection
@@ -145,13 +150,14 @@ Backbone.Select = (function (Backbone, _) {
       }, this);
 
       options = initOptions(options);
+      triggerMultiSelectEvents(this, prevSelected, options, reselected);
+
       if (options._processedBy[this._pickyCid]) {
         options._processedBy[this._pickyCid].done = true;
       } else {
         options._processedBy[this._pickyCid] = { done: true };
       }
-
-      triggerMultiSelectEvents(this, prevSelected, options, reselected);
+      processEventQueue(options);
     },
 
     // Deselect all models in this collection
@@ -171,13 +177,14 @@ Backbone.Select = (function (Backbone, _) {
       this.selectedLength = 0;
 
       options = initOptions(options);
+      triggerMultiSelectEvents(this, prevSelected, options);
+
       if (options._processedBy[this._pickyCid]) {
         options._processedBy[this._pickyCid].done = true;
       } else {
         options._processedBy[this._pickyCid] = { done: true };
       }
-
-      triggerMultiSelectEvents(this, prevSelected, options);
+      processEventQueue(options);
     },
 
     selectNone: function (options) {
@@ -233,15 +240,17 @@ Backbone.Select = (function (Backbone, _) {
         // it directly
         if (!options._processedBy[this.collection._pickyCid]) this.collection.select(this, stripLocalOptions(options));
       }
-      options._processedBy[this.cid].done = true;
 
       if (!(options.silent || options._silentLocally)) {
         if (reselected) {
-          if (!options._silentReselect) this.trigger("reselected", this, stripInternalOptions(options));
+          if (!options._silentReselect) queueEvent(options, this, [ "reselected", this, stripInternalOptions(options) ]);
         } else {
-          this.trigger("selected", this, stripInternalOptions(options));
+          queueEvent(options, this, [ "selected", this, stripInternalOptions(options) ]);
         }
       }
+
+      options._processedBy[this.cid].done = true;
+      processEventQueue(options);
     },
 
     // Deselect this model, and tell our
@@ -263,9 +272,11 @@ Backbone.Select = (function (Backbone, _) {
         // it directly
         this.collection.deselect(this, stripLocalOptions(options));
       }
-      options._processedBy[this.cid].done = true;
 
-      if (!(options.silent || options._silentLocally)) this.trigger("deselected", this, stripInternalOptions(options));
+      if (!(options.silent || options._silentLocally)) queueEvent(options, this, [ "deselected", this, stripInternalOptions(options) ]);
+
+      options._processedBy[this.cid].done = true;
+      processEventQueue(options);
     },
 
     // Change selected to the opposite of what
@@ -376,7 +387,7 @@ Backbone.Select = (function (Backbone, _) {
         diff;
 
     if (reselected && reselected.length && !options._silentReselect) {
-      collection.trigger("reselect:any", reselected, collection, stripInternalOptions(options));
+      queueEvent(options, collection, [ "reselect:any", reselected, collection, stripInternalOptions(options) ]);
     }
 
     if (unchanged) return;
@@ -387,17 +398,17 @@ Backbone.Select = (function (Backbone, _) {
     };
 
     if (selectedLength === length) {
-      collection.trigger("select:all", diff, collection, stripInternalOptions(options));
+      queueEvent(options, collection, [ "select:all", diff, collection, stripInternalOptions(options) ]);
       return;
     }
 
     if (selectedLength === 0) {
-      collection.trigger("select:none", diff, collection, stripInternalOptions(options));
+      queueEvent(options, collection, [ "select:none", diff, collection, stripInternalOptions(options) ]);
       return;
     }
 
     if (selectedLength > 0 && selectedLength < length) {
-      collection.trigger("select:some", diff, collection, stripInternalOptions(options));
+      queueEvent(options, collection, [ "select:some", diff, collection, stripInternalOptions(options) ]);
       return;
     }
   };
@@ -490,10 +501,34 @@ Backbone.Select = (function (Backbone, _) {
 
   function initOptions (options) {
     options || (options = {});
-    options._processedBy || (options._processedBy = []);
+    options._processedBy || (options._processedBy = {});
     options._eventQueue || (options._eventQueue = []);
 
     return options;
+  }
+
+  function queueEvent (storage, actor, triggerArgs) {
+    storage._eventQueue.push( {
+      actor: actor,
+      triggerArgs: triggerArgs
+    } );
+  }
+
+  function processEventQueue(storage) {
+    var resolved, eventData;
+
+    if ( storage._eventQueue.length ) {
+      resolved = _.every(storage._processedBy, function(entry) {
+        return entry.done;
+      });
+
+      if (resolved) {
+        while (storage._eventQueue.length) {
+          eventData = storage._eventQueue.pop();
+          eventData.actor.trigger.apply(eventData.actor, eventData.triggerArgs);
+        }
+      }
+    }
   }
 
   // Creates a new trigger method which calls the predefined event handlers

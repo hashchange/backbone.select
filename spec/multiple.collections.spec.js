@@ -1429,4 +1429,474 @@ describe("models shared between multiple collections", function(){
 
   });
 
+  describe('Timing of events', function () {
+
+    var model1, model2, model3, otherModel, singleSelectCollection, otherSingleSelectCollection, multiSelectCollection, doCapture;
+
+    beforeEach(function () {
+
+      var ListenerMixin = function () {
+
+        var createContainer = function () {
+          return {
+            calls: 0,
+            model1: {}, model2: {}, model3: {}, otherModel: {},
+            singleSelectCollection: {}, otherSingleSelectCollection: {}, multiSelectCollection: {}
+          }
+        };
+
+        this.snapshots = {
+          onSelected: _.extend({}, createContainer()),
+          onDeselected: _.extend({}, createContainer()),
+          onSelectOne: _.extend({}, createContainer()),
+          onDeselectOne: _.extend({}, createContainer()),
+          onSelectNone: _.extend({}, createContainer()),
+          onSelectSome: _.extend({}, createContainer()),
+          onSelectAll: _.extend({}, createContainer())
+        };
+
+      };
+
+      _.extend(ListenerMixin.prototype, {
+
+        bindEvents: function () {
+          this.listenTo(this, "selected", this.captureOnSelected);
+          this.listenTo(this, "deselected", this.captureOnDeselected);
+          this.listenTo(this, "select:one", this.captureOnSelectOne);
+          this.listenTo(this, "deselect:one", this.captureOnDeselectOne);
+          this.listenTo(this, "select:none", this.captureOnSelectNone);
+          this.listenTo(this, "select:some", this.captureOnSelectSome);
+          this.listenTo(this, "select:all", this.captureOnSelectAll);
+        },
+
+        captureOnSelected: function () {
+          this.takeSnapshot(this.snapshots.onSelected);
+        },
+
+        captureOnDeselected: function () {
+          this.takeSnapshot(this.snapshots.onDeselected);
+        },
+
+        captureOnSelectOne: function () {
+          this.takeSnapshot(this.snapshots.onSelectOne);
+        },
+
+        captureOnDeselectOne: function () {
+          this.takeSnapshot(this.snapshots.onDeselectOne);
+        },
+
+        captureOnSelectNone: function () {
+          this.takeSnapshot(this.snapshots.onSelectNone);
+        },
+
+        captureOnSelectSome: function () {
+          this.takeSnapshot(this.snapshots.onSelectSome);
+        },
+
+        captureOnSelectAll: function () {
+          this.takeSnapshot(this.snapshots.onSelectAll);
+        },
+
+        takeSnapshot: function (container) {
+
+          if (doCapture) {
+            container.calls++;
+            container.model1.selected = model1.selected;
+            container.model2.selected = model2.selected;
+            container.model3.selected = model3.selected;
+            container.otherModel.selected = otherModel.selected;
+            container.singleSelectCollection.selected = singleSelectCollection.selected;
+            container.otherSingleSelectCollection.selected = otherSingleSelectCollection.selected;
+            container.multiSelectCollection.selected = _.clone(multiSelectCollection.selected);
+          }
+
+        }
+      });
+
+      var ObservableModel = Backbone.Model.extend({
+        initialize: function () {
+          Backbone.Select.Me.applyTo(this);
+          _.extend(this, new ListenerMixin());
+          this.bindEvents();
+        }
+      });
+
+      var ObservableSingleSelectCollection = Backbone.Collection.extend({
+        initialize: function (models) {
+          Backbone.Select.One.applyTo(this, models, { enableModelSharing: true });
+          _.extend(this, new ListenerMixin());
+          this.bindEvents();
+        }
+      });
+
+      var ObservableMultiSelectCollection = Backbone.Collection.extend({
+        initialize: function (models) {
+          Backbone.Select.Many.applyTo(this, models, { enableModelSharing: true });
+          _.extend(this, new ListenerMixin());
+          this.bindEvents();
+        }
+      });
+
+      doCapture = false;
+
+      model1 = new ObservableModel();
+      model2 = new ObservableModel();
+      model3 = new ObservableModel();
+      otherModel = new ObservableModel();
+
+      singleSelectCollection = new ObservableSingleSelectCollection([ model1, model2, model3 ]);
+      otherSingleSelectCollection = new ObservableSingleSelectCollection([ model3, otherModel ]);
+      multiSelectCollection = new ObservableMultiSelectCollection([ model1, model2, model3 ]);
+    });
+
+    describe('when a deselect action is initiated in a model', function () {
+
+      beforeEach(function () {
+        model3.select();
+        doCapture = true;
+        model3.deselect();
+      });
+
+      it('the deselected event fires after the deselection in a related collection has taken place', function () {
+        expect(model3.snapshots.onDeselected.calls).toBe(1);
+        expect(model3.snapshots.onDeselected.singleSelectCollection.selected).toBeUndefined();
+      });
+
+      it('the deselect:* event in a related collection fires after the deselection of the model has taken place', function () {
+        expect(singleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+        expect(singleSelectCollection.snapshots.onDeselectOne.model3.selected).toBe(false);
+      });
+
+      it('if the model is part of a second collection, the deselect:* event in the second collection fires after the first collection is updated', function () {
+        expect(otherSingleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+        expect(otherSingleSelectCollection.snapshots.onDeselectOne.singleSelectCollection.selected).toBeUndefined();
+      });
+
+      it('if the model is part of a second collection, the deselect:* event in the first collection fires after the second collection is updated', function () {
+        expect(singleSelectCollection.snapshots.onDeselectOne.otherSingleSelectCollection.selected).toBeUndefined();
+      });
+    });
+
+    describe('when a select action is initiated in a model', function () {
+
+      beforeEach(function () {
+        doCapture = true;
+        model3.select();
+      });
+
+      it('the selected event fires after the status in a related collection is updated', function () {
+        expect(model3.snapshots.onSelected.calls).toBe(1);
+        expect(model3.snapshots.onSelected.singleSelectCollection.selected).toBe(model3);
+      });
+
+      it('the select:* event in a related collection fires after the model status is updated', function () {
+        expect(singleSelectCollection.snapshots.onSelectOne.calls).toBe(1);
+        expect(singleSelectCollection.snapshots.onSelectOne.model3.selected).toBe(true);
+      });
+
+
+      it('if the model is part of a second collection, the select:* event in the second collection fires after the first collection is updated', function () {
+        expect(otherSingleSelectCollection.snapshots.onSelectOne.calls).toBe(1);
+        expect(otherSingleSelectCollection.snapshots.onSelectOne.singleSelectCollection.selected).toBe(model3);
+      });
+
+      it('if the model is part of a second collection, the select:* event in the first collection fires after the second collection is updated', function () {
+        expect(singleSelectCollection.snapshots.onSelectOne.otherSingleSelectCollection.selected).toBe(model3);
+      });
+    });
+
+//    describe('when a select action is initiated in a model and it triggers the deselection of another model', function () {
+//
+//      beforeEach(function () {
+//        otherModel.select();
+//        doCapture = true;
+//        model3.select();
+//      });
+//
+//      it('the deselected event on the other model fires before the selection of the original model has taken place', function () {
+//        expect(otherModel.snapshots.onDeselected.calls).toBe(1);
+//        expect(otherModel.snapshots.onDeselected.otherSingleSelectCollection.selected).toBeUndefined();
+//      });
+//
+//      it('in a collection holding the other model, the deselect:* event fires before the selection of the original model has taken place', function () {
+//        expect(otherSingleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+//        expect(otherSingleSelectCollection.snapshots.onDeselectOne.model3.selected).toBeFalsy();
+//      });
+//    });
+
+
+    describe('when a deselect action is initiated in a multi-select collection', function () {
+
+      beforeEach(function () {
+        model1.select();
+        doCapture = true;
+        multiSelectCollection.deselect(model1);
+      });
+
+      it('the select:none or select:some event fires after the deselection of the model has taken place', function () {
+        expect(multiSelectCollection.snapshots.onSelectNone.calls).toBe(1);
+        expect(multiSelectCollection.snapshots.onSelectNone.model1.selected).toBe(false);
+      });
+
+      it('the select:none or select:some event fires after the deselection in another collection has taken place', function () {
+        expect(multiSelectCollection.snapshots.onSelectNone.singleSelectCollection.selected).toBeUndefined();
+      });
+
+
+      it('the deselected event fires after the deselection in the originating collection has taken place', function () {
+        expect(model1.snapshots.onDeselected.calls).toBe(1);
+        expect(model1.snapshots.onDeselected.multiSelectCollection.selected).toEqual({});
+      });
+
+      it('the deselected event fires after the deselection in another collection has taken place', function () {
+        expect(model1.snapshots.onDeselected.singleSelectCollection.selected).toBeUndefined();
+      });
+
+
+      it('the deselect:* event in another collection fires after the deselection in the originating collection has taken place', function () {
+        expect(singleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+        expect(singleSelectCollection.snapshots.onDeselectOne.multiSelectCollection.selected).toEqual({});
+      });
+
+      it('the deselect:* event in another collection fires after the deselection of the model has taken place', function () {
+        expect(singleSelectCollection.snapshots.onDeselectOne.model1.selected).toBe(false);
+      });
+    });
+
+
+    describe('when a select action is initiated in a multi-select collection', function () {
+
+      beforeEach(function () {
+        doCapture = true;
+        multiSelectCollection.select(model1);
+      });
+
+      it('the select:some or select:all event fires after the model status is updated', function () {
+        expect(multiSelectCollection.snapshots.onSelectSome.calls).toBe(1);
+        expect(multiSelectCollection.snapshots.onSelectSome.model1.selected).toBe(true);
+      });
+
+      it('the select:some or select:all event fires after the status in another collection is updated', function () {
+        expect(multiSelectCollection.snapshots.onSelectSome.singleSelectCollection.selected).toBe(model1);
+      });
+
+
+      it('the selected event fires after the status in the originating collection is updated', function () {
+        expect(model1.snapshots.onSelected.calls).toBe(1);
+        expect(model1.snapshots.onSelected.multiSelectCollection.selected[model1.cid]).toBe(model1);
+      });
+
+      it('the selected event fires after the status in another collection is updated', function () {
+        expect(model1.snapshots.onSelected.singleSelectCollection.selected).toBe(model1);
+      });
+
+
+      it('the select:* event in another collection fires after the status in the originating collection is updated', function () {
+        expect(singleSelectCollection.snapshots.onSelectOne.calls).toBe(1);
+        expect(singleSelectCollection.snapshots.onSelectOne.multiSelectCollection.selected[model1.cid]).toBe(model1);
+      });
+
+      it('the select:* event in another collection fires after the model status is updated', function () {
+        expect(singleSelectCollection.snapshots.onSelectOne.model1.selected).toBe(true);
+      });
+    });
+
+    describe('when a select action is initiated in a multi-select collection and it triggers the deselection of another model', function () {
+
+      beforeEach(function () {
+        otherModel.select();
+        doCapture = true;
+        multiSelectCollection.select(model3);
+      });
+
+//      it('the deselected event on the other model fires before the selection of the original model has taken place', function () {
+//        expect(otherModel.snapshots.onDeselected.calls).toBe(1);
+//        expect(otherModel.snapshots.onDeselected.model3.selected).toBeFalsy();
+//      });
+//
+//      it('the deselect:* event in another collection fires before the selection of the original model has taken place', function () {
+//        expect(otherSingleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+//        expect(otherSingleSelectCollection.snapshots.onDeselectOne.model3.selected).toBeFalsy();
+//      });
+
+
+//      it('the deselected event on the other model fires before before the selection in the originating collection has taken place', function () {
+//        expect(otherModel.snapshots.onDeselected.multiSelectCollection.selected).toEqual({});
+//      });
+//
+//      it('the deselect:* event in another collection fires before before the selection in the originating collection has taken place', function () {
+//        expect(otherSingleSelectCollection.snapshots.onDeselectOne.multiSelectCollection.selected).toEqual({});
+//      });
+
+
+      it('the selected event on the model fires after the deselection of the other model has taken place', function () {
+        expect(model3.snapshots.onSelected.calls).toBe(1);
+        expect(model3.snapshots.onSelected.otherModel.selected).toBe(false);
+      });
+
+      it('the select:some or select:all event in the originating collection fires after the deselection of the other model has taken place', function () {
+        expect(multiSelectCollection.snapshots.onSelectSome.calls).toBe(1);
+        expect(multiSelectCollection.snapshots.onSelectSome.otherModel.selected).toBe(false);
+      });
+
+
+      it('the selected event on the model fires after the deselection in the other collection has taken place', function () {
+        expect(model3.snapshots.onSelected.otherSingleSelectCollection.selected).toBe(model3);
+      });
+
+      it('the select:some or select:all event in the originating collection fires after the deselection in the other collection has taken place', function () {
+        expect(multiSelectCollection.snapshots.onSelectSome.otherSingleSelectCollection.selected).toBe(model3);
+      });
+    });
+
+
+    describe('when a deselect action is initiated in a single-select collection', function () {
+
+      beforeEach(function () {
+        model3.select();
+        doCapture = true;
+        singleSelectCollection.deselect(model3);
+      });
+
+      it('the deselect:one event fires after the deselection of the model has taken place', function () {
+        expect(singleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+        expect(singleSelectCollection.snapshots.onDeselectOne.model3.selected).toBe(false);
+      });
+
+      it('the deselect:one event fires after the deselection in another collection has taken place', function () {
+        expect(singleSelectCollection.snapshots.onDeselectOne.otherSingleSelectCollection.selected).toBeUndefined();
+      });
+
+
+      it('the deselected event fires after the deselection in the originating collection has taken place', function () {
+        expect(model3.snapshots.onDeselected.calls).toBe(1);
+        expect(model3.snapshots.onDeselected.singleSelectCollection.selected).toBeUndefined();
+      });
+
+      it('the deselected event fires after the deselection in another collection has taken place', function () {
+        expect(model3.snapshots.onDeselected.otherSingleSelectCollection.selected).toBeUndefined();
+      });
+
+
+      it('the deselect:* event in another collection fires after the deselection in the originating collection has taken place', function () {
+        expect(otherSingleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+        expect(otherSingleSelectCollection.snapshots.onDeselectOne.singleSelectCollection.selected).toBeUndefined();
+      });
+
+      it('the deselect:* event in another collection fires after the deselection of the model has taken place', function () {
+        expect(otherSingleSelectCollection.snapshots.onDeselectOne.model3.selected).toBe(false);
+      });
+
+    });
+
+
+    describe('when a select action is initiated in a single-select collection', function () {
+
+      beforeEach(function () {
+        doCapture = true;
+        singleSelectCollection.select(model3);
+      });
+
+      it('the select:one event fires after the model status is updated', function () {
+        expect(singleSelectCollection.snapshots.onSelectOne.calls).toBe(1);
+        expect(singleSelectCollection.snapshots.onSelectOne.model3.selected).toBe(true);
+      });
+
+      it('the select:one event fires after the status in another collection is updated', function () {
+        expect(singleSelectCollection.snapshots.onSelectOne.otherSingleSelectCollection.selected).toBe(model3);
+      });
+
+
+      it('the selected event fires after the status in the originating collection is updated', function () {
+        expect(model3.snapshots.onSelected.calls).toBe(1);
+        expect(model3.snapshots.onSelected.singleSelectCollection.selected).toBe(model3);
+      });
+
+      it('the selected event fires after the status in another collection is updated', function () {
+        expect(model3.snapshots.onSelected.otherSingleSelectCollection.selected).toBe(model3);
+      });
+
+
+      it('the select:* event in another collection fires after the status in the originating collection is updated', function () {
+        expect(otherSingleSelectCollection.snapshots.onSelectOne.calls).toBe(1);
+        expect(otherSingleSelectCollection.snapshots.onSelectOne.singleSelectCollection.selected).toBe(model3);
+      });
+
+      it('the select:* event in another collection fires after the model status is updated', function () {
+        expect(otherSingleSelectCollection.snapshots.onSelectOne.model3.selected).toBe(true);
+      });
+    });
+
+
+    describe('when a select action is initiated in a single-select collection, deselecting the previously selected model', function () {
+
+      beforeEach(function () {
+        model1.select();
+        doCapture = true;
+        singleSelectCollection.select(model3);
+      });
+
+//      it('the deselect:one event fires before the selection of the model has taken place', function () {
+//        expect(singleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+//        expect(singleSelectCollection.snapshots.onDeselectOne.model3.selected).toBeFalsy();
+//      });
+//
+//      it('the deselect:one event fires before the selection in another collection has taken place', function () {
+//        expect(singleSelectCollection.snapshots.onDeselectOne.otherSingleSelectCollection.selected).toBeUndefined();
+//      });
+
+
+//      it('the deselected event fires before the selection in the originating collection has taken place', function () {
+//        expect(model1.snapshots.onDeselected.calls).toBe(1);
+//        expect(model1.snapshots.onDeselected.singleSelectCollection.selected).toBeUndefined();
+//      });
+//
+//      it('the deselected event fires before the selection in another collection has taken place', function () {
+//        expect(model1.snapshots.onDeselected.otherSingleSelectCollection.selected).toBeUndefined();
+//      });
+//
+//
+//      it('the deselect:* event in another collection fires before the selection in the originating collection has taken place', function () {
+//        expect(multiSelectCollection.snapshots.onSelectNone.calls).toBe(1);
+//        expect(multiSelectCollection.snapshots.onSelectNone.singleSelectCollection.selected).toBeUndefined();
+//      });
+//
+//      it('the deselect:* event in another collection fires before the selection of the model has taken place', function () {
+//        expect(multiSelectCollection.snapshots.onSelectNone.model3.selected).toBeFalsy();
+//      });
+    });
+
+
+    describe('when a select action is initiated in a single-select collection and it triggers the deselection of a model in another collection', function () {
+
+      // NB The deselected model is not shared with the originating collection
+
+      beforeEach(function () {
+        otherModel.select();
+        doCapture = true;
+        singleSelectCollection.select(model3);
+      });
+
+//      it('the deselected event on the other model fires before the selection in the originating collection has taken place', function () {
+//        expect(otherModel.snapshots.onDeselected.calls).toBe(1);
+//        expect(otherModel.snapshots.onDeselected.singleSelectCollection.selected).toBeUndefined();
+//      });
+//
+//      it('the deselected event on the other model fires before the selection in another collection has taken place', function () {
+//        expect(otherModel.snapshots.onDeselected.otherSingleSelectCollection.selected).toBeUndefined();
+//      });
+//
+//
+//      it('the deselect:* event in the other collection fires before the selection in the originating collection has taken place', function () {
+//        expect(otherSingleSelectCollection.snapshots.onDeselectOne.calls).toBe(1);
+//        expect(otherSingleSelectCollection.snapshots.onDeselectOne.singleSelectCollection.selected).toBeUndefined();
+//      });
+//
+//      it('the deselect:* event in the other collection fires before the selection of the model has taken place', function () {
+//        expect(otherSingleSelectCollection.snapshots.onDeselectOne.model3.selected).toBeFalsy();
+//      });
+    });
+
+  });
+
 });
