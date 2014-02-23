@@ -25,7 +25,17 @@ Backbone.Select = (function (Backbone, _) {
       if (options._processedBy[this._pickyCid]) { return; }
 
       if (!reselected) {
-        this.deselect(undefined, _.omit(options, "_silentLocally", "_processedBy", "_eventQueue"));
+        this.deselect(undefined, _.extend(
+            // _eventQueue vs _eventQueueAppendOnly:
+            //
+            // When a deselect sub action is initiated from a select action, the
+            // deselection events are added to the common event queue. But the
+            // event queue must not be resolved prematurely during the
+            // deselection phase. Resolution is prevented by naming the queue
+            // differently.
+            _.omit(options, "_silentLocally", "_processedBy", "_eventQueue"),
+            { _eventQueueAppendOnly: options._eventQueue }
+        ));
         this.selected = model;
       }
       options._processedBy[this._pickyCid] = { done: false };
@@ -485,7 +495,7 @@ Backbone.Select = (function (Backbone, _) {
   }
 
   function stripInternalOptions (options) {
-    return _.omit(options, "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue");
+    return _.omit(options, "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly");
   }
 
   function multiSelectionToArray (selectionsHash) {
@@ -508,7 +518,12 @@ Backbone.Select = (function (Backbone, _) {
   }
 
   function queueEvent (storage, actor, triggerArgs) {
-    storage._eventQueue.push( {
+    // Use either _eventQueue, which will eventually be processed by the calling
+    // object, or _eventQueueAppendOnly, which is another object's event queue
+    // and resolved elsewhere. _eventQueueAppendOnly exists only when needed,
+    // and thus takes precedence.
+    var queue = storage._eventQueueAppendOnly || storage._eventQueue;
+    queue.push( {
       actor: actor,
       triggerArgs: triggerArgs
     } );
