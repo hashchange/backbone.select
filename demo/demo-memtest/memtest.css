@@ -8,7 +8,7 @@ label.disabled {
     color: #acacac;
 }
 
-.row input[type="checkbox"]{
+.row input[type="checkbox"] {
     margin-left: 0.5rem;
 }
 
@@ -17,6 +17,7 @@ label.disabled {
     #runMemtest {
         margin-top: 1.75rem;
     }
+
     #testTypes label {
         margin-right: 0.5rem;
     }

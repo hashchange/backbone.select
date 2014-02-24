@@ -1,224 +1,224 @@
-describe("multi-select collection: toggleSelectAll", function(){
-  var Model = Backbone.Model.extend({
-    initialize: function(){
-      Backbone.Select.Me.applyTo(this);
-    }
-  });
-  
-  var Collection = Backbone.Collection.extend({
-    initialize: function(models){
-      Backbone.Select.Many.applyTo(this, models);
-    }
-  });
+describe( "multi-select collection: toggleSelectAll", function () {
+    var Model = Backbone.Model.extend( {
+        initialize: function () {
+            Backbone.Select.Me.applyTo( this );
+        }
+    } );
 
-  describe("when no models are selected, and toggling", function(){
-    var m1, m2, collection;
+    var Collection = Backbone.Collection.extend( {
+        initialize: function ( models ) {
+            Backbone.Select.Many.applyTo( this, models );
+        }
+    } );
 
-    beforeEach(function(){
-      m1 = new Model();
-      m2 = new Model();
+    describe( "when no models are selected, and toggling", function () {
+        var m1, m2, collection;
 
-      collection = new Collection([m1, m2]);
-      spyOn(collection, "trigger").andCallThrough();
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
 
-      collection.toggleSelectAll();
-    });
-    
-    it("should trigger a select:all event", function(){
-      expect(collection.trigger).toHaveBeenCalledWithInitial("select:all", { selected: [m1, m2], deselected: [] }, collection);
-    });
+            collection = new Collection( [m1, m2] );
+            spyOn( collection, "trigger" ).andCallThrough();
 
-    it("should have a selected count of 2", function(){
-      expect(collection.selectedLength).toBe(2);
-    });
+            collection.toggleSelectAll();
+        } );
 
-    it("should have 2 models in the selected list", function(){
-      var size = _.size(collection.selected);
-      expect(size).toBe(2);
-    });
-  });
-  
-  describe("when no models are selected, and toggling with options.silent enabled", function(){
-    var m1, m2, collection;
+        it( "should trigger a select:all event", function () {
+            expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [m1, m2], deselected: [] }, collection );
+        } );
 
-    beforeEach(function(){
-      m1 = new Model();
-      m2 = new Model();
+        it( "should have a selected count of 2", function () {
+            expect( collection.selectedLength ).toBe( 2 );
+        } );
 
-      collection = new Collection([m1, m2]);
-      spyOn(collection, "trigger").andCallThrough();
+        it( "should have 2 models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 2 );
+        } );
+    } );
 
-      collection.toggleSelectAll({silent: true});
-    });
+    describe( "when no models are selected, and toggling with options.silent enabled", function () {
+        var m1, m2, collection;
 
-    it("should not trigger a select:all event", function(){
-      expect(collection.trigger).not.toHaveBeenCalledWithInitial("select:all");
-    });
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
 
-    it("should have a selected count of 2", function(){
-      expect(collection.selectedLength).toBe(2);
-    });
+            collection = new Collection( [m1, m2] );
+            spyOn( collection, "trigger" ).andCallThrough();
 
-    it("should have 2 models in the selected list", function(){
-      var size = _.size(collection.selected);
-      expect(size).toBe(2);
-    });
-  });
+            collection.toggleSelectAll( {silent: true} );
+        } );
 
-  describe("when some models are selected, and toggling", function(){
-    var m1, m2, collection;
+        it( "should not trigger a select:all event", function () {
+            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
+        } );
 
-    beforeEach(function(){
-      m1 = new Model();
-      m2 = new Model();
+        it( "should have a selected count of 2", function () {
+            expect( collection.selectedLength ).toBe( 2 );
+        } );
 
-      collection = new Collection([m1, m2]);
-      m1.select();
+        it( "should have 2 models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 2 );
+        } );
+    } );
 
-      spyOn(collection, "trigger").andCallThrough();
+    describe( "when some models are selected, and toggling", function () {
+        var m1, m2, collection;
 
-      collection.toggleSelectAll();
-    });
-    
-    it("should trigger a select:all event", function(){
-      expect(collection.trigger).toHaveBeenCalledWithInitial("select:all", { selected: [m2], deselected: [] }, collection);
-    });
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
 
-    it("should trigger a reselect:any event", function(){
-      expect(collection.trigger).toHaveBeenCalledWithInitial("reselect:any", [m1], collection);
-    });
+            collection = new Collection( [m1, m2] );
+            m1.select();
 
-    it("should have a selected count of 2", function(){
-      expect(collection.selectedLength).toBe(2);
-    });
+            spyOn( collection, "trigger" ).andCallThrough();
 
-    it("should have 2 models in the selected list", function(){
-      var size = _.size(collection.selected);
-      expect(size).toBe(2);
-    });
-  });
-  
-  describe("when all models are selected, and toggling", function(){
-    var m1, m2, collection;
+            collection.toggleSelectAll();
+        } );
 
-    beforeEach(function(){
-      m1 = new Model();
-      m2 = new Model();
+        it( "should trigger a select:all event", function () {
+            expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [m2], deselected: [] }, collection );
+        } );
 
-      collection = new Collection([m1, m2]);
-      m1.select();
-      m2.select();
+        it( "should trigger a reselect:any event", function () {
+            expect( collection.trigger ).toHaveBeenCalledWithInitial( "reselect:any", [m1], collection );
+        } );
 
-      spyOn(collection, "trigger").andCallThrough();
+        it( "should have a selected count of 2", function () {
+            expect( collection.selectedLength ).toBe( 2 );
+        } );
 
-      collection.toggleSelectAll();
-    });
-    
-    it("should trigger a select:none event", function(){
-      expect(collection.trigger).toHaveBeenCalledWithInitial("select:none", { selected: [], deselected: [m1, m2] }, collection);
-    });
+        it( "should have 2 models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 2 );
+        } );
+    } );
 
-    it("should have a selected count of 0", function(){
-      expect(collection.selectedLength).toBe(0);
-    });
+    describe( "when all models are selected, and toggling", function () {
+        var m1, m2, collection;
 
-    it("should have 0 models in the selected list", function(){
-      var size = _.size(collection.selected);
-      expect(size).toBe(0);
-    });
-  });
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
 
-  describe("when all models are selected, and toggling with options.silent enabled", function(){
-    var m1, m2, collection;
+            collection = new Collection( [m1, m2] );
+            m1.select();
+            m2.select();
 
-    beforeEach(function(){
-      m1 = new Model();
-      m2 = new Model();
+            spyOn( collection, "trigger" ).andCallThrough();
 
-      collection = new Collection([m1, m2]);
-      m1.select();
-      m2.select();
+            collection.toggleSelectAll();
+        } );
 
-      spyOn(collection, "trigger").andCallThrough();
+        it( "should trigger a select:none event", function () {
+            expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [m1, m2] }, collection );
+        } );
 
-      collection.toggleSelectAll({silent: true});
-    });
+        it( "should have a selected count of 0", function () {
+            expect( collection.selectedLength ).toBe( 0 );
+        } );
 
-    it("should not trigger a select:none event", function(){
-      expect(collection.trigger).not.toHaveBeenCalledWithInitial("select:none");
-    });
+        it( "should have 0 models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 0 );
+        } );
+    } );
 
-    it("should have a selected count of 0", function(){
-      expect(collection.selectedLength).toBe(0);
-    });
+    describe( "when all models are selected, and toggling with options.silent enabled", function () {
+        var m1, m2, collection;
 
-    it("should have 0 models in the selected list", function(){
-      var size = _.size(collection.selected);
-      expect(size).toBe(0);
-    });
-  });
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
 
-  describe('custom options', function () {
+            collection = new Collection( [m1, m2] );
+            m1.select();
+            m2.select();
 
-    describe("when no models are selected, and toggling with a custom option", function(){
-      var m1, m2, collection;
+            spyOn( collection, "trigger" ).andCallThrough();
 
-      beforeEach(function(){
-        m1 = new Model();
-        m2 = new Model();
+            collection.toggleSelectAll( {silent: true} );
+        } );
 
-        collection = new Collection([m1, m2]);
+        it( "should not trigger a select:none event", function () {
+            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:none" );
+        } );
 
-        spyOn(m1, "trigger").andCallThrough();
-        spyOn(m2, "trigger").andCallThrough();
-        spyOn(collection, "trigger").andCallThrough();
+        it( "should have a selected count of 0", function () {
+            expect( collection.selectedLength ).toBe( 0 );
+        } );
 
-        collection.toggleSelectAll({foo: "bar"});
-      });
+        it( "should have 0 models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 0 );
+        } );
+    } );
 
-      it("should trigger a selected event on the first model and pass the options object along as the last parameter", function(){
-        expect(m1.trigger).toHaveBeenCalledWith("selected", m1, {foo: "bar"});
-      });
+    describe( 'custom options', function () {
 
-      it("should trigger a selected event on the second model and pass the options object along as the last parameter", function(){
-        expect(m2.trigger).toHaveBeenCalledWith("selected", m2, {foo: "bar"});
-      });
+        describe( "when no models are selected, and toggling with a custom option", function () {
+            var m1, m2, collection;
 
-      it("should trigger a select:all event and pass the options object along as the last parameter", function(){
-        expect(collection.trigger).toHaveBeenCalledWith("select:all", { selected: [m1, m2], deselected: [] }, collection, {foo: "bar"});
-      });
-    });
+            beforeEach( function () {
+                m1 = new Model();
+                m2 = new Model();
 
-    describe("when all models are selected, and toggling with a custom option", function(){
-      var m1, m2, collection;
+                collection = new Collection( [m1, m2] );
 
-      beforeEach(function(){
-        m1 = new Model();
-        m2 = new Model();
+                spyOn( m1, "trigger" ).andCallThrough();
+                spyOn( m2, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).andCallThrough();
 
-        collection = new Collection([m1, m2]);
-        collection.selectAll();
+                collection.toggleSelectAll( {foo: "bar"} );
+            } );
 
-        spyOn(m1, "trigger").andCallThrough();
-        spyOn(m2, "trigger").andCallThrough();
-        spyOn(collection, "trigger").andCallThrough();
+            it( "should trigger a selected event on the first model and pass the options object along as the last parameter", function () {
+                expect( m1.trigger ).toHaveBeenCalledWith( "selected", m1, {foo: "bar"} );
+            } );
 
-        collection.toggleSelectAll({foo: "bar"});
-      });
+            it( "should trigger a selected event on the second model and pass the options object along as the last parameter", function () {
+                expect( m2.trigger ).toHaveBeenCalledWith( "selected", m2, {foo: "bar"} );
+            } );
 
-      it("should trigger a deselected event on the first model and pass the options object along as the last parameter", function(){
-        expect(m1.trigger).toHaveBeenCalledWith("deselected", m1, {foo: "bar"});
-      });
+            it( "should trigger a select:all event and pass the options object along as the last parameter", function () {
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m1, m2], deselected: [] }, collection, {foo: "bar"} );
+            } );
+        } );
 
-      it("should trigger a deselected event on the second model and pass the options object along as the last parameter", function(){
-        expect(m2.trigger).toHaveBeenCalledWith("deselected", m2, {foo: "bar"});
-      });
+        describe( "when all models are selected, and toggling with a custom option", function () {
+            var m1, m2, collection;
 
-      it("should trigger a select:none event and pass the options object along as the last parameter", function(){
-        expect(collection.trigger).toHaveBeenCalledWith("select:none", { selected: [], deselected: [m1, m2] }, collection, {foo: "bar"});
-      });
-    });
+            beforeEach( function () {
+                m1 = new Model();
+                m2 = new Model();
 
-  });
+                collection = new Collection( [m1, m2] );
+                collection.selectAll();
 
-});
+                spyOn( m1, "trigger" ).andCallThrough();
+                spyOn( m2, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).andCallThrough();
+
+                collection.toggleSelectAll( {foo: "bar"} );
+            } );
+
+            it( "should trigger a deselected event on the first model and pass the options object along as the last parameter", function () {
+                expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, {foo: "bar"} );
+            } );
+
+            it( "should trigger a deselected event on the second model and pass the options object along as the last parameter", function () {
+                expect( m2.trigger ).toHaveBeenCalledWith( "deselected", m2, {foo: "bar"} );
+            } );
+
+            it( "should trigger a select:none event and pass the options object along as the last parameter", function () {
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1, m2] }, collection, {foo: "bar"} );
+            } );
+        } );
+
+    } );
+
+} );

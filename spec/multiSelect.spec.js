@@ -1,221 +1,221 @@
-describe("multi-select collection: general", function(){
-  var Model = Backbone.Model.extend({
-    initialize: function(){
-      Backbone.Select.Me.applyTo(this);
-    }
-  });
-  
-  var Collection = Backbone.Collection.extend({
-    initialize: function(models){
-      Backbone.Select.Many.applyTo(this, models);
-    }
-  });
+describe( "multi-select collection: general", function () {
+    var Model = Backbone.Model.extend( {
+        initialize: function () {
+            Backbone.Select.Me.applyTo( this );
+        }
+    } );
 
-  describe('A Select.Many collection instance should identify itself', function () {
-    var collection;
+    var Collection = Backbone.Collection.extend( {
+        initialize: function ( models ) {
+            Backbone.Select.Many.applyTo( this, models );
+        }
+    } );
 
-    beforeEach(function(){
-      collection = new Collection();
-    });
+    describe( 'A Select.Many collection instance should identify itself', function () {
+        var collection;
 
-    it("as an instance of Backbone.Collection", function(){
-      expect(collection instanceof Backbone.Collection).toBe(true);
-    });
+        beforeEach( function () {
+            collection = new Collection();
+        } );
 
-    it("as 'Backbone.Select.Many' with the _pickyType property", function(){
-      expect(collection._pickyType).toBe("Backbone.Select.Many");
-    });
-  });
+        it( "as an instance of Backbone.Collection", function () {
+            expect( collection instanceof Backbone.Collection ).toBe( true );
+        } );
 
-  describe('automatic invocation of onSelectNone, onSelectSome, onSelectAll, onReselect handlers', function () {
-    var EventHandlingCollection, model, collection;
+        it( "as 'Backbone.Select.Many' with the _pickyType property", function () {
+            expect( collection._pickyType ).toBe( "Backbone.Select.Many" );
+        } );
+    } );
 
-    beforeEach(function () {
+    describe( 'automatic invocation of onSelectNone, onSelectSome, onSelectAll, onReselect handlers', function () {
+        var EventHandlingCollection, model, collection;
 
-      EventHandlingCollection = Collection.extend({
-        onSelectNone: function () {},
-        onSelectSome: function () {},
-        onSelectAll:  function () {},
-        onReselect:   function () {},
+        beforeEach( function () {
 
-        // Pseudo event handlers modeled on internal events `_selected`,
-        // `_deselected`; should not be invoked automatically
-        on_select: function () {},
-        on_deselect: function () {}
-      });
+            EventHandlingCollection = Collection.extend( {
+                onSelectNone: function () {},
+                onSelectSome: function () {},
+                onSelectAll: function () {},
+                onReselect: function () {},
 
-      model = new Model();
-      collection = new EventHandlingCollection([model]);
+                // Pseudo event handlers modeled on internal events `_selected`,
+                // `_deselected`; should not be invoked automatically
+                on_select: function () {},
+                on_deselect: function () {}
+            } );
 
-      spyOn(collection, "onSelectNone").andCallThrough();
-      spyOn(collection, "onSelectSome").andCallThrough();
-      spyOn(collection, "onSelectAll").andCallThrough();
-      spyOn(collection, "onReselect").andCallThrough();
+            model = new Model();
+            collection = new EventHandlingCollection( [model] );
 
-      spyOn(collection, "on_select").andCallThrough();
-      spyOn(collection, "on_deselect").andCallThrough();
-    });
+            spyOn( collection, "onSelectNone" ).andCallThrough();
+            spyOn( collection, "onSelectSome" ).andCallThrough();
+            spyOn( collection, "onSelectAll" ).andCallThrough();
+            spyOn( collection, "onReselect" ).andCallThrough();
 
-    it('calls the onSelectNone handler when triggering a select:none event', function () {
-      collection.trigger("select:none", { selected: [], deselected: [model] }, collection, {foo: "bar"});
-      expect(collection.onSelectNone).toHaveBeenCalledWith({ selected: [], deselected: [model] }, collection, {foo: "bar"});
-    });
+            spyOn( collection, "on_select" ).andCallThrough();
+            spyOn( collection, "on_deselect" ).andCallThrough();
+        } );
 
-    it('calls the onSelectSome handler when triggering a select:some event', function () {
-      collection.trigger("select:some", { selected: [model], deselected: [] }, collection, {foo: "bar"});
-      expect(collection.onSelectSome).toHaveBeenCalledWith({ selected: [model], deselected: [] }, collection, {foo: "bar"});
-    });
+        it( 'calls the onSelectNone handler when triggering a select:none event', function () {
+            collection.trigger( "select:none", { selected: [], deselected: [model] }, collection, {foo: "bar"} );
+            expect( collection.onSelectNone ).toHaveBeenCalledWith( { selected: [], deselected: [model] }, collection, {foo: "bar"} );
+        } );
 
-    it('calls the onSelectAll handler when triggering a select:all event', function () {
-      collection.trigger("select:all", { selected: [model], deselected: [] }, collection, {foo: "bar"});
-      expect(collection.onSelectAll).toHaveBeenCalledWith({ selected: [model], deselected: [] }, collection, {foo: "bar"});
-    });
+        it( 'calls the onSelectSome handler when triggering a select:some event', function () {
+            collection.trigger( "select:some", { selected: [model], deselected: [] }, collection, {foo: "bar"} );
+            expect( collection.onSelectSome ).toHaveBeenCalledWith( { selected: [model], deselected: [] }, collection, {foo: "bar"} );
+        } );
 
-    it('calls the onReselect handler when triggering a reselect:any event', function () {
-      collection.trigger("reselect:any", [model], collection, {foo: "bar"});
-      expect(collection.onReselect).toHaveBeenCalledWith([model], collection, {foo: "bar"});
-    });
+        it( 'calls the onSelectAll handler when triggering a select:all event', function () {
+            collection.trigger( "select:all", { selected: [model], deselected: [] }, collection, {foo: "bar"} );
+            expect( collection.onSelectAll ).toHaveBeenCalledWith( { selected: [model], deselected: [] }, collection, {foo: "bar"} );
+        } );
 
-    it('does not call an event handler accidentally named after the internal _selected event', function () {
-      model.trigger("_selected", model);
-      expect(collection.on_select).not.toHaveBeenCalled();
-    });
+        it( 'calls the onReselect handler when triggering a reselect:any event', function () {
+            collection.trigger( "reselect:any", [model], collection, {foo: "bar"} );
+            expect( collection.onReselect ).toHaveBeenCalledWith( [model], collection, {foo: "bar"} );
+        } );
 
-    it('does not call an event handler accidentally named after the internal _deselected event', function () {
-      model.trigger("_deselected", model);
-      expect(collection.on_deselect).not.toHaveBeenCalled();
-    });
-  });
+        it( 'does not call an event handler accidentally named after the internal _selected event', function () {
+            model.trigger( "_selected", model );
+            expect( collection.on_select ).not.toHaveBeenCalled();
+        } );
 
-  describe('Model-sharing status flag', function () {
+        it( 'does not call an event handler accidentally named after the internal _deselected event', function () {
+            model.trigger( "_deselected", model );
+            expect( collection.on_deselect ).not.toHaveBeenCalled();
+        } );
+    } );
 
-    describe('when model sharing is disabled', function () {
-      var collection;
+    describe( 'Model-sharing status flag', function () {
 
-      it('with no models being passed in during construction, the _modelSharingEnabled property is not set to true', function () {
-        // Ie, the property must not exist, or be false.
-        collection = new Collection();
-        expect(collection._modelSharingEnabled).not.toBe(true);
-      });
+        describe( 'when model sharing is disabled', function () {
+            var collection;
 
-      it('with models being passed in during construction, the _modelSharingEnabled property is not set to true', function () {
-        // Ie, the property must not exist, or be false.
-        collection = new Collection( [new Model()]);
-        expect(collection._modelSharingEnabled).not.toBe(true);
-      });
-    });
+            it( 'with no models being passed in during construction, the _modelSharingEnabled property is not set to true', function () {
+                // Ie, the property must not exist, or be false.
+                collection = new Collection();
+                expect( collection._modelSharingEnabled ).not.toBe( true );
+            } );
 
-    describe('when model sharing is enabled', function () {
-      var SharingCollection, collection;
+            it( 'with models being passed in during construction, the _modelSharingEnabled property is not set to true', function () {
+                // Ie, the property must not exist, or be false.
+                collection = new Collection( [new Model()] );
+                expect( collection._modelSharingEnabled ).not.toBe( true );
+            } );
+        } );
 
-      beforeEach(function () {
-        SharingCollection = Backbone.Collection.extend({
-          initialize: function(models){
-            Backbone.Select.Many.applyTo(this, models, { enableModelSharing: true });
-          }
-        });
-      });
+        describe( 'when model sharing is enabled', function () {
+            var SharingCollection, collection;
 
-      it('with no models being passed in during construction, the _modelSharingEnabled property is true', function () {
-        collection = new SharingCollection();
-        expect(collection._modelSharingEnabled).toBe(true);
-      });
+            beforeEach( function () {
+                SharingCollection = Backbone.Collection.extend( {
+                    initialize: function ( models ) {
+                        Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+                    }
+                } );
+            } );
 
-      it('with models being passed in during construction, the _modelSharingEnabled property is true', function () {
-        collection = new SharingCollection( [new Model()]);
-        expect(collection._modelSharingEnabled).toBe(true);
-      });
-    });
+            it( 'with no models being passed in during construction, the _modelSharingEnabled property is true', function () {
+                collection = new SharingCollection();
+                expect( collection._modelSharingEnabled ).toBe( true );
+            } );
 
-  });
+            it( 'with models being passed in during construction, the _modelSharingEnabled property is true', function () {
+                collection = new SharingCollection( [new Model()] );
+                expect( collection._modelSharingEnabled ).toBe( true );
+            } );
+        } );
 
-  describe('Checking for memory leaks', function () {
+    } );
 
-    describe('when a collection is replaced by another one and is not referenced by a variable any more, with model sharing disabled', function () {
-      var logger, LoggedCollection, m1, m2, collection;
+    describe( 'Checking for memory leaks', function () {
 
-      beforeEach(function () {
-        logger = new Logger();
+        describe( 'when a collection is replaced by another one and is not referenced by a variable any more, with model sharing disabled', function () {
+            var logger, LoggedCollection, m1, m2, collection;
 
-        LoggedCollection = Collection.extend({
-          initialize: function(models){
-            this.on("select:none", function () {
-              logger.log( "select:none event fired in selected in collection " + this._pickyCid );
-            });
-            this.on("select:some", function () {
-              logger.log( "select:some event fired in selected in collection " + this._pickyCid );
-            });
-            this.on("select:all", function () {
-              logger.log( "select:all event fired in selected in collection " + this._pickyCid );
-            });
+            beforeEach( function () {
+                logger = new Logger();
 
-            Collection.prototype.initialize.call(this, models);
-          }
-        });
+                LoggedCollection = Collection.extend( {
+                    initialize: function ( models ) {
+                        this.on( "select:none", function () {
+                            logger.log( "select:none event fired in selected in collection " + this._pickyCid );
+                        } );
+                        this.on( "select:some", function () {
+                            logger.log( "select:some event fired in selected in collection " + this._pickyCid );
+                        } );
+                        this.on( "select:all", function () {
+                            logger.log( "select:all event fired in selected in collection " + this._pickyCid );
+                        } );
 
-        m1 = new Model();
-        m2 = new Model();
-      });
+                        Collection.prototype.initialize.call( this, models );
+                    }
+                } );
 
-      it('should no longer respond to model events', function () {
-        // With only variable holding a collection, only one 'select:*' event
-        // should be logged.
+                m1 = new Model();
+                m2 = new Model();
+            } );
 
-        //noinspection JSUnusedAssignment
-        collection = new LoggedCollection([m1, m2]);
-        collection = new LoggedCollection([m1, m2]);
+            it( 'should no longer respond to model events', function () {
+                // With only variable holding a collection, only one 'select:*' event
+                // should be logged.
 
-        m2.select();
-        expect(logger.entries.length).toBe(1);
-      });
-    });
+                //noinspection JSUnusedAssignment
+                collection = new LoggedCollection( [m1, m2] );
+                collection = new LoggedCollection( [m1, m2] );
 
-    describe('when a collection is replaced by another one and is not referenced by a variable any more, with model sharing enabled', function () {
-      var logger, Collection, LoggedCollection, m1, m2, collection;
+                m2.select();
+                expect( logger.entries.length ).toBe( 1 );
+            } );
+        } );
 
-      beforeEach(function () {
-        logger = new Logger();
+        describe( 'when a collection is replaced by another one and is not referenced by a variable any more, with model sharing enabled', function () {
+            var logger, Collection, LoggedCollection, m1, m2, collection;
 
-        Collection = Backbone.Collection.extend({
-          model: Model,
+            beforeEach( function () {
+                logger = new Logger();
 
-          initialize: function(models){
-            Backbone.Select.Many.applyTo(this, models, { enableModelSharing: true });
-          }
-        });
+                Collection = Backbone.Collection.extend( {
+                    model: Model,
 
-        LoggedCollection = Collection.extend({
-          initialize: function(models){
-            this.on("select:none", function () {
-              logger.log( "select:none event fired in selected in collection " + this._pickyCid );
-            });
-            this.on("select:some", function () {
-              logger.log( "select:some event fired in selected in collection " + this._pickyCid );
-            });
-            this.on("select:all", function () {
-              logger.log( "select:all event fired in selected in collection " + this._pickyCid );
-            });
+                    initialize: function ( models ) {
+                        Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+                    }
+                } );
 
-            Collection.prototype.initialize.call(this, models);
-          }
-        });
+                LoggedCollection = Collection.extend( {
+                    initialize: function ( models ) {
+                        this.on( "select:none", function () {
+                            logger.log( "select:none event fired in selected in collection " + this._pickyCid );
+                        } );
+                        this.on( "select:some", function () {
+                            logger.log( "select:some event fired in selected in collection " + this._pickyCid );
+                        } );
+                        this.on( "select:all", function () {
+                            logger.log( "select:all event fired in selected in collection " + this._pickyCid );
+                        } );
 
-        m1 = new Model();
-        m2 = new Model();
-      });
+                        Collection.prototype.initialize.call( this, models );
+                    }
+                } );
 
-      it('should no longer respond to model events after calling close on it', function () {
-        // With only variable holding a collection, only one 'select:*' event
-        // should be logged.
-        collection = new LoggedCollection([m1, m2]);
-        collection.close();
-        collection = new LoggedCollection([m1, m2]);
+                m1 = new Model();
+                m2 = new Model();
+            } );
 
-        m2.select();
-        expect(logger.entries.length).toBe(1);
-      });
-    });
+            it( 'should no longer respond to model events after calling close on it', function () {
+                // With only variable holding a collection, only one 'select:*' event
+                // should be logged.
+                collection = new LoggedCollection( [m1, m2] );
+                collection.close();
+                collection = new LoggedCollection( [m1, m2] );
 
-  });
+                m2.select();
+                expect( logger.entries.length ).toBe( 1 );
+            } );
+        } );
 
-});
+    } );
+
+} );

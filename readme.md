@@ -6,12 +6,9 @@ Selecting Backbone models; handling selections in Backbone collections.
 
 The component is available with Bower: `bower install backbone.select`.
 
-Alternatively, you can download the raw source code from the "src"
-folder above, or grab one of the builds from the 
-"dist" folder.
+Alternatively, you can download the raw source code from the "src" folder above, or grab one of the builds from the "dist" folder.
 
-To get the latest stable release, use these links 
-which point to the 'master' branch's builds:
+To get the latest stable release, use these links which point to the 'master' branch's builds:
 
 ### Standard Builds
 
@@ -33,19 +30,11 @@ Backbone.Backbone.Select requires Backbone 0.9.9 or later.
 
 #### IMPORTANT NOTE ABOUT METHOD NAME "select"
 
-The Backbone.Select collections override the method `select` on collections. At this
-point, I can't think of a better name for specifying a model has been
-selected. Once I find a better name, the API will change. But for now,
-you will not be able to use the standard `select` method on any
-collection that has a Backbone.Select collection mixin.
+The Backbone.Select collections override the method `select` on collections. At this point, I can't think of a better name for specifying a model has been selected. Once I find a better name, the API will change. But for now, you will not be able to use the standard `select` method on any collection that has a Backbone.Select collection mixin.
 
 ## Model and Collection Interactions
 
-If you implement a `Backbone.Select.Me` model, the methods on the models and the
-`Backbone.Select.Many` collection will keep each other in sync. That is, if you
-call `model.select()` on a model, the collection will be notified of the
-model being selected and it will correctly update the `selectedLength` and
-fire the correct events.
+If you implement a `Backbone.Select.Me` model, the methods on the models and the `Backbone.Select.Many` collection will keep each other in sync. That is, if you call `model.select()` on a model, the collection will be notified of the model being selected and it will correctly update the `selectedLength` and fire the correct events.
 
 Therefore, the following are functionally the same:
 
@@ -75,13 +64,11 @@ Your model for a Backbone.Select collection must extend `Backbone.Select.Me`.
 
 ## Backbone.Select.Me: Making models selectable
 
-Creates selectable capabilities for a model, including tracking whether or
-not the model is selected, and raising events when selection changes.
+Creates selectable capabilities for a model, including tracking whether or not the model is selected, and raising events when selection changes.
 
 ### Basic Usage
 
-To create a selectable model type, apply the mixin in its `initialize` method.
-Assuming your base type is `Backbone.Model`, augment it with
+To create a selectable model type, apply the mixin in its `initialize` method. Assuming your base type is `Backbone.Model`, augment it with
 
 ```js
 SelectableModel = Backbone.Model.extend({
@@ -91,8 +78,7 @@ SelectableModel = Backbone.Model.extend({
 });
 ```
 
-Replace `Backbone.Model` in the example above with whatever base type you work
-with.
+Replace `Backbone.Model` in the example above with whatever base type you work with.
 
 ### Backbone.Select.Me Methods
 
@@ -100,8 +86,7 @@ The following methods are included in the `Select.Me` object.
 
 #### Select.Me#select([options])
 
-Select a model, setting the model's `selected` property to true and
-triggering a "select" event.
+Select a model, setting the model's `selected` property to true and triggering a "select" event.
 
 ```js
 var myModel = new SelectableModel();
@@ -114,14 +99,11 @@ myModel.select(); //=> logs "I'm selected!"
 myModel.selected; //=> true
 ```
 
-The `select` method can be called with the `{silent: true}` option to prevent
-selection-related events from firing. See the [events section](#selectable-events)
-below.
+The `select` method can be called with the `{silent: true}` option to prevent selection-related events from firing. See the [events section](#selectable-events) below.
 
 #### Select.Me#deselect([options])
 
-Deselect a model, setting the model's `selected` property to false and
-triggering a "deselected" event.
+Deselect a model, setting the model's `selected` property to false and triggering a "deselected" event.
 
 ```js
 var myModel = new SelectableModel();
@@ -141,8 +123,7 @@ The `deselect` method supports the `silent` option.
 
 #### Select.Me#toggleSelected([options])
 
-Toggles the selection state between selected and deselected by calling
-the `select` or `deselect` method appropriately.
+Toggles the selection state between selected and deselected by calling the `select` or `deselect` method appropriately.
 
 ```js
 var myModel = new SelectableModel();
@@ -168,50 +149,35 @@ The following properties are manipulated by the Select.Me object.
 
 #### Select.Me#selected
 
-Returns a boolean value indicating whether or not the model is
-currently selected.
+Returns a boolean value indicating whether or not the model is currently selected.
 
 ### Backbone.Select.Me Events
 
-The events listed below are are triggered from Select.Me models. Events can be
-prevented from firing when Backbone.Select methods are called with the `silent`
-option, as in `myModel.select({silent: true})`.
+The events listed below are are triggered from Select.Me models. Events can be prevented from firing when Backbone.Select methods are called with the `silent` option, as in `myModel.select({silent: true})`.
 
-Event handlers with standard names are invoked automatically. Standard names are
-`onSelect`, `onDeselect`, and `onReselect`. If these methods exist on the model,
-they are run without having to be wired up with the event manually.
+Event handlers with standard names are invoked automatically. Standard names are `onSelect`, `onDeselect`, and `onReselect`. If these methods exist on the model, they are run without having to be wired up with the event manually.
 
-Custom options can be used when invoking any method. See the [section on custom
-options](#custom-options), below.
+Custom options can be used when invoking any method. See the [section on custom options](#custom-options), below.
 
 #### "selected"
 
-Triggers when a model has been selected. Provides the selected model as the
-first parameter. Runs the `onSelect` event handler if the method exists on the
-model.
+Triggers when a model has been selected. Provides the selected model as the first parameter. Runs the `onSelect` event handler if the method exists on the model.
 
 #### "deselected"
 
-Triggers when a model has been deselected. Provides the selected model as the
-first parameter. Runs the `onDeselect` event handler if the method exists on the
-model.
+Triggers when a model has been deselected. Provides the selected model as the first parameter. Runs the `onDeselect` event handler if the method exists on the model.
 
 #### "reselected"
 
-Triggers when a model, which is already selected, is selected again. Provides
-the re-selected model as the first parameter. Runs the `onReselect` event
-handler if the method exists on the model.
+Triggers when a model, which is already selected, is selected again. Provides the re-selected model as the first parameter. Runs the `onReselect` event handler if the method exists on the model.
 
 ## Backbone.Select.One: a single-select collection
 
-Creates single-select capabilities for a `Backbone.Collection`, allowing
-a single model to be exclusively selected within the collection. Selecting
-another model will cause the first one to be deselected.
+Creates single-select capabilities for a `Backbone.Collection`, allowing a single model to be exclusively selected within the collection. Selecting another model will cause the first one to be deselected.
 
 ### Basic Usage
 
-To create a single-select collection type, apply the mixin in the `initialize`
-method. Assuming your base type is `Backbone.Collection`, augment it with
+To create a single-select collection type, apply the mixin in the `initialize` method. Assuming your base type is `Backbone.Collection`, augment it with
 
 ```js
 SelectableModel = Backbone.Model.extend({
@@ -229,12 +195,9 @@ SingleCollection = Backbone.Collection.extend({
 });
 ```
 
-Replace `Backbone.Collection` in the example above with whatever base type you
-work with.
+Replace `Backbone.Collection` in the example above with whatever base type you work with.
 
-If you share models among multiple collections, Backbone.Select will handle the
-interaction for you. You must turn on model-sharing mode explicitly, with the
-`enableModelSharing` option:
+If you share models among multiple collections, Backbone.Select will handle the interaction for you. You must turn on model-sharing mode explicitly, with the `enableModelSharing` option:
 
 ```js
 SingleCollection = Backbone.Collection.extend({
@@ -254,9 +217,7 @@ The following methods are provided by the `Select.One` object.
 
 #### Select.One#select(model, [options])
 
-Select a model. This method will store the selected model in
-the collection's `selected` property, and call the model's `select`
-method to ensure the model knows it has been selected.
+Select a model. This method will store the selected model in the collection's `selected` property, and call the model's `select` method to ensure the model knows it has been selected.
 
 ```js
 myModel = new SelectableModel();
@@ -272,16 +233,13 @@ myCol = new SingleCollection([myModel]);
 myModel.select();
 ```
 
-If the model is already selected, this is a no-op. If a previous model
-is already selected, the previous model will be deselected.
+If the model is already selected, this is a no-op. If a previous model is already selected, the previous model will be deselected.
 
 The `select` method supports the `silent` option.
 
 #### Select.One#deselect([model], [options])
 
-Deselect the currently selected model. This method will remove the 
-model from the collection's `selected` property, and call the model's
-`deselect` method to ensure the model knows it has been deselected.
+Deselect the currently selected model. This method will remove the  model from the collection's `selected` property, and call the model's `deselect` method to ensure the model knows it has been deselected.
 
 ```js
 myModel = new SelectableModel();
@@ -297,12 +255,9 @@ myCol = new SingleCollection([myModel]);
 myModel.deselect();
 ```
 
-If the model is not currently selected, this is a no-op. If you try to
-deselect a model that is not the currently selected model, the actual
-selected model will not be deselected.
+If the model is not currently selected, this is a no-op. If you try to deselect a model that is not the currently selected model, the actual selected model will not be deselected.
 
-You can call `deselect` without a model argument. The currently selected model,
-if any, will be deselected in that case.
+You can call `deselect` without a model argument. The currently selected model, if any, will be deselected in that case.
 
 The `deselect` method supports the `silent` option.
 
@@ -323,53 +278,35 @@ myCol.selected; //=> model
 
 ### Backbone.Select.One Events
 
-The events listed below are triggered by Backbone.Select.One based on changes in
-selection. Events can be prevented from firing when Backbone.Select methods are
-called with the `silent` option, as in `myCol.select(myModel, {silent: true})`.
+The events listed below are triggered by Backbone.Select.One based on changes in selection. Events can be prevented from firing when Backbone.Select methods are called with the `silent` option, as in `myCol.select(myModel, {silent: true})`.
 
-Event handlers with standard names are invoked automatically. Standard names are
-`onSelect`, `onDeselect`, and `onReselect`. If these methods exist on the
-collection, they are run without having to be wired up with the event manually.
+Event handlers with standard names are invoked automatically. Standard names are `onSelect`, `onDeselect`, and `onReselect`. If these methods exist on the collection, they are run without having to be wired up with the event manually.
 
-Custom options can be used when invoking any method. See the [section on custom
-options](#custom-options), below.
+Custom options can be used when invoking any method. See the [section on custom options](#custom-options), below.
 
 #### "select:one"
 
-Triggered when a model has been selected. Provides the selected model as the
-first parameter, and the collection as the second. Runs the `onSelect` event
-handler if the method exists on the collection.
+Triggered when a model has been selected. Provides the selected model as the first parameter, and the collection as the second. Runs the `onSelect` event handler if the method exists on the collection.
 
 #### "deselect:one"
 
-Triggered when a model has been deselected. Provides the deselected model as the
-first parameter, and the collection as the second.. Runs the `onDeselect` event
-handler if the method exists on the collection.
+Triggered when a model has been deselected. Provides the deselected model as the first parameter, and the collection as the second.. Runs the `onDeselect` event handler if the method exists on the collection.
 
-The event fires when `deselect` has been called explicitly, and also when the
-selection is being replaced through another call to `select`. 
+The event fires when `deselect` has been called explicitly, and also when the selection is being replaced through another call to `select`.
 
-Combined select-deselect actions are treated as atomic, so "deselect:one" fires 
-after both the deselection and the selection have already taken place. That is 
-also the case for any other events involved in the transaction, such as the 
-"deselected" and "selected" events on the models involved.
+Combined select-deselect actions are treated as atomic, so "deselect:one" fires after both the deselection and the selection have already taken place. That is also the case for any other events involved in the transaction, such as the  "deselected" and "selected" events on the models involved.
 
 #### "reselect:one"
 
-Triggered when a model, which is already selected, is selected again. Provides
-the selected model as the first parameter, and the collection as the second.
-Runs the `onReselect` event handler if the method exists on the collection.
+Triggered when a model, which is already selected, is selected again. Provides the selected model as the first parameter, and the collection as the second. Runs the `onReselect` event handler if the method exists on the collection.
 
 ## Backbone.Select.Many: a multi-select collection
 
-Creates multi-select capabilities for a `Backbone.Collection`, allowing one or
-more models to be selected in a collection. Backbone.Select.Many also provides
-"select all", "select none" and "select some" features.
+Creates multi-select capabilities for a `Backbone.Collection`, allowing one or more models to be selected in a collection. Backbone.Select.Many also provides "select all", "select none" and "select some" features.
 
 ### Basic Usage
 
-To create a multi-select collection type, apply the mixin in the `initialize`
-method. Assuming your base type is `Backbone.Collection`, augment it with
+To create a multi-select collection type, apply the mixin in the `initialize` method. Assuming your base type is `Backbone.Collection`, augment it with
 
 ```js
 SelectableModel = Backbone.Model.extend({
@@ -387,12 +324,9 @@ MultiCollection = Backbone.Collection.extend({
 });
 ```
 
-Replace `Backbone.Collection` in the example above with whatever base type you
-work with.
+Replace `Backbone.Collection` in the example above with whatever base type you work with.
 
-If you share models among different collections, Backbone.Select will handle the
-interaction for you. You must turn on model-sharing mode explicitly, with the
-`enableModelSharing` option:
+If you share models among different collections, Backbone.Select will handle the interaction for you. You must turn on model-sharing mode explicitly, with the `enableModelSharing` option:
 
 ```js
 MultiCollection = Backbone.Collection.extend({
@@ -412,9 +346,7 @@ The following methods are provided by the `Select.Many` object.
 
 #### Select.Many#select(model, [options])
 
-Select a model. This method will store the selected model in
-the collection's `selected` list, and call the model's `select`
-method to ensure the model knows it has been selected.
+Select a model. This method will store the selected model in the collection's `selected` list, and call the model's `select` method to ensure the model knows it has been selected.
 
 ```js
 myCol = new MultiCollection([myModel]);
@@ -428,9 +360,7 @@ The `select` method supports the `silent` option.
 
 #### Select.Many#deselect(model, [options])
 
-Deselect a model. This method will remove the  model from
-the collection's `selected` list, and call the model's `deselect`
-method to ensure the model knows it has been deselected.
+Deselect a model. This method will remove the  model from the collection's `selected` list, and call the model's `deselect` method to ensure the model knows it has been deselected.
 
 ```js
 myCol = new MultiCollection([myModel]);
@@ -452,10 +382,7 @@ myCol = new MultiCollection();
 myCol.selectAll();
 ```
 
-Models that are already selected will not be re-selected. 
-Models that are not currently selected will be selected.
-The end result will be all models in the collection are
-selected.
+Models that are already selected will not be re-selected. Models that are not currently selected will be selected. The end result will be all models in the collection are selected.
 
 The `selectAll` method supports the `silent` option.
 
@@ -469,10 +396,7 @@ myCol = new MultiCollection();
 myCol.deselectAll();
 ```
 
-Models that are selected will be deselected. 
-Models that are not selected will not be deselected again.
-The end result will be no models in the collection are
-selected.
+Models that are selected will be deselected. Models that are not selected will not be deselected again. The end result will be no models in the collection are selected.
 
 The `deselectAll` method supports the `silent` option.
 
@@ -529,114 +453,69 @@ myCol.selectedLength; //=> 1
 
 ### Backbone.Select.Many Events
 
-The events below are triggered by Backbone.Select.Many based on changes in selection.
-Events can be prevented from firing when Backbone.Select methods are called with
-the `silent` option, as in `myCol.select(myModel, {silent: true})`.
+The events below are triggered by Backbone.Select.Many based on changes in selection. Events can be prevented from firing when Backbone.Select methods are called with the `silent` option, as in `myCol.select(myModel, {silent: true})`.
 
-Select.Many events, with the exception of `reselect:any`, pass a "diff" hash to
-event handlers as the first parameter: `{ selected: [...], deselected: [...] }`.
-The `selected` array holds models which have been newly selected by the action
-triggering the event. Likewise, models in the `deselected` array have changed
-their status from selected to deselected.
+Select.Many events, with the exception of `reselect:any`, pass a "diff" hash to event handlers as the first parameter: `{ selected: [...], deselected: [...] }`. The `selected` array holds models which have been newly selected by the action triggering the event. Likewise, models in the `deselected` array have changed their status from selected to deselected.
 
-_(Note that up to version 0.2, the first parameter passed to event handlers had
-been the collection.)_
+_(Note that up to version 0.2, the first parameter passed to event handlers had been the collection.)_
 
-Event handlers with standard names are invoked automatically. Standard names are
-`onSelectNone`, `onSelectSome`, `onSelectAll` and `onReselect`. If these methods
-exist on the collection, they are run without having to be wired up with the
-event manually.
+Event handlers with standard names are invoked automatically. Standard names are `onSelectNone`, `onSelectSome`, `onSelectAll` and `onReselect`. If these methods exist on the collection, they are run without having to be wired up with the event manually.
 
-Custom options can be used when invoking any method. See the [section on custom
-options](#custom-options), below.
+Custom options can be used when invoking any method. See the [section on custom options](#custom-options), below.
 
 #### "select:all"
 
-Triggered when all models have been selected. Provides the ["diff" hash]
-(#multiselect-events) as the first parameter, and the collection as the second.
-Runs the `onSelectAll` event handler if the method exists on the collection.
+Triggered when all models have been selected. Provides the ["diff" hash](#multiselect-events) as the first parameter, and the collection as the second. Runs the `onSelectAll` event handler if the method exists on the collection.
 
 #### "select:none"
 
-Triggered when all models have been deselected. Provides the ["diff" hash]
-(#multiselect-events) as the first parameter, and the collection as the second.
-Runs the `onSelectNone` event handler if the method exists on the collection.
+Triggered when all models have been deselected. Provides the ["diff" hash](#multiselect-events) as the first parameter, and the collection as the second. Runs the `onSelectNone` event handler if the method exists on the collection.
 
 #### "select:some"
 
-Triggered when at least 1 model is selected, but less than all models have
-been selected. Provides the ["diff" hash](#multiselect-events) as the first
-parameter, and the collection as the second. Runs the `onSelectSome` event
-handler if the method exists on the collection.
+Triggered when at least 1 model is selected, but less than all models have been selected. Provides the ["diff" hash](#multiselect-events) as the first parameter, and the collection as the second. Runs the `onSelectSome` event handler if the method exists on the collection.
 
 #### "reselect:any"
 
-Triggered when at least one model, which is already selected, is selected again.
-Provides an array of the re-selected models as the first parameter. Runs the
-`onReselect` event handler if the method exists on the collection.
+Triggered when at least one model, which is already selected, is selected again. Provides an array of the re-selected models as the first parameter. Runs the `onReselect` event handler if the method exists on the collection.
 
-In contrast to the other events, this event fires even if there isn't any change
-in the resulting selection at all. Note that there is no separate reselect:all
-event; the re-selection of all items in the collection is also covered by
-`reselect:any`.
+In contrast to the other events, this event fires even if there isn't any change in the resulting selection at all. Note that there is no separate reselect:all event; the re-selection of all items in the collection is also covered by `reselect:any`.
 
 ## Sharing models among collections
 
-Models can be part of more than one collection, and Backbone.Select still manages
-selections correctly. You must enable model sharing explicitly, though, and play
-by a few rules.
+Models can be part of more than one collection, and Backbone.Select still manages selections correctly. You must enable model sharing explicitly, though, and play by a few rules.
 
 ### Features
 
-When sharing models among collections, the collections don't have to be of the
-same type. A model can be part of single-select and multi-select collections at
-the same time. Backbone.Select handles all aspects of it:
+When sharing models among collections, the collections don't have to be of the same type. A model can be part of single-select and multi-select collections at the same time. Backbone.Select handles all aspects of it:
 
-- Suppose you have selected a model (or models) in one collection, and then you
-  create another one with these models. The new collection will pick up the
-  selections you have already made. That also works when adding models to
-  existing collections.
+- Suppose you have selected a model (or models) in one collection, and then you create another one with these models. The new collection will pick up the selections you have already made. That also works when adding models to existing collections.
 
-- The selections in a collection are updated as needed when models are removed.
-  A model loses its `selected` status when it is removed from the last collection
-  holding it. Resetting collections is governed by the same rules.
+- The selections in a collection are updated as needed when models are removed. A model loses its `selected` status when it is removed from the last collection holding it. Resetting collections is governed by the same rules.
 
-- When a selection, or deselection, is made with the `silent` option enabled,
-  selection-related events will be silenced in all of the collections sharing
-  the model.
+- When a selection, or deselection, is made with the `silent` option enabled, selection-related events will be silenced in all of the collections sharing the model.
 
-- Selections and deselections involving a number of collections and models are 
-  treated as atomic. Events are delayed until all collections and models have 
-  been updated, without select or deselect actions pending.
+- Selections and deselections involving a number of collections and models are treated as atomic. Events are delayed until all collections and models have been updated, without select or deselect actions pending.
 
-- Edge cases are covered as well. Suppose a number of models are selected in a
-  multi-select collection. You then proceed to add them to a single-select
-  collection. Only one model can be selected there, so Backbone.Select will
-  deselect all but one of them. The last model added to the single-select
-  collection "wins", ie its `selected` status survives.
+- Edge cases are covered as well. Suppose a number of models are selected in a multi-select collection. You then proceed to add them to a single-select collection. Only one model can be selected there, so Backbone.Select will deselect all but one of them. The last model added to the single-select collection "wins", ie its `selected` status survives.
 
 ### Enabling model sharing
 
-To enable model sharing, use the option `enableModelSharing`. Create the mixin
-with
+To enable model sharing, use the option `enableModelSharing`. Create the mixin with
 
-    Backbone.Select.One.applyTo(this, models, { enableModelSharing: true })
+```js
+Backbone.Select.One.applyTo(this, models, { enableModelSharing: true })
+```
 
-and likewise for Backbone.Select.Many. See the Basic Usage sections of
-Backbone.Select.One and Backbone.Select.Many.
+and likewise for Backbone.Select.Many. See the Basic Usage sections of Backbone.Select.One and Backbone.Select.Many.
 
 ### Restrictions when sharing models
 
-There are a few things you must and mustn't do in order to make sharing work,
-and keep yourself out of trouble.
+There are a few things you must and mustn't do in order to make sharing work, and keep yourself out of trouble.
 
-- Don't use the `silent` option when adding models, removing them, or resetting
-  a collection. If you change the contents of a collection silently, the
-  `selected`/`deselected` status of the shared models won't be synced across
-  collections reliably.
+- Don't use the `silent` option when adding models, removing them, or resetting a collection. If you change the contents of a collection silently, the `selected`/`deselected` status of the shared models won't be synced across collections reliably.
 
-- When a collection is no longer in use, call `close()` on it to avoid memory
-  leaks.
+- When a collection is no longer in use, call `close()` on it to avoid memory leaks.
 
   So don't just replace a collection like this:
 
@@ -644,42 +523,28 @@ and keep yourself out of trouble.
         // ... do stuff
         myCol = new MySelectableCollection([myModel]);  // WRONG!
 
-  Instead, call `close()` before you let an obsolete collection fade away into
-  oblivion:
+  Instead, call `close()` before you let an obsolete collection fade away into oblivion:
 
         var myCol = new MySelectableCollection([myModel]);
         // ... do stuff
         myCol.close();
         myCol = new MySelectableCollection([myModel]);
 
-  Note that you don't need to call `close()` if you use Backbone.Select in
-  "single-collection mode", without sharing models among collections.
+  Note that you don't need to call `close()` if you use Backbone.Select in "single-collection mode", without sharing models among collections.
 
 ### Events
 
 If you are working with events a lot, there are a few details which may help.
 
-- As stated earlier, selections and deselections involving a number of collections 
-  and models are treated as atomic. Events are delayed until all collections and 
-  models have been updated, without select or deselect actions pending.
+- As stated earlier, selections and deselections involving a number of collections and models are treated as atomic. Events are delayed until all collections and models have been updated, without select or deselect actions pending.
 
-- When selected models are added or removed, the collection is updated and the
-  corresponding `select:*` event is fired. In its options, the name of the
-  initial Backbone `add` or `remove` event is available as `options._externalEvent`.
-  The `select:*` options also contain the event options of the initial Backbone
-  event.
+- When selected models are added or removed, the collection is updated and the corresponding `select:*` event is fired. In its options, the name of the initial Backbone `add` or `remove` event is available as `options._externalEvent`. The `select:*` options also contain the event options of the initial Backbone event.
 
-- By contrast, a `reset` does not trigger a `select:*` or `deselect:one` event
-  on the collection which is reset. The command is meant to suppress individual
-  notifications, just like it does for `add` and `remove` events, and only fires
-  a `reset` event in the end.
+- By contrast, a `reset` does not trigger a `select:*` or `deselect:one` event on the collection which is reset. The command is meant to suppress individual notifications, just like it does for `add` and `remove` events, and only fires a `reset` event in the end.
 
 ## Custom options
 
-With custom options, you can send additional information to event handlers. Just
-pass an arbitrary, custom option (or a whole bunch of them) to any method. The
-option doesn't affect the operation of Backbone.Select, but it is passed on to
-the event handlers as the last argument.
+With custom options, you can send additional information to event handlers. Just pass an arbitrary, custom option (or a whole bunch of them) to any method. The option doesn't affect the operation of Backbone.Select, but it is passed on to the event handlers as the last argument.
 
 ```js
 myCol = new SingleCollection([myModel]);
@@ -690,9 +555,7 @@ myCol.on("select:one", function (model, collection, options) {
 myCol.select(myModel, {foo: "bar"});    // prints "Selected while foo=bar"
 ```
 
-Options get passed around to all event handlers which are running. In the
-example above, the event handler is set up for the collection. But it will also
-pick up an option passed to the `select` method of the model, for instance.
+Options get passed around to all event handlers which are running. In the example above, the event handler is set up for the collection. But it will also pick up an option passed to the `select` method of the model, for instance.
 
 ```js
 myModel.select({foo: "baz"});    // prints "Selected while foo=baz"

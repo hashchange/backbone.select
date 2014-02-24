@@ -20,17 +20,27 @@
     <!-- body content here... -->
     <section>
         <h1 class="row">Memory leak test</h1>
+
         <p class="row">Enable memory profiling in the browser, then run one of these tests:</p>
+
         <form id="memtest">
 
             <div class="row">
 
                 <fieldset id="testTypes" class="large-3 medium-4 columns">
                     <legend>Component</legend>
-                    <div><input type="radio" id="backboneTest" name="testType" value="backbone"><label for="backboneTest">Backbone</label></div>
-                    <div><input type="radio" id="pickyTest" name="testType" value="picky"><label for="pickyTest">Backbone.Picky</label></div>
-                    <div><input type="radio" id="selectTest" name="testType" value="select" checked><label for="selectTest">Backbone.Select</label></div>
-                    <div><input type="radio" id="cycleTest" name="testType" value="cycle"><label for="cycleTest">Backbone.Cycle</label></div>
+                    <div>
+                        <input type="radio" id="backboneTest" name="testType" value="backbone"><label for="backboneTest">Backbone</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="pickyTest" name="testType" value="picky"><label for="pickyTest">Backbone.Picky</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="selectTest" name="testType" value="select" checked><label for="selectTest">Backbone.Select</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="cycleTest" name="testType" value="cycle"><label for="cycleTest">Backbone.Cycle</label>
+                    </div>
                 </fieldset>
 
                 <fieldset id="repetition" class="large-8 medium-7 columns">
@@ -50,7 +60,9 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="large-12 columns"><small>* reference released immediately, only one instance kept around</small></div>
+                        <div class="large-12 columns">
+                            <small>* reference released immediately, only one instance kept around</small>
+                        </div>
                     </div>
                 </fieldset>
 
@@ -91,11 +103,13 @@
 
         </form>
         <div class="row">
-            <h2><small>Script output</small></h2>
+            <h2>
+                <small>Script output</small>
+            </h2>
             <pre id="log"></pre>
         </div>
     </section>
-    
+
     <!-- libraries --><!-- edit and replace with your project libraries as needed -->
     <script src="../bower_demo_components/jquery/jquery.js"></script>
     <script src="../../bower_components/underscore/underscore.js"></script>

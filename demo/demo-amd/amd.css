@@ -26,5 +26,5 @@ body {
 }
 
 .item a.selected {
-    background-color:rgba( 0, 123, 159, 0.2 );
+    background-color: rgba(0, 123, 159, 0.2);
 }
