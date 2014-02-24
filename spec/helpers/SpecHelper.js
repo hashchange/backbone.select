@@ -1,3 +1,5 @@
+// --- Logger ---
+
 var Logger = function () {
   this.reset();
 };
@@ -10,6 +12,106 @@ _.extend(Logger.prototype, {
     this.entries = [];
   }
 });
+
+
+// --- ListenerMixin ---
+
+var ListenerMixin = function (observableNames, takeSnapshotMethod) {
+
+  var createContainer = function () {
+    var container = {
+      calls: 0
+    };
+    _.each(observableNames, function (name) {
+      container[name] = {}
+    });
+
+    return container;
+  };
+
+  this.snapshots = {
+    onSelected: _.extend({}, createContainer()),
+    onDeselected: _.extend({}, createContainer()),
+    onSelectOne: _.extend({}, createContainer()),
+    onDeselectOne: _.extend({}, createContainer()),
+    onSelectNone: _.extend({}, createContainer()),
+    onSelectSome: _.extend({}, createContainer()),
+    onSelectAll: _.extend({}, createContainer())
+  };
+
+  this.takeSnapshot = takeSnapshotMethod;
+};
+
+_.extend(ListenerMixin.prototype, {
+
+  bindEvents: function () {
+    this.listenTo(this, "selected", this.captureOnSelected);
+    this.listenTo(this, "deselected", this.captureOnDeselected);
+    this.listenTo(this, "select:one", this.captureOnSelectOne);
+    this.listenTo(this, "deselect:one", this.captureOnDeselectOne);
+    this.listenTo(this, "select:none", this.captureOnSelectNone);
+    this.listenTo(this, "select:some", this.captureOnSelectSome);
+    this.listenTo(this, "select:all", this.captureOnSelectAll);
+    _.bindAll(this, "takeSnapshot");
+  },
+
+  captureOnSelected: function () {
+    this.takeSnapshot(this.snapshots.onSelected);
+  },
+
+  captureOnDeselected: function () {
+    this.takeSnapshot(this.snapshots.onDeselected);
+  },
+
+  captureOnSelectOne: function () {
+    this.takeSnapshot(this.snapshots.onSelectOne);
+  },
+
+  captureOnDeselectOne: function () {
+    this.takeSnapshot(this.snapshots.onDeselectOne);
+  },
+
+  captureOnSelectNone: function () {
+    this.takeSnapshot(this.snapshots.onSelectNone);
+  },
+
+  captureOnSelectSome: function () {
+    this.takeSnapshot(this.snapshots.onSelectSome);
+  },
+
+  captureOnSelectAll: function () {
+    this.takeSnapshot(this.snapshots.onSelectAll);
+  },
+
+  takeSnapshot: function (container) {
+
+    // Implement takeSnapshot as suggested in the section below and add to
+    // the prototype.
+
+    // NB doCapture: just a suggested name. Use some var which is in scope, a
+    // boolean, to activate the capturing.
+
+    //noinspection JSUnresolvedVariable
+    if (doCapture) {
+      container.calls++;
+
+//      container.model1.selected = model1.selected;
+//      container.model2.selected = model2.selected;
+//      container.someSingleSelectCollection.selected = someSingleSelectCollection.selected;
+//      container.someMultiSelectCollection.selected = _.clone(someMultiSelectCollection.selected);
+    }
+
+  }
+});
+
+ListenerMixin.applyTo = function (hostObject, observableNames, takeSnapshotMethod) {
+  Backbone.Select.Me.applyTo(this);
+  _.extend(hostObject, new ListenerMixin(observableNames, takeSnapshotMethod));
+  hostObject.bindEvents();
+};
+
+
+// --- Custom Matchers ---
 
 beforeEach(function() {
 

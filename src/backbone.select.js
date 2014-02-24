@@ -538,12 +538,89 @@ Backbone.Select = (function (Backbone, _) {
       });
 
       if (resolved) {
+        mergeMultiSelectEvents(storage._eventQueue);
         while (storage._eventQueue.length) {
           eventData = storage._eventQueue.pop();
           eventData.actor.trigger.apply(eventData.actor, eventData.triggerArgs);
         }
       }
     }
+  }
+
+  // Merges separate (sub-)events of a Select.Many collection into a single,
+  // summary event, and cleans up the event queue.
+  //
+  // NB "reselect:any" events stand on their own and are not merged into a joint
+  // select:some event. They only occur once per collection in the event queue.
+  function mergeMultiSelectEvents (queue) {
+    var multiSelectCollections = {};
+
+    // Create merged data for each multi-select collection
+    _.each(queue, function (event, index) {
+      var extractedData, diff, opts,
+          actor = event.actor,
+          eventName = event.triggerArgs[0];
+
+      if (actor._pickyType === "Backbone.Select.Many" && eventName !== "reselect:any") {
+
+        extractedData = multiSelectCollections[actor._pickyCid];
+        if (!extractedData) extractedData = multiSelectCollections[actor._pickyCid] = {
+          actor: actor,
+          indexes: [],
+          merged: {
+            selected: [],
+            deselected: [],
+            options: {}
+          }
+        };
+
+        extractedData.indexes.push(index);
+
+        diff = event.triggerArgs[1];
+        opts = event.triggerArgs[3];
+        extractedData.merged.selected = extractedData.merged.selected.concat(diff.selected);
+        extractedData.merged.deselected = extractedData.merged.deselected.concat(diff.deselected);
+        _.extend(extractedData.merged.options, opts);
+      }
+
+    });
+
+    // If there are multiple event entries for a collection, remove them from
+    // the queue and append a merged event.
+
+    // - Don't touch the queued events for multi-select collections which have
+    //   just one entry.
+    multiSelectCollections = _.filter(multiSelectCollections, function (entry) {
+      return entry.indexes.length > 1;
+    });
+
+    // - Remove existing entries in the queue.
+    var removeIndexes = _.flatten(_.pluck(multiSelectCollections, "indexes"));
+    removeIndexes.sort(function (a, b) {
+      return a - b;
+    });
+    _.each(removeIndexes, function (position, index) {
+      queue.splice(position - index, 1);
+    });
+
+    // - Append merged event entry.
+    _.each(multiSelectCollections, function (extractedData) {
+
+      // NB Multiple entries only occur if a select has been accompanied by
+      // one or more deselects. By definition, that translates into a
+      // select:some event (and never into select:all, select:none).
+      queue.push({
+        actor: extractedData.actor,
+        triggerArgs: [
+          "select:some",
+          { selected: extractedData.merged.selected, deselected: extractedData.merged.deselected },
+          extractedData.actor,
+          extractedData.merged.options
+        ]
+      });
+
+    });
+
   }
 
   // Creates a new trigger method which calls the predefined event handlers
