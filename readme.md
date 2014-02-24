@@ -347,7 +347,12 @@ first parameter, and the collection as the second.. Runs the `onDeselect` event
 handler if the method exists on the collection.
 
 The event fires when `deselect` has been called explicitly, and also when the
-selection is being replaced through another call to `select`.
+selection is being replaced through another call to `select`. 
+
+Combined select-deselect actions are treated as atomic, so "deselect:one" fires 
+after both the deselection and the selection have already taken place. That is 
+also the case for any other events involved in the transaction, such as the 
+"deselected" and "selected" events on the models involved.
 
 #### "reselect:one"
 
@@ -600,6 +605,10 @@ the same time. Backbone.Select handles all aspects of it:
   selection-related events will be silenced in all of the collections sharing
   the model.
 
+- Selections and deselections involving a number of collections and models are 
+  treated as atomic. Events are delayed until all collections and models have 
+  been updated, without select or deselect actions pending.
+
 - Edge cases are covered as well. Suppose a number of models are selected in a
   multi-select collection. You then proceed to add them to a single-select
   collection. Only one model can be selected there, so Backbone.Select will
@@ -649,6 +658,10 @@ and keep yourself out of trouble.
 ### Events
 
 If you are working with events a lot, there are a few details which may help.
+
+- As stated earlier, selections and deselections involving a number of collections 
+  and models are treated as atomic. Events are delayed until all collections and 
+  models have been updated, without select or deselect actions pending.
 
 - When selected models are added or removed, the collection is updated and the
   corresponding `select:*` event is fired. In its options, the name of the
@@ -778,6 +791,29 @@ In case anything about the test and build process needs to be changed, have a lo
 New test files in the `spec` directory are picked up automatically, no need to edit the configuration for that.
 
 ## Release Notes
+
+### v1.2.0
+
+* Related selections and deselections are treated as a single, atomic transaction. Firing of events is delayed until select and deselect actions have spread across all affected models and collections, without any actions still pending.
+
+### v1.1.2
+
+* Fixed bug when models were added or removed with `reset` (collection was not correctly registered with models)
+
+### v1.1.1
+
+* Relaxed dependency requirements in `bower.json`
+
+### v1.1.0
+
+* Moved build to `dist` directory
+* Added `_pickyType` property to identify mixins in a model or collection
+* Switched development stack to Bower, Karma, Node web server
+* Added demo app, memory-leak test environment in `demo` directory
+
+### v1.0.1
+
+* Removed obsolete Backbone.Picky files from build
 
 ### v1.0.0
 
