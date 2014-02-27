@@ -1,4 +1,4 @@
-// Backbone.Select, v1.2.0
+// Backbone.Select, v1.2.2
 // Copyright (c) 2014 Michael Heim
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
