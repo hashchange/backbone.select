@@ -308,7 +308,15 @@ describe( "selectable model", function () {
                 // Pseudo event handlers modeled on internal events `_selected`,
                 // `_deselected`; should not be invoked automatically
                 on_select: function () {},
-                on_deselect: function () {}
+                on_deselect: function () {},
+
+                // Pseudo event handlers modeled on standard Backbone events `add`,
+                // `remove`, `change`, `all` (as stand-ins for all others) ; should
+                // not be invoked automatically
+                onAdd: function () {},
+                onRemove: function () {},
+                onChange: function () {},
+                onAll: function () {}
             } );
 
             model = new EventHandlingModel();
@@ -319,6 +327,11 @@ describe( "selectable model", function () {
 
             spyOn( model, "on_select" ).andCallThrough();
             spyOn( model, "on_deselect" ).andCallThrough();
+
+            spyOn( model, "onAdd" ).andCallThrough();
+            spyOn( model, "onRemove" ).andCallThrough();
+            spyOn( model, "onChange" ).andCallThrough();
+            spyOn( model, "onAll" ).andCallThrough();
         } );
 
         it( 'calls the onSelect handler when triggering a selected event on the model', function () {
@@ -344,6 +357,17 @@ describe( "selectable model", function () {
         it( 'does not call an event handler accidentally named after the internal _deselected event', function () {
             model.trigger( "_deselected", model );
             expect( model.on_deselect ).not.toHaveBeenCalled();
+        } );
+
+        it( 'does not automatically call an event handler named after a standard Backbone event (e.g. onAdd)', function () {
+            model.trigger( "add", model );
+            model.trigger( "remove", model );
+            model.trigger( "change" );
+            model.trigger( "all", model );
+            expect( model.onAdd ).not.toHaveBeenCalled();
+            expect( model.onRemove ).not.toHaveBeenCalled();
+            expect( model.onChange ).not.toHaveBeenCalled();
+            expect( model.onAll ).not.toHaveBeenCalled();
         } );
     } );
 

@@ -41,7 +41,15 @@ describe( "multi-select collection: general", function () {
                 // Pseudo event handlers modeled on internal events `_selected`,
                 // `_deselected`; should not be invoked automatically
                 on_select: function () {},
-                on_deselect: function () {}
+                on_deselect: function () {},
+
+                // Pseudo event handlers modeled on standard Backbone events `add`,
+                // `remove`, `reset`, `all` (as stand-ins for all others) ; should
+                // not be invoked automatically
+                onAdd: function () {},
+                onRemove: function () {},
+                onReset: function () {},
+                onAll: function () {}
             } );
 
             model = new Model();
@@ -54,6 +62,11 @@ describe( "multi-select collection: general", function () {
 
             spyOn( collection, "on_select" ).andCallThrough();
             spyOn( collection, "on_deselect" ).andCallThrough();
+
+            spyOn( collection, "onAdd" ).andCallThrough();
+            spyOn( collection, "onRemove" ).andCallThrough();
+            spyOn( collection, "onReset" ).andCallThrough();
+            spyOn( collection, "onAll" ).andCallThrough();
         } );
 
         it( 'calls the onSelectNone handler when triggering a select:none event', function () {
@@ -84,6 +97,17 @@ describe( "multi-select collection: general", function () {
         it( 'does not call an event handler accidentally named after the internal _deselected event', function () {
             model.trigger( "_deselected", model );
             expect( collection.on_deselect ).not.toHaveBeenCalled();
+        } );
+
+        it( 'does not automatically call an event handler named after a standard Backbone event (e.g. onAdd)', function () {
+            collection.trigger( "add", model );
+            collection.trigger( "remove", model );
+            collection.trigger( "reset" );
+            collection.trigger( "all", model );
+            expect( collection.onAdd ).not.toHaveBeenCalled();
+            expect( collection.onRemove ).not.toHaveBeenCalled();
+            expect( collection.onReset ).not.toHaveBeenCalled();
+            expect( collection.onAll ).not.toHaveBeenCalled();
         } );
     } );
 
