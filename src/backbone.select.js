@@ -297,11 +297,17 @@ Backbone.Select = (function ( Backbone, _ ) {
 
     // Applying the mixin: class methods for setup
     Select.Me.applyTo = function ( hostObject ) {
+        if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
+
         _.extend( hostObject, new Backbone.Select.Me() );
         hostObject.trigger = trigger( hostObject );
     };
 
     Select.One.applyTo = function ( hostObject, models, options ) {
+
+        if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
+        if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
+        if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
 
         _.extend( hostObject, new Backbone.Select.One() );
 
@@ -335,6 +341,10 @@ Backbone.Select = (function ( Backbone, _ ) {
     };
 
     Select.Many.applyTo = function ( hostObject, models, options ) {
+
+        if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
+        if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
+        if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
 
         _.extend( hostObject, new Backbone.Select.Many() );
 

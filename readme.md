@@ -655,6 +655,11 @@ New test files in the `spec` directory are picked up automatically, no need to e
 
 ## Release Notes
 
+### v1.2.4
+
+* Added arguments validation to `applyTo` factory methods.
+* Various minor bugs fixed.
+
 ### v1.2.0
 
 * Related selections and deselections are treated as a single, atomic transaction. Firing of events is delayed until select and deselect actions have spread across all affected models and collections, without any actions still pending.
