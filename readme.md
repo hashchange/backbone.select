@@ -616,6 +616,8 @@ If you want to [enable model sharing][sharing] in a Select.One or Select.Many co
 
 ## Build process and tests
 
+If you'd like to fix, customize or otherwise improve the project: here are your tools.
+
 ### Setup
 
 [npm][] and [Bower][] set up the environment for you.
@@ -637,7 +639,8 @@ A handful of commands manage everything for you:
 - Run the tests in a browser interactively, live-reloading the page when the source or the tests change: `grunt interactive`.
 - Build the dist files (also running tests and linter) with `grunt build`, or just `grunt`.
 - Build continuously on every save with `grunt ci`.
-- Change the version number throughout the project with `grunt setver --to=1.2.3`. (Remember to rebuild the project with `grunt` afterwards.)
+- Change the version number throughout the project with `grunt setver --to=1.2.3`. Or just increment the revision with `grunt setver --inc`. (Remember to rebuild the project with `grunt` afterwards.)
+- `grunt getver` will quickly tell you which version you are at.
 
 Finally, if need be, you can set up a quick demo page to play with the code. First, edit the files in the `demo` directory. Then display `demo/index.html`, live-reloading your changes to the code or the page, with `grunt demo`. Libraries needed for the demo/playground should go into the Bower dev dependencies, in the project-wide `bower.json`, or else be managed by the dedicated `bower.json` in the demo directory.
 

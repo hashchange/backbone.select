@@ -172,11 +172,11 @@ module.exports = function(grunt) {
         src: ['bower.json', 'package.json'],
         overwrite: true,
         replacements: [{
-          from: /"version"\s*:\s*"(\d+\.\d+.\d+)"\s*,/,
+          from: /"version"\s*:\s*"((\d+\.\d+\.)(\d+))"\s*,/,
           to: function (matchedWord, index, fullText, regexMatches) {
-            var version = grunt.option('to');
+            var version = grunt.option('inc') ? regexMatches[1] + (parseInt(regexMatches[2], 10) + 1) : grunt.option('to');
 
-            if (version === undefined) grunt.fail.fatal('Version number not specified. Use the --to option, e.g. --to=1.2.3');
+            if (version === undefined) grunt.fail.fatal('Version number not specified. Use the --to option, e.g. --to=1.2.3, or the --inc option to increment the revision');
             if (typeof version !== "string") grunt.fail.fatal('Version number is not a string. Provide a semantic version number, e.g. --to=1.2.3');
             if (!/^\d+\.\d+.\d+$/.test(version)) grunt.fail.fatal('Version number is not semantic. Provide a version number in the format n.n.n, e.g. --to=1.2.3');
 
@@ -185,6 +185,9 @@ module.exports = function(grunt) {
           }
         }]
       }
+    },
+    getver: {
+      files: ['bower.json', 'package.json']
     }
   });
 
@@ -205,6 +208,12 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['jshint', 'karma:build', 'preprocess:build', 'concat', 'uglify']);
   grunt.registerTask('ci', ['watch:build']);
   grunt.registerTask('setver', ['replace:version']);
+  grunt.registerTask('getver', function () {
+    grunt.config.get('getver.files').forEach(function (file) {
+      var config = grunt.file.readJSON(file);
+      grunt.log.writeln('Version number in ' + file + ': ' + config.version);
+    });
+  });
 
   // Make 'build' the default task.
   grunt.registerTask('default', ['build']);
