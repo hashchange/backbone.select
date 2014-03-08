@@ -304,15 +304,22 @@ Backbone.Select = (function ( Backbone, _ ) {
     };
 
     Select.One.applyTo = function ( hostObject, models, options ) {
+        var oldSelect;
 
         if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
         if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
         if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
 
+        // Store a reference to the existing select method (most likely the
+        // default Backbone.Collection.select method). Used to overload the new
+        // select method.
+        oldSelect = hostObject.select;
+
         _.extend( hostObject, new Backbone.Select.One() );
 
         hostObject._pickyCid = _.uniqueId( 'singleSelect' );
         hostObject.trigger = trigger( hostObject );
+        overloadSelect( oldSelect, hostObject );
 
         if ( options && options.enableModelSharing ) {
 
@@ -341,16 +348,23 @@ Backbone.Select = (function ( Backbone, _ ) {
     };
 
     Select.Many.applyTo = function ( hostObject, models, options ) {
+        var oldSelect;
 
         if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
         if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
         if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
+
+        // Store a reference to the existing select method (most likely the
+        // default Backbone.Collection.select method). Used to overload the new
+        // select method.
+        oldSelect = hostObject.select;
 
         _.extend( hostObject, new Backbone.Select.Many() );
 
         hostObject._pickyCid = _.uniqueId( 'multiSelect' );
         hostObject.selected = {};
         hostObject.trigger = trigger( hostObject );
+        overloadSelect( oldSelect, hostObject );
 
         if ( options && options.enableModelSharing ) {
 
@@ -625,6 +639,27 @@ Backbone.Select = (function ( Backbone, _ ) {
             } );
 
         } );
+
+    }
+
+    // Overloads the select method. Provides access to the previous, legacy
+    // implementation, based on the arguments passed to the method.
+    //
+    // If `select` is called with a model as first parameter, the `select`
+    // method of the mixin is used, otherwise the previous implementation is
+    // called.
+    function overloadSelect( oldSelect, context ) {
+
+        context.select = (function () {
+            var mixinSelect = context.select;
+            return function ( model ) {
+                if ( model instanceof Backbone.Model ) {
+                    return mixinSelect.apply( context, arguments );
+                } else {
+                    return oldSelect.apply( context, arguments );
+                }
+            };
+        })();
 
     }
 

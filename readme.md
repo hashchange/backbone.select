@@ -2,6 +2,8 @@
 
 Selecting Backbone models; handling selections in Backbone collections.
 
+Backbone.Select is [compatible with Backbone.Picky][picky-compatibility]. For a superset of Backbone.Select with even more features, have a look at [Backbone.Cycle][].
+
 ## Source Code And Downloads
 
 The component is available with Bower: `bower install backbone.select`.
@@ -25,12 +27,6 @@ Production: [backbone.select.min.js](https://raw.github.com/hashchange/backbone.
 ## Requirements
 
 Backbone.Backbone.Select requires Backbone 0.9.9 or later.
-
-## Method Name Overrides
-
-#### IMPORTANT NOTE ABOUT METHOD NAME "select"
-
-The Backbone.Select collections override the method `select` on collections. At this point, I can't think of a better name for specifying a model has been selected. Once I find a better name, the API will change. But for now, you will not be able to use the standard `select` method on any collection that has a Backbone.Select collection mixin.
 
 ## Model and Collection Interactions
 
@@ -237,6 +233,8 @@ If the model is already selected, this is a no-op. If a previous model is alread
 
 The `select` method supports the `silent` option.
 
+_Compatibility:_ Backbone collections have a `select` method out of the box, an alias of `filter`. It continues to be accessible, based on its different signature. See [below][select-compatibility].
+
 #### Select.One#deselect([model], [options])
 
 Deselect the currently selected model. This method will remove the  model from the collection's `selected` property, and call the model's `deselect` method to ensure the model knows it has been deselected.
@@ -357,6 +355,8 @@ myCol.select(myModel);
 If the model is already selected, this is a no-op.
 
 The `select` method supports the `silent` option.
+
+_Compatibility:_ Backbone collections have a `select` method out of the box, an alias of `filter`. It continues to be accessible, based on its different signature. See [below][select-compatibility].
 
 #### Select.Many#deselect(model, [options])
 
@@ -561,7 +561,15 @@ Options get passed around to all event handlers which are running. In the exampl
 myModel.select({foo: "baz"});    // prints "Selected while foo=baz"
 ```
 
-## Backbone.Picky Compatibility
+## Compatibility with Backbone's own select method
+
+Out of the box, Backbone collections have their own `select` method - an alias of `filter`. In your own code, that should not be an issue: just use `filter`.
+
+The original `select` method of Backbone collections is still available, though, and can be called just as before. Even implementations overriding Backbone's `select` remain accessible. That's because the `select` method is overloaded. If the first argument in a `select` call is a model, the Backbone.Select mixin will handle it. If not, the call is passed up the prototype chain.
+
+That kind of compatibility is crucial for third-party plugins or legacy code. They may rely on Backbone's select, or on their own implementation. Even so, they will continue to work - no modification required.
+
+## Compatibility with Backbone.Picky
 
 This component started off as a series of PRs for [Backbone.Picky][] and eventually turned into an independent fork.
 
@@ -576,6 +584,7 @@ Simplicity is a virtue. If that is what you want, Picky is the better choice. Co
 
 - If you share models among multiple collections, by all means, choose Backbone.Select. It takes care of all the quirks, and there are many. Backbone.Picky doesn't support model sharing.
 - Additions, resets, and models passed in during instantiation are taken care of.
+- The original `select` method of Backbone collections can still be called. Third-party code relying on it will continue to work.
 - You get a richer set of events, more helpful data emitted by these events, a `silent` option, custom options pass-through, and predefined event handlers like `onSelect`.
 - Better events make it less likely you ever need to touch the component itself. Your adaptations can go into event handlers, allowing for a clean design.
 - Backbone.Select is extremely well tested. Even though the code is (a little) more complex than Backbone.Picky, you can tweak it without hesitation. If you mess up, a unit test will tell you.
@@ -658,6 +667,10 @@ New test files in the `spec` directory are picked up automatically, no need to e
 
 ## Release Notes
 
+### v1.2.5
+
+* Restored access to the `select` method of Backbone.Collection by overloading the `select` method.
+
 ### v1.2.4
 
 * Added arguments validation to `applyTo` factory methods.
@@ -726,7 +739,7 @@ New test files in the `spec` directory are picked up automatically, no need to e
 
 ## Credits, Copyright, MIT License
 
-Special credits go to [Derick Bailey][muted-solutions], who created the original version of this component, [Backbone.Picky][]. It is still around; see the [Backbone.Picky Compatibility section][compatibility] for the differences.
+Special credits go to [Derick Bailey][muted-solutions], who created the original version of this component, [Backbone.Picky][]. It is still around; see the [Backbone.Picky Compatibility section][picky-compatibility] for the differences.
 
 Copyright (c) 2014 Michael Heim<br>
 Copyright (c) 2013 Derick Bailey, Muted Solutions, LLC
@@ -747,6 +760,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [JSHint]: http://www.jshint.com/ "JSHint, a JavaScript Code Quality Tool"
 
 [sharing]: #sharing-models-among-collections
-[compatibility]: #backbonepicky-compatibility
+[select-compatibility]: #compatibility-with-backbones-own-select-method
+[picky-compatibility]: #compatibility-with-backbonepicky
 [muted-solutions]: http://mutedsolutions.com/ "Muted Solutions, LLC"
 [Backbone.Picky]: https://github.com/derickbailey/backbone.picky#readme "Backbone.Picky"
+[Backbone.Cycle]: https://github.com/hashchange/backbone.cycle#readme "Backbone.Cycle"

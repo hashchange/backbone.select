@@ -875,6 +875,100 @@ describe( "single-select collection", function () {
 
     } );
 
+    describe( 'Compatibility with Backbone.Collection.select', function () {
+
+        describe( "The collection's select is called without a model as first argument", function () {
+
+            describe( 'when Backbone.Collection.select has not been modified or overridden on the base type', function () {
+
+                var model0, model1, model2, models, filter, filterWithContext, collection;
+
+                beforeEach( function () {
+                    filter = function ( model ) {
+                        // Arbitrary filter function, here returning the models with an even ID.
+                        return model.id % 2 === 0;
+                    };
+
+                    filterWithContext = function ( model ) {
+                        // Arbitrary filter function, relying on a this argument representing the collection. Returns
+                        // models at an even index in the collection, given the default sort order.
+                        return this.indexOf( model ) % 2 === 0;
+                    };
+
+
+                    model0 = new Model( {id: 0} );
+                    model1 = new Model( {id: 1} );
+                    model2 = new Model( {id: 2} );
+
+                    models = [ model0, model1, model2 ];
+
+                    collection = new Collection( models );
+                } );
+
+                it( 'returns the same array of models as Backbone.Collection.filter', function () {
+                    var result = collection.select( filter );
+                    expect( result ).toEqual( [ model0, model2 ] );
+                    expect( result ).toEqual( collection.filter( filter ) );
+                } );
+
+                it( 'honours the context argument of the Backbone filter/select method if it is provided', function () {
+                    var result = collection.select( filterWithContext, collection );
+                    expect( result ).toEqual( [ model0, model2 ] );
+                    expect( result ).toEqual( collection.filter( filterWithContext, collection ) );
+                } );
+            } );
+
+            describe( 'when Backbone.Collection.select has been overridden in the prototype chain', function () {
+
+                var model, CollectionWithCustomSelectFoo, CollectionWithCustomSelectBar;
+
+                beforeEach( function () {
+
+                    CollectionWithCustomSelectFoo = Backbone.Collection.extend( {
+                        initialize: function ( models ) {
+                            Backbone.Select.One.applyTo( this, models );
+                        },
+                        select: function ( arg1, arg2 ) {
+                            return "foo:" + arg1 + ":" + arg2;
+                        }
+                    } );
+
+                    CollectionWithCustomSelectBar = CollectionWithCustomSelectFoo.extend( {
+                        select: function ( arg1, arg2 ) {
+                            return "bar:" + arg1 + ":" + arg2;
+                        }
+                    } );
+
+                    model = new Model();
+                } );
+
+                it( 'returns the result of the modified select method', function () {
+                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    expect( collectionFoo.select( "arg1", "arg2" ) ).toEqual( "foo:arg1:arg2" );
+                } );
+
+                // Now checking that the modified select methods are kept around independently, without e.g. the last
+                // modification overwriting the others.
+
+                it( 'returns the result of a another select method, which has been modified in different way, when that collection is instantiated after the original one', function () {
+                    //noinspection JSUnusedLocalSymbols
+                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    var collectionBar = new CollectionWithCustomSelectBar( [model] );
+                    expect( collectionBar.select( "arg1", "arg2" ) ).toEqual( "bar:arg1:arg2" );
+                } );
+
+                it( 'returns the result of a another select method, which has been modified in different way, when that collection is instantiated before the original one', function () {
+                    var collectionBar = new CollectionWithCustomSelectBar( [model] );
+                    //noinspection JSUnusedLocalSymbols
+                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    expect( collectionBar.select( "arg1", "arg2" ) ).toEqual( "bar:arg1:arg2" );
+                } );
+            } );
+
+        } );
+
+    } );
+    
     describe( 'Checking for memory leaks', function () {
 
         describe( 'when a collection is replaced by another one and is not referenced by a variable any more, with model sharing disabled', function () {
