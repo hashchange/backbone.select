@@ -6,6 +6,38 @@ Collections either allow only a single model to be selected ([Backbone.Select.On
 
 Backbone.Select is [compatible with Backbone.Picky][picky-compatibility]. For a superset of Backbone.Select with even more features, have a look at [Backbone.Cycle][].
 
+#### Outline
+
+- [Introductory example](#an-introductory-example)
+- [Dependencies and setup](#dependencies-and-setup)
+- [Basic model and collection interaction](#basic-model-and-collection-interaction)
+- [Backbone.Select.Me: Making models selectable](#backboneselectme-making-models-selectable)
+    * [Basic usage](#basic-usage)
+    * [Methods](#backboneselectme-methods): [`select`](#modelselect-options-), [`deselect`](#modeldeselect-options-), [`toggleSelected`](#modeltoggleselected-options-)
+    * [Property](#backboneselectme-properties): [`selected`](#modelselected)
+    * [Events](#backboneselectme-events): ["selected"](#selected), ["deselected"](#deselected), ["reselected"](#reselected)
+- [Backbone.Select.One: a single-select collection](#backboneselectone-a-single-select-collection)
+    * [Basic usage](#basic-usage-1)
+    * [Methods](#backboneselectone-methods): [`select`](#collectionselect-model-options-), [`deselect`](#collectiondeselect-model-options-)
+    * [Property](#backboneselectone-properties): [`selected`](#collectionselected)
+    * [Events](t#backboneselectone-events): ["select:one"](#selectone), ["deselect:one"](#deselectone), ["reselect:one"](#reselectone)
+- [Backbone.Select.Many: a multi-select collection](#backboneselectmany-a-multi-select-collection)
+    * [Basic usage](#basic-usage-2)
+    * [Methods](#backboneselectmany-methods): [`select`](#collectionselect-model-options--1), [`deselect`](#collectiondeselect-model-options--1), [`selectAll`](#collectionselectall-options-), [`deselectAll`](#collectiondeselectall-options-), [`toggleSelectAll`](#collectiontoggleselectall-options-)
+    * [Properties](#backboneselectmany-properties): [`selected`](#collectionselected-1), [`selectedLength`](#collectionselectedlength)
+    * [Events](#backboneselectmany-events): ["select:all"](#selectall), ["select:none"](#selectnone), ["select:some"](#selectsome), ["reselect:any"](#reselectany)
+- [Sharing models among collections](#sharing-models-among-collections):
+    * [Features](#features)
+    * [Enabling model sharing](#enabling-model-sharing)
+    * [Restrictions when sharing models](#restrictions-when-sharing-models)
+    * [Events](#events)
+- [Custom options](#custom-options)
+- [Compatibility with Backbone's own select method](#compatibility-with-backbones-own-select-method)
+- [Compatibility with Backbone.Picky](#compatibility-with-backbonepicky)
+    * [Picky vs Select: When to choose which](#picky-vs-select-when-to-choose-which)
+    * [Compatibility](#compatibility)
+- [Build process and tests](#build-process-and-tests), [release notes](#release-notes), [credits, copyright, MIT license](#credits-copyright-mit-license)
+
 ## An introductory example
 
 Perhaps the best way to explain what Backbone.Select does, before getting into the details, is an example.
@@ -257,7 +289,7 @@ The `deselect` method supports the `silent` option.
 
 The following property is managed by the Select.One mixin.
 
-### collection.selected
+#### collection.selected
 
 Returns the model which is currently selected in the collection, or `undefined` if no model is selected.
 
@@ -409,7 +441,7 @@ The `toggleSelectAll` method supports the `silent` option.
 
 The following properties are managed by the Select.Many mixin.
 
-### collection.selected
+#### collection.selected
 
 Returns a hash of the selected models. The `cid` of the models serve as the keys. Returns an empty object, `{}`, if no models are selected.
 
