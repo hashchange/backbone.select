@@ -91,7 +91,7 @@ The stable version of Backbone.Select is available in the `dist` directory ([dev
 
 In theory, a selectable model could be used on its own, but what purpose would it serve? Models are selected in the context of a collection.
 
-So the mixins are used in tandem: Models are augmented with the `Backbone.Select.Me` mixin, and stored in `Backbone.Select.One` or `Backbone.Select.Many` collections. All models in a Backbone.Select collection must have the `Backbone.Select.Me` mixin applied to them.
+So the mixins are used in tandem: Models are augmented with the Backbone.Select.Me mixin, and stored in Backbone.Select.One or Backbone.Select.Many collections. All models in a Backbone.Select collection must have the Backbone.Select.Me mixin applied to them.
 
 Selections can be made with model or collection methods. Model and collection will keep each other in sync. Thus, if `model` is part of `collection`, `model.select()` and `collection.select( model )` are equivalent.
 
@@ -132,7 +132,7 @@ myModel.select(); // => prints "I am model foo and just got selected."
 myModel.selected; // => true
 ```
 
-The `select` method can be called with the `{silent: true}` option to prevent selection-related events from firing. See the [events section](#selectable-events) below.
+The `select` method can be called with the `{silent: true}` option to prevent selection-related events from firing. See the [events section][select.me-events] below.
 
 If the model has already been selected, selecting it again does not affect its state, and a "selected" event is not triggered. A "reselected" event is triggered instead.
 
@@ -187,11 +187,11 @@ Returns a boolean value indicating whether or not the model is currently selecte
 
 ### Backbone.Select.Me events
 
-The events listed below are are triggered from Select.Me models. They bubble up to the collection, too. Events can be prevented from firing when Backbone.Select methods are called with the `silent` option, as in `myModel.select({silent: true})`.
+The events listed below are are triggered from Select.Me models. They bubble up to the collection, too. Events can be prevented from firing when Backbone.Select methods are called with the `silent` option, as in `myModel.select( {silent: true} )`.
 
 Event handlers with standard names are invoked automatically. Standard names are `onSelect`, `onDeselect`, and `onReselect`. If these methods exist on the model, they are run without having to be wired up with the event manually.
 
-Custom options can be used when invoking any method. See the [section on custom options](#custom-options), below.
+Custom options can be used when invoking any method. See the [section on custom options][custom-options], below.
 
 #### "selected"
 
@@ -306,7 +306,7 @@ The events listed below are triggered by Backbone.Select.One based on changes of
 
 Event handlers with standard names are invoked automatically. Standard names are `onSelect`, `onDeselect`, and `onReselect`. If these methods exist on the collection, they are run without having to be wired up with the event manually.
 
-Custom options can be used when invoking any method. See the [section on custom options](#custom-options), below.
+Custom options can be used when invoking any method. See the [section on custom options][custom-options], below.
 
 #### "select:one"
 
@@ -478,19 +478,19 @@ _(Backbone.Picky users: Note that up to version 0.2, the first parameter passed 
 
 Event handlers with standard names are invoked automatically. Standard names are `onSelectNone`, `onSelectSome`, `onSelectAll` and `onReselect`. If these methods exist on the collection, they are run without having to be wired up with the event manually.
 
-Custom options can be used when invoking any method. See the [section on custom options](#custom-options), below.
+Custom options can be used when invoking any method. See the [section on custom options][custom-options], below.
 
 #### "select:all"
 
-Triggered when all models have been selected. Provides the ["diff" hash](#multiselect-events) as the first parameter, and the collection as the second. Runs the `onSelectAll` event handler if the method exists on the collection.
+Triggered when all models have been selected. Provides the ["diff" hash][select.many-events] as the first parameter, and the collection as the second. Runs the `onSelectAll` event handler if the method exists on the collection.
 
 #### "select:none"
 
-Triggered when all models have been deselected. Provides the ["diff" hash](#multiselect-events) as the first parameter, and the collection as the second. Runs the `onSelectNone` event handler if the method exists on the collection.
+Triggered when all models have been deselected. Provides the ["diff" hash][select.many-events] as the first parameter, and the collection as the second. Runs the `onSelectNone` event handler if the method exists on the collection.
 
 #### "select:some"
 
-Triggered when some, but not all, models have been selected. Provides the ["diff" hash](#multiselect-events) as the first parameter, and the collection as the second. Runs the `onSelectSome` event handler if the method exists on the collection.
+Triggered when some, but not all, models have been selected. Provides the ["diff" hash][select.many-events] as the first parameter, and the collection as the second. Runs the `onSelectSome` event handler if the method exists on the collection.
 
 #### "reselect:any"
 
@@ -801,9 +801,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [Backbone.Select.One]: #backboneselectone-a-single-select-collection
 [Backbone.Select.Many]: #backboneselectmany-a-multi-select-collection
 [model-collection-interaction]: #basic-model-and-collection-interaction
+[select.me-events]: #backboneselectme-events
 [select.one-basic-usage]: #basic-usage-1
 [select.many-basic-usage]: #basic-usage-2
 [select.many-events]: #backboneselectmany-events
 [sharing]: #sharing-models-among-collections
+[custom-options]: #custom-options
 [select-compatibility]: #compatibility-with-backbones-own-select-method
 [picky-compatibility]: #compatibility-with-backbonepicky
