@@ -26,16 +26,10 @@ Backbone.Select is [compatible with Backbone.Picky][picky-compatibility]. For a 
     * [Methods](#backboneselectmany-methods): [`select`](#collectionselect-model-options--1), [`deselect`](#collectiondeselect-model-options--1), [`selectAll`](#collectionselectall-options-), [`deselectAll`](#collectiondeselectall-options-), [`toggleSelectAll`](#collectiontoggleselectall-options-)
     * [Properties](#backboneselectmany-properties): [`selected`](#collectionselected-1), [`selectedLength`](#collectionselectedlength)
     * [Events](#backboneselectmany-events): ["select:all"](#selectall), ["select:none"](#selectnone), ["select:some"](#selectsome), ["reselect:any"](#reselectany)
-- [Sharing models among collections](#sharing-models-among-collections):
-    * [Features](#features)
-    * [Enabling model sharing](#enabling-model-sharing)
-    * [Restrictions when sharing models](#restrictions-when-sharing-models)
-    * [Events](#events)
+- [Sharing models among collections](#sharing-models-among-collections)
 - [Custom options](#custom-options)
 - [Compatibility with Backbone's own select method](#compatibility-with-backbones-own-select-method)
 - [Compatibility with Backbone.Picky](#compatibility-with-backbonepicky)
-    * [Picky vs Select: When to choose which](#picky-vs-select-when-to-choose-which)
-    * [Compatibility](#compatibility)
 - [Build process and tests](#build-process-and-tests), [release notes](#release-notes), [credits, copyright, MIT license](#credits-copyright-mit-license)
 
 ## An introductory example
