@@ -1,4 +1,4 @@
-Backbone.Select = (function ( Backbone, _ ) {
+;( function ( Backbone, _ ) {
     var Select = {};
 
     // Select.One
@@ -730,5 +730,6 @@ Backbone.Select = (function ( Backbone, _ ) {
         return eventName;
     }
 
-    return Select;
-})( Backbone, _ );
+    Backbone.Select = Select;
+
+} )( Backbone, _ );

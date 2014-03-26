@@ -1,10 +1,10 @@
-// Backbone.Select, v1.2.5
+// Backbone.Select, v1.2.6
 // Copyright (c) 2014 Michael Heim
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
 // http://github.com/hashchange/backbone.select
 
-(function ( root, factory ) {
+;( function ( root, factory ) {
     if ( typeof exports === 'object' ) {
 
         var underscore = require( 'underscore' );
@@ -20,7 +20,7 @@
 }( this, function ( _, Backbone ) {
     "option strict";
 
-    Backbone.Select = (function ( Backbone, _ ) {
+    ;( function ( Backbone, _ ) {
         var Select = {};
     
         // Select.One
@@ -752,8 +752,9 @@
             return eventName;
         }
     
-        return Select;
-    })( Backbone, _ );
+        Backbone.Select = Select;
+    
+    } )( Backbone, _ );
     
     return Backbone.Select;
 
