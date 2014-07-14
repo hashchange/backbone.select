@@ -20,7 +20,7 @@ Backbone.Select is [compatible with Backbone.Picky][picky-compatibility]. For a 
     * [Basic usage](#basic-usage-1)
     * [Methods](#backboneselectone-methods): [`select`](#collectionselect-model-options-), [`deselect`](#collectiondeselect-model-options-)
     * [Property](#backboneselectone-properties): [`selected`](#collectionselected)
-    * [Events](t#backboneselectone-events): ["select:one"](#selectone), ["deselect:one"](#deselectone), ["reselect:one"](#reselectone)
+    * [Events](#backboneselectone-events): ["select:one"](#selectone), ["deselect:one"](#deselectone), ["reselect:one"](#reselectone)
 - [Backbone.Select.Many: a multi-select collection](#backboneselectmany-a-multi-select-collection)
     * [Basic usage](#basic-usage-2)
     * [Methods](#backboneselectmany-methods): [`select`](#collectionselect-model-options--1), [`deselect`](#collectiondeselect-model-options--1), [`selectAll`](#collectionselectall-options-), [`deselectAll`](#collectiondeselectall-options-), [`toggleSelectAll`](#collectiontoggleselectall-options-)
@@ -79,7 +79,7 @@ m2.select();
 
 [Backbone][] is the only dependency. Include backbone.select.js after [Backbone][]. Backbone.Select requires Backbone 0.9.9 or later.
 
-The stable version of Backbone.Select is available in the `dist` directory ([dev][dist-dev], [prod][dist-prod]), including an AMD build ([dev][dist-amd-dev], [prod][dist-amd-prod]). If you use Bower, fetch the files with `bower install backbone.select`.
+The stable version of Backbone.Select is available in the `dist` directory ([dev][dist-dev], [prod][dist-prod]), including an AMD build ([dev][dist-amd-dev], [prod][dist-amd-prod]). If you use Bower, fetch the files with `bower install backbone.select`. With npm, it is `npm install backbone.select`.
 
 ## Basic model and collection interaction
 
@@ -689,6 +689,10 @@ In case anything about the test and build process needs to be changed, have a lo
 New test files in the `spec` directory are picked up automatically, no need to edit the configuration for that.
 
 ## Release notes
+
+### v1.2.7
+
+* Fleshed out package.json for npm installs
 
 ### v1.2.5
 

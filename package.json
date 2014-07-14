@@ -1,7 +1,38 @@
 {
   "name": "backbone.select",
-  "version": "1.2.6",
-  "dependencies": {},
+  "version": "1.2.7",
+  "homepage": "https://github.com/hashchange/backbone.select",
+  "bugs": "https://github.com/hashchange/backbone.select/issues",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/hashchange/backbone.select.git"
+  },
+  "author": "Michael Heim <heim@zeilenwechsel.de> (http://www.zeilenwechsel.de/)",
+  "contributors": [
+    "Derick Bailey <derickbailey@gmail.com> (http://derickbailey.com/)",
+    "Rifat Nabi <rifat@facebook.com> (http://rifatnabi.com/)",
+    "Deni (https://github.com/yethee)",
+    "Liam McLennan (http://hackingon.net/)",
+    "Walther Lalk (https://github.com/dakota)",
+    "Jack Anderson <hi@janderson.me> (http://janderson.me/)",
+    "Aaron Brethorst (http://brethorsting.com/)",
+    "Marc Delagrammatikas (https://github.com/marcdel)"
+  ],
+  "description": "Selecting Backbone models; handling selections in Backbone collections.",
+  "main": "dist/amd/backbone.select.js",
+  "keywords": [
+    "backbone",
+    "picky",
+    "selection",
+    "select",
+    "models",
+    "collections"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "backbone": "^1.0.0 <1.2.0",
+    "underscore": "^1.5.0 <1.7.0"
+  },
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-cli": "~0.1.11",
