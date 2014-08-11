@@ -1,22 +1,33 @@
 {
+  "bitwise": true,
   "curly": false,
   "eqeqeq": true,
-  "immed": false,
+  "es3": true,
+  "freeze": true,
+  "immed": true,
   "latedef": true,
   "newcap": true,
   "noarg": true,
-  "sub": true,
+  "noempty": true,
+  "nonbsp": true,
   "undef": true,
-  "boss": true,
+
   "eqnull": true,
   "expr": true,
+  "sub": true,
+
   "browser": true,
+  "jquery": true,
+
+  "strict": true,
+
   "globals": {
-    "jQuery": true,
     "Backbone": true,
     "_": true,
     "$": true,
-    "slice": true,
-    "throwError": true
+
+    "require": false,
+    "define": false,
+    "module": false
   }
 }

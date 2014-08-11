@@ -90,7 +90,7 @@ module.exports = function(grunt) {
       options: {
         jshintrc: '.jshintrc'
       },
-      component: 'src/backbone.select.js'
+      components: 'src/**/*.js'
     },
 
     plato: {
@@ -145,7 +145,7 @@ module.exports = function(grunt) {
     connect: {
       options: {
         port: HTTP_PORT,
-        // change this to '*' to access the server from outside
+        // change this from 'localhost' to '*' to access the server from outside
         hostname: 'localhost',
         open: true,
         base: '.'
