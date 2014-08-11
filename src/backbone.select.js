@@ -1,4 +1,6 @@
 ;( function ( Backbone, _ ) {
+    "use strict";
+
     var Select = {};
 
     // Select.One

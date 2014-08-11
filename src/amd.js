@@ -1,18 +1,23 @@
 ;( function ( root, factory ) {
+    "use strict";
+
     if ( typeof exports === 'object' ) {
 
-        var underscore = require( 'underscore' );
-        var backbone = require( 'backbone' );
-
-        module.exports = factory( underscore, backbone );
+        module.exports = factory(
+            require( 'underscore' ),
+            require( 'backbone' )
+        );
 
     } else if ( typeof define === 'function' && define.amd ) {
 
-        define( [ 'underscore', 'backbone' ], factory );
+        define( [
+            'underscore',
+            'backbone'
+        ], factory );
 
     }
 }( this, function ( _, Backbone ) {
-    "option strict";
+    "use strict";
 
     // @include backbone.select.js
     return Backbone.Select;

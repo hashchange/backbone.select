@@ -1,10 +1,12 @@
-// Backbone.Select, v1.2.7
+// Backbone.Select, v1.2.8
 // Copyright (c) 2014 Michael Heim
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
 // http://github.com/hashchange/backbone.select
 
 ;( function ( Backbone, _ ) {
+    "use strict";
+
     var Select = {};
 
     // Select.One
