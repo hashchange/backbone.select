@@ -336,4 +336,25 @@ describe( "multi-select collection: general", function () {
 
     } );
 
+    describe( 'Mixin is protected from modification', function () {
+        var m1, m2, c1, c2;
+
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
+            c1 = new Collection( [ m1 ] );
+            c2 = new Collection( [ m2 ] );
+        } );
+
+        it( 'when overwriting the select() method on one collection, the select method of another collection stays intact', function () {
+            var expected = {};
+
+            c1.select = function () {};
+            c2.select( m2 );
+
+            expected[m2.cid] = m2;
+            expect( c2.selected ).toEqual( expected );
+        } );
+    } );
+
 } );

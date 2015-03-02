@@ -371,4 +371,19 @@ describe( "selectable model", function () {
         } );
     } );
 
+    describe( 'Mixin is protected from modification', function () {
+        var m1, m2;
+
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
+        } );
+
+        it( 'when overwriting the select() method on one model, the select method of another model stays intact', function () {
+            m1.select = function () {};
+            m2.select();
+            expect( m2.selected ).toBe( true );
+        } );
+    } );
+
 } );
