@@ -1,7 +1,11 @@
 ;( function ( Backbone, _ ) {
     "use strict";
 
-    var Select = {};
+    var Select = {
+        Me: {},
+        Many: {},
+        One: {}
+    };
 
     // Select.One
     // ------------------
@@ -10,9 +14,7 @@
     // model within the collection causes the previous model to be
     // deselected.
 
-    Select.One = function () {};
-
-    _.extend( Select.One.prototype, {
+    var SelectOneMixin = {
 
         // Type indicator, undocumented, but part of the API (monitored by tests).
         // Can be queried safely by other components. Use it read-only.
@@ -83,7 +85,7 @@
             this.stopListening();
         }
 
-    } );
+    };
 
     // Select.Many
     // -----------------
@@ -91,9 +93,7 @@
     // have multiple items selected, including `selectAll` and `deselectAll`
     // capabilities.
 
-    Select.Many = function () {};
-
-    _.extend( Select.Many.prototype, {
+    var SelectManyMixin = {
 
         // Type indicator, undocumented, but part of the API (monitored by tests).
         // Can be queried safely by other components. Use it read-only.
@@ -214,16 +214,14 @@
             unregisterCollectionWithModels( this );
             this.stopListening();
         }
-    } );
+    };
 
     // Select.Me
     // ----------------
     // A selectable mixin for Backbone.Model, allowing a model to be selected,
     // enabling it to work with Select.One or Select.Many, or on it's own.
 
-    Select.Me = function () {};
-
-    _.extend( Select.Me.prototype, {
+    var SelectMeMixin = {
 
         // Type indicator, undocumented, but part of the API (monitored by tests).
         // Can be queried safely by other components. Use it read-only.
@@ -295,13 +293,13 @@
                 this.select( options );
             }
         }
-    } );
+    };
 
     // Applying the mixin: class methods for setup
     Select.Me.applyTo = function ( hostObject ) {
         if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
 
-        _.extend( hostObject, new Backbone.Select.Me() );
+        _.extend( hostObject, SelectMeMixin );
         augmentTrigger( hostObject );
     };
 
@@ -317,7 +315,7 @@
         // select method.
         oldSelect = hostObject.select;
 
-        _.extend( hostObject, new Backbone.Select.One() );
+        _.extend( hostObject, SelectOneMixin );
 
         hostObject._pickyCid = _.uniqueId( 'singleSelect' );
         augmentTrigger( hostObject );
@@ -361,7 +359,7 @@
         // select method.
         oldSelect = hostObject.select;
 
-        _.extend( hostObject, new Backbone.Select.Many() );
+        _.extend( hostObject, SelectManyMixin );
 
         hostObject._pickyCid = _.uniqueId( 'multiSelect' );
         hostObject.selected = {};
