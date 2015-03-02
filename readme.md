@@ -690,6 +690,15 @@ New test files in the `spec` directory are picked up automatically, no need to e
 
 ## Release notes
 
+### v1.3.0
+
+* Fixed compatibility with Underscore 1.7.0
+* Switched to plain objects as mixins internally
+
+### v1.2.8
+
+* Enforced strict mode 
+
 ### v1.2.7
 
 * Fleshed out package.json for npm installs

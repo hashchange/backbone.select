@@ -31,7 +31,7 @@
   "license": "MIT",
   "dependencies": {
     "backbone": "^1.0.0 <1.2.0",
-    "underscore": "^1.5.0 <1.7.0"
+    "underscore": "^1.5.0 <1.9.0"
   },
   "devDependencies": {
     "grunt": "~0.4.2",
