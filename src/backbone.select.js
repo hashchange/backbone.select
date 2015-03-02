@@ -1,393 +1,410 @@
 ;( function ( Backbone, _ ) {
     "use strict";
 
-    var Select = {
-        Me: {},
-        Many: {},
-        One: {}
-    };
+    var Mixins = {
 
-    // Select.One
-    // ------------------
-    // A single-select mixin for Backbone.Collection, allowing a single
-    // model to be selected within a collection. Selection of another
-    // model within the collection causes the previous model to be
-    // deselected.
+            // Select.One
+            // ----------
+            // A single-select mixin for Backbone.Collection, allowing a single
+            // model to be selected within a collection. Selection of another
+            // model within the collection causes the previous model to be
+            // deselected.
 
-    var SelectOneMixin = {
+            SelectOne: {
 
-        // Type indicator, undocumented, but part of the API (monitored by tests).
-        // Can be queried safely by other components. Use it read-only.
-        _pickyType: "Backbone.Select.One",
+                // Type indicator, undocumented, but part of the API (monitored by tests).
+                // Can be queried safely by other components. Use it read-only.
+                _pickyType: "Backbone.Select.One",
 
-        // Select a model, deselecting any previously selected model
-        select: function ( model, options ) {
-            var reselected = model && this.selected === model ? model : undefined;
+                // Select a model, deselecting any previously selected model
+                select: function ( model, options ) {
+                    var reselected = model && this.selected === model ? model : undefined;
 
-            options = initOptions( options );
-            if ( options._processedBy[this._pickyCid] ) return;
+                    options = initOptions( options );
+                    if ( options._processedBy[this._pickyCid] ) return;
 
-            if ( !reselected ) {
-                this.deselect( undefined, _.extend(
-                    // _eventQueue vs _eventQueueAppendOnly:
-                    //
-                    // When a deselect sub action is initiated from a select action, the
-                    // deselection events are added to the common event queue. But the
-                    // event queue must not be resolved prematurely during the
-                    // deselection phase. Resolution is prevented by naming the queue
-                    // differently.
-                    _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
-                    { _eventQueueAppendOnly: options._eventQueue }
-                ) );
-                this.selected = model;
+                    if ( !reselected ) {
+                        this.deselect( undefined, _.extend(
+                            // _eventQueue vs _eventQueueAppendOnly:
+                            //
+                            // When a deselect sub action is initiated from a select action, the
+                            // deselection events are added to the common event queue. But the
+                            // event queue must not be resolved prematurely during the
+                            // deselection phase. Resolution is prevented by naming the queue
+                            // differently.
+                            _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
+                            { _eventQueueAppendOnly: options._eventQueue }
+                        ) );
+                        this.selected = model;
+                    }
+                    options._processedBy[this._pickyCid] = { done: false };
+
+                    if ( !options._processedBy[this.selected.cid] ) this.selected.select( stripLocalOptions( options ) );
+
+                    if ( !(options.silent || options._silentLocally) ) {
+
+                        if ( reselected ) {
+                            if ( !options._silentReselect ) queueEvent( options, this, ["reselect:one", model, this, stripInternalOptions( options )] );
+                        } else {
+                            queueEvent( options, this, ["select:one", model, this, stripInternalOptions( options )] );
+                        }
+
+                    }
+
+                    options._processedBy[this._pickyCid].done = true;
+                    processEventQueue( options );
+                },
+
+                // Deselect a model, resulting in no model
+                // being selected
+                deselect: function ( model, options ) {
+                    options = initOptions( options );
+                    if ( options._processedBy[this._pickyCid] ) return;
+
+                    if ( !this.selected ) return;
+
+                    model = model || this.selected;
+                    if ( this.selected !== model ) return;
+
+                    options._processedBy[this._pickyCid] = { done: false };
+
+                    delete this.selected;
+                    if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
+                    if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, ["deselect:one", model, this, stripInternalOptions( options )] );
+
+                    options._processedBy[this._pickyCid].done = true;
+                    processEventQueue( options );
+                },
+
+                close: function () {
+                    unregisterCollectionWithModels( this );
+                    this.stopListening();
+                }
+
+            },
+
+            // Select.Many
+            // -----------
+            // A multi-select mixin for Backbone.Collection, allowing a collection to
+            // have multiple items selected, including `selectAll` and `deselectAll`
+            // capabilities.
+
+            SelectMany: {
+
+                // Type indicator, undocumented, but part of the API (monitored by tests).
+                // Can be queried safely by other components. Use it read-only.
+                _pickyType: "Backbone.Select.Many",
+
+                // Select a specified model, make sure the model knows it's selected, and
+                // hold on to the selected model.
+                select: function ( model, options ) {
+                    var prevSelected = multiSelectionToArray( this.selected ),
+                        reselected = this.selected[model.cid] ? [model] : [];
+
+                    options = initOptions( options );
+
+                    if ( reselected.length && options._processedBy[this._pickyCid] ) return;
+
+                    if ( !reselected.length ) {
+                        this.selected[model.cid] = model;
+                        this.selectedLength = _.size( this.selected );
+                    }
+                    options._processedBy[this._pickyCid] = { done: false };
+
+                    if ( !options._processedBy[model.cid] ) model.select( stripLocalOptions( options ) );
+                    triggerMultiSelectEvents( this, prevSelected, options, reselected );
+
+                    options._processedBy[this._pickyCid].done = true;
+                    processEventQueue( options );
+                },
+
+                // Deselect a specified model, make sure the model knows it has been deselected,
+                // and remove the model from the selected list.
+                deselect: function ( model, options ) {
+                    var prevSelected = multiSelectionToArray( this.selected );
+
+                    options = initOptions( options );
+                    if ( options._processedBy[this._pickyCid] ) return;
+
+                    if ( !this.selected[model.cid] ) return;
+
+                    options._processedBy[this._pickyCid] = { done: false };
+
+                    delete this.selected[model.cid];
+                    this.selectedLength = _.size( this.selected );
+
+                    if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
+                    triggerMultiSelectEvents( this, prevSelected, options );
+
+                    options._processedBy[this._pickyCid].done = true;
+                    processEventQueue( options );
+                },
+
+                // Select all models in this collection
+                selectAll: function ( options ) {
+                    var prevSelected = multiSelectionToArray( this.selected ),
+                        reselected = [];
+
+                    options || (options = {});
+
+                    this.selectedLength = 0;
+                    this.each( function ( model ) {
+                        this.selectedLength++;
+                        if ( this.selected[model.cid] ) reselected.push( model );
+                        this.select( model, _.extend( {}, options, { _silentLocally: true } ) );
+                    }, this );
+
+                    options = initOptions( options );
+                    triggerMultiSelectEvents( this, prevSelected, options, reselected );
+
+                    if ( options._processedBy[this._pickyCid] ) {
+                        options._processedBy[this._pickyCid].done = true;
+                    } else {
+                        options._processedBy[this._pickyCid] = { done: true };
+                    }
+                    processEventQueue( options );
+                },
+
+                // Deselect all models in this collection
+                deselectAll: function ( options ) {
+                    var prevSelected;
+
+                    if ( this.selectedLength === 0 ) return;
+                    prevSelected = multiSelectionToArray( this.selected );
+
+                    options || (options = {});
+
+                    this.each( function ( model ) {
+                        if ( model.selected ) this.selectedLength--;
+                        this.deselect( model, _.extend( {}, options, { _silentLocally: true } ) );
+                    }, this );
+
+                    this.selectedLength = 0;
+
+                    options = initOptions( options );
+                    triggerMultiSelectEvents( this, prevSelected, options );
+
+                    if ( options._processedBy[this._pickyCid] ) {
+                        options._processedBy[this._pickyCid].done = true;
+                    } else {
+                        options._processedBy[this._pickyCid] = { done: true };
+                    }
+                    processEventQueue( options );
+                },
+
+                selectNone: function ( options ) {
+                    this.deselectAll( options );
+                },
+
+                // Toggle select all / none. If some are selected, it will select all. If all
+                // are selected, it will select none. If none are selected, it will select all.
+                toggleSelectAll: function ( options ) {
+                    if ( this.selectedLength === this.length ) {
+                        this.deselectAll( options );
+                    } else {
+                        this.selectAll( options );
+                    }
+                },
+
+                close: function () {
+                    unregisterCollectionWithModels( this );
+                    this.stopListening();
+                }
+            },
+
+            // Select.Me
+            // ---------
+            // A selectable mixin for Backbone.Model, allowing a model to be selected,
+            // enabling it to work with Select.One or Select.Many, or on it's own.
+
+            SelectMe: {
+
+                // Type indicator, undocumented, but part of the API (monitored by tests).
+                // Can be queried safely by other components. Use it read-only.
+                _pickyType: "Backbone.Select.Me",
+
+                // Select this model, and tell our
+                // collection that we're selected
+                select: function ( options ) {
+                    var reselected = this.selected;
+
+                    options = initOptions( options );
+                    if ( options._processedBy[this.cid] ) return;
+
+                    options._processedBy[this.cid] = { done: false };
+                    this.selected = true;
+
+                    if ( this._pickyCollections ) {
+                        // Model-sharing mode: notify collections with an event
+                        this.trigger( "_selected", this, stripLocalOptions( options ) );
+                    } else if ( this.collection ) {
+                        // Single collection only: no event listeners set up in collection, call
+                        // it directly
+                        if ( !options._processedBy[this.collection._pickyCid] ) this.collection.select( this, stripLocalOptions( options ) );
+                    }
+
+                    if ( !(options.silent || options._silentLocally) ) {
+                        if ( reselected ) {
+                            if ( !options._silentReselect ) queueEvent( options, this, ["reselected", this, stripInternalOptions( options )] );
+                        } else {
+                            queueEvent( options, this, ["selected", this, stripInternalOptions( options )] );
+                        }
+                    }
+
+                    options._processedBy[this.cid].done = true;
+                    processEventQueue( options );
+                },
+
+                // Deselect this model, and tell our collection that we're deselected
+                deselect: function ( options ) {
+                    options = initOptions( options );
+                    if ( options._processedBy[this.cid] ) return;
+
+                    if ( !this.selected ) return;
+
+                    options._processedBy[this.cid] = { done: false };
+                    this.selected = false;
+
+                    if ( this._pickyCollections ) {
+                        // Model-sharing mode: notify collections with an event
+                        this.trigger( "_deselected", this, stripLocalOptions( options ) );
+                    } else if ( this.collection ) {
+                        // Single collection only: no event listeners set up in collection, call
+                        // it directly
+                        this.collection.deselect( this, stripLocalOptions( options ) );
+                    }
+
+                    if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, ["deselected", this, stripInternalOptions( options )] );
+
+                    options._processedBy[this.cid].done = true;
+                    processEventQueue( options );
+                },
+
+                // Change selected to the opposite of what
+                // it currently is
+                toggleSelected: function ( options ) {
+                    if ( this.selected ) {
+                        this.deselect( options );
+                    } else {
+                        this.select( options );
+                    }
+                }
             }
-            options._processedBy[this._pickyCid] = { done: false };
 
-            if ( !options._processedBy[this.selected.cid] ) this.selected.select( stripLocalOptions( options ) );
+        },
 
-            if ( !(options.silent || options._silentLocally) ) {
 
-                if ( reselected ) {
-                    if ( !options._silentReselect ) queueEvent( options, this, [ "reselect:one", model, this, stripInternalOptions( options ) ] );
-                } else {
-                    queueEvent( options, this, [ "select:one", model, this, stripInternalOptions( options ) ] );
+        // Applying the mixins: setup methods
+
+        Select = {
+
+            Me: {
+
+                applyTo: function ( hostObject ) {
+                    if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
+
+                    _.extend( hostObject, Mixins.SelectMe );
+                    augmentTrigger( hostObject );
+                }
+
+            },
+
+            One: {
+
+                applyTo: function ( hostObject, models, options ) {
+                    var oldSelect;
+
+                    if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
+                    if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
+                    if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
+
+                    // Store a reference to the existing select method (most likely the
+                    // default Backbone.Collection.select method). Used to overload the new
+                    // select method.
+                    oldSelect = hostObject.select;
+
+                    _.extend( hostObject, Mixins.SelectOne );
+
+                    hostObject._pickyCid = _.uniqueId( 'singleSelect' );
+                    augmentTrigger( hostObject );
+                    overloadSelect( oldSelect, hostObject );
+
+                    if ( options && options.enableModelSharing ) {
+
+                        // model-sharing mode
+                        _.each( models || [], function ( model ) {
+                            registerCollectionWithModel( model, hostObject );
+                            if ( model.selected ) {
+                                if ( hostObject.selected ) hostObject.selected.deselect();
+                                hostObject.selected = model;
+                            }
+                        } );
+
+                        hostObject.listenTo( hostObject, '_selected', hostObject.select );
+                        hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
+
+                        hostObject.listenTo( hostObject, 'reset', onResetSingleSelect );
+                        hostObject.listenTo( hostObject, 'add', onAdd );
+                        hostObject.listenTo( hostObject, 'remove', onRemove );
+
+                        // Mode flag, undocumented, but part of the API (monitored by tests). Can
+                        // be queried safely by other components. Use it read-only.
+                        hostObject._modelSharingEnabled = true;
+
+                    }
+
+                }
+
+            },
+
+            Many: {
+
+                applyTo: function ( hostObject, models, options ) {
+                    var oldSelect;
+
+                    if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
+                    if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
+                    if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
+
+                    // Store a reference to the existing select method (most likely the
+                    // default Backbone.Collection.select method). Used to overload the new
+                    // select method.
+                    oldSelect = hostObject.select;
+
+                    _.extend( hostObject, Mixins.SelectMany );
+
+                    hostObject._pickyCid = _.uniqueId( 'multiSelect' );
+                    hostObject.selected = {};
+                    augmentTrigger( hostObject );
+                    overloadSelect( oldSelect, hostObject );
+
+                    if ( options && options.enableModelSharing ) {
+
+                        // model-sharing mode
+                        _.each( models || [], function ( model ) {
+                            registerCollectionWithModel( model, hostObject );
+                            if ( model.selected ) hostObject.selected[model.cid] = model;
+                        } );
+
+                        hostObject.listenTo( hostObject, '_selected', hostObject.select );
+                        hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
+
+                        hostObject.listenTo( hostObject, 'reset', onResetMultiSelect );
+                        hostObject.listenTo( hostObject, 'add', onAdd );
+                        hostObject.listenTo( hostObject, 'remove', onRemove );
+
+                        // Mode flag, undocumented, but part of the API (monitored by tests). Can
+                        // be queried safely by other components. Use it read-only.
+                        hostObject._modelSharingEnabled = true;
+
+                    }
+
                 }
 
             }
 
-            options._processedBy[this._pickyCid].done = true;
-            processEventQueue( options );
-        },
+        };
 
-        // Deselect a model, resulting in no model
-        // being selected
-        deselect: function ( model, options ) {
-            options = initOptions( options );
-            if ( options._processedBy[this._pickyCid] ) return;
-
-            if ( !this.selected ) return;
-
-            model = model || this.selected;
-            if ( this.selected !== model ) return;
-
-            options._processedBy[this._pickyCid] = { done: false };
-
-            delete this.selected;
-            if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
-            if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, [ "deselect:one", model, this, stripInternalOptions( options ) ] );
-
-            options._processedBy[this._pickyCid].done = true;
-            processEventQueue( options );
-        },
-
-        close: function () {
-            unregisterCollectionWithModels( this );
-            this.stopListening();
-        }
-
-    };
-
-    // Select.Many
-    // -----------------
-    // A multi-select mixin for Backbone.Collection, allowing a collection to
-    // have multiple items selected, including `selectAll` and `deselectAll`
-    // capabilities.
-
-    var SelectManyMixin = {
-
-        // Type indicator, undocumented, but part of the API (monitored by tests).
-        // Can be queried safely by other components. Use it read-only.
-        _pickyType: "Backbone.Select.Many",
-
-        // Select a specified model, make sure the model knows it's selected, and
-        // hold on to the selected model.
-        select: function ( model, options ) {
-            var prevSelected = multiSelectionToArray( this.selected ),
-                reselected = this.selected[model.cid] ? [ model ] : [];
-
-            options = initOptions( options );
-
-            if ( reselected.length && options._processedBy[this._pickyCid] ) return;
-
-            if ( !reselected.length ) {
-                this.selected[model.cid] = model;
-                this.selectedLength = _.size( this.selected );
-            }
-            options._processedBy[this._pickyCid] = { done: false };
-
-            if ( !options._processedBy[model.cid] ) model.select( stripLocalOptions( options ) );
-            triggerMultiSelectEvents( this, prevSelected, options, reselected );
-
-            options._processedBy[this._pickyCid].done = true;
-            processEventQueue( options );
-        },
-
-        // Deselect a specified model, make sure the model knows it has been deselected,
-        // and remove the model from the selected list.
-        deselect: function ( model, options ) {
-            var prevSelected = multiSelectionToArray( this.selected );
-
-            options = initOptions( options );
-            if ( options._processedBy[this._pickyCid] ) return;
-
-            if ( !this.selected[model.cid] ) return;
-
-            options._processedBy[this._pickyCid] = { done: false };
-
-            delete this.selected[model.cid];
-            this.selectedLength = _.size( this.selected );
-
-            if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
-            triggerMultiSelectEvents( this, prevSelected, options );
-
-            options._processedBy[this._pickyCid].done = true;
-            processEventQueue( options );
-        },
-
-        // Select all models in this collection
-        selectAll: function ( options ) {
-            var prevSelected = multiSelectionToArray( this.selected ),
-                reselected = [];
-
-            options || (options = {});
-
-            this.selectedLength = 0;
-            this.each( function ( model ) {
-                this.selectedLength++;
-                if ( this.selected[model.cid] ) reselected.push( model );
-                this.select( model, _.extend( {}, options, {_silentLocally: true} ) );
-            }, this );
-
-            options = initOptions( options );
-            triggerMultiSelectEvents( this, prevSelected, options, reselected );
-
-            if ( options._processedBy[this._pickyCid] ) {
-                options._processedBy[this._pickyCid].done = true;
-            } else {
-                options._processedBy[this._pickyCid] = { done: true };
-            }
-            processEventQueue( options );
-        },
-
-        // Deselect all models in this collection
-        deselectAll: function ( options ) {
-            var prevSelected;
-
-            if ( this.selectedLength === 0 ) return;
-            prevSelected = multiSelectionToArray( this.selected );
-
-            options || (options = {});
-
-            this.each( function ( model ) {
-                if ( model.selected ) this.selectedLength--;
-                this.deselect( model, _.extend( {}, options, {_silentLocally: true} ) );
-            }, this );
-
-            this.selectedLength = 0;
-
-            options = initOptions( options );
-            triggerMultiSelectEvents( this, prevSelected, options );
-
-            if ( options._processedBy[this._pickyCid] ) {
-                options._processedBy[this._pickyCid].done = true;
-            } else {
-                options._processedBy[this._pickyCid] = { done: true };
-            }
-            processEventQueue( options );
-        },
-
-        selectNone: function ( options ) {
-            this.deselectAll( options );
-        },
-
-        // Toggle select all / none. If some are selected, it will select all. If all
-        // are selected, it will select none. If none are selected, it will select all.
-        toggleSelectAll: function ( options ) {
-            if ( this.selectedLength === this.length ) {
-                this.deselectAll( options );
-            } else {
-                this.selectAll( options );
-            }
-        },
-
-        close: function () {
-            unregisterCollectionWithModels( this );
-            this.stopListening();
-        }
-    };
-
-    // Select.Me
-    // ----------------
-    // A selectable mixin for Backbone.Model, allowing a model to be selected,
-    // enabling it to work with Select.One or Select.Many, or on it's own.
-
-    var SelectMeMixin = {
-
-        // Type indicator, undocumented, but part of the API (monitored by tests).
-        // Can be queried safely by other components. Use it read-only.
-        _pickyType: "Backbone.Select.Me",
-
-        // Select this model, and tell our
-        // collection that we're selected
-        select: function ( options ) {
-            var reselected = this.selected;
-
-            options = initOptions( options );
-            if ( options._processedBy[this.cid] ) return;
-
-            options._processedBy[this.cid] = { done: false };
-            this.selected = true;
-
-            if ( this._pickyCollections ) {
-                // Model-sharing mode: notify collections with an event
-                this.trigger( "_selected", this, stripLocalOptions( options ) );
-            } else if ( this.collection ) {
-                // Single collection only: no event listeners set up in collection, call
-                // it directly
-                if ( !options._processedBy[this.collection._pickyCid] ) this.collection.select( this, stripLocalOptions( options ) );
-            }
-
-            if ( !(options.silent || options._silentLocally) ) {
-                if ( reselected ) {
-                    if ( !options._silentReselect ) queueEvent( options, this, [ "reselected", this, stripInternalOptions( options ) ] );
-                } else {
-                    queueEvent( options, this, [ "selected", this, stripInternalOptions( options ) ] );
-                }
-            }
-
-            options._processedBy[this.cid].done = true;
-            processEventQueue( options );
-        },
-
-        // Deselect this model, and tell our collection that we're deselected
-        deselect: function ( options ) {
-            options = initOptions( options );
-            if ( options._processedBy[this.cid] ) return;
-
-            if ( !this.selected ) return;
-
-            options._processedBy[this.cid] = { done: false };
-            this.selected = false;
-
-            if ( this._pickyCollections ) {
-                // Model-sharing mode: notify collections with an event
-                this.trigger( "_deselected", this, stripLocalOptions( options ) );
-            } else if ( this.collection ) {
-                // Single collection only: no event listeners set up in collection, call
-                // it directly
-                this.collection.deselect( this, stripLocalOptions( options ) );
-            }
-
-            if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, [ "deselected", this, stripInternalOptions( options ) ] );
-
-            options._processedBy[this.cid].done = true;
-            processEventQueue( options );
-        },
-
-        // Change selected to the opposite of what
-        // it currently is
-        toggleSelected: function ( options ) {
-            if ( this.selected ) {
-                this.deselect( options );
-            } else {
-                this.select( options );
-            }
-        }
-    };
-
-    // Applying the mixin: class methods for setup
-    Select.Me.applyTo = function ( hostObject ) {
-        if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
-
-        _.extend( hostObject, SelectMeMixin );
-        augmentTrigger( hostObject );
-    };
-
-    Select.One.applyTo = function ( hostObject, models, options ) {
-        var oldSelect;
-
-        if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
-        if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
-        if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
-
-        // Store a reference to the existing select method (most likely the
-        // default Backbone.Collection.select method). Used to overload the new
-        // select method.
-        oldSelect = hostObject.select;
-
-        _.extend( hostObject, SelectOneMixin );
-
-        hostObject._pickyCid = _.uniqueId( 'singleSelect' );
-        augmentTrigger( hostObject );
-        overloadSelect( oldSelect, hostObject );
-
-        if ( options && options.enableModelSharing ) {
-
-            // model-sharing mode
-            _.each( models || [], function ( model ) {
-                registerCollectionWithModel( model, hostObject );
-                if ( model.selected ) {
-                    if ( hostObject.selected ) hostObject.selected.deselect();
-                    hostObject.selected = model;
-                }
-            } );
-
-            hostObject.listenTo( hostObject, '_selected', hostObject.select );
-            hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
-
-            hostObject.listenTo( hostObject, 'reset', onResetSingleSelect );
-            hostObject.listenTo( hostObject, 'add', onAdd );
-            hostObject.listenTo( hostObject, 'remove', onRemove );
-
-            // Mode flag, undocumented, but part of the API (monitored by tests). Can
-            // be queried safely by other components. Use it read-only.
-            hostObject._modelSharingEnabled = true;
-
-        }
-
-    };
-
-    Select.Many.applyTo = function ( hostObject, models, options ) {
-        var oldSelect;
-
-        if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
-        if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
-        if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
-
-        // Store a reference to the existing select method (most likely the
-        // default Backbone.Collection.select method). Used to overload the new
-        // select method.
-        oldSelect = hostObject.select;
-
-        _.extend( hostObject, SelectManyMixin );
-
-        hostObject._pickyCid = _.uniqueId( 'multiSelect' );
-        hostObject.selected = {};
-        augmentTrigger( hostObject );
-        overloadSelect( oldSelect, hostObject );
-
-        if ( options && options.enableModelSharing ) {
-
-            // model-sharing mode
-            _.each( models || [], function ( model ) {
-                registerCollectionWithModel( model, hostObject );
-                if ( model.selected ) hostObject.selected[model.cid] = model;
-            } );
-
-            hostObject.listenTo( hostObject, '_selected', hostObject.select );
-            hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
-
-            hostObject.listenTo( hostObject, 'reset', onResetMultiSelect );
-            hostObject.listenTo( hostObject, 'add', onAdd );
-            hostObject.listenTo( hostObject, 'remove', onRemove );
-
-            // Mode flag, undocumented, but part of the API (monitored by tests). Can
-            // be queried safely by other components. Use it read-only.
-            hostObject._modelSharingEnabled = true;
-
-        }
-
-    };
 
     // Helper Methods
     // --------------
@@ -416,7 +433,7 @@
             diff;
 
         if ( reselected && reselected.length && !options._silentReselect ) {
-            queueEvent( options, collection, [ "reselect:any", reselected, collection, stripInternalOptions( options ) ] );
+            queueEvent( options, collection, ["reselect:any", reselected, collection, stripInternalOptions( options )] );
         }
 
         if ( unchanged ) return;
@@ -427,28 +444,28 @@
         };
 
         if ( selectedLength === length ) {
-            queueEvent( options, collection, [ "select:all", diff, collection, stripInternalOptions( options ) ] );
+            queueEvent( options, collection, ["select:all", diff, collection, stripInternalOptions( options )] );
             return;
         }
 
         if ( selectedLength === 0 ) {
-            queueEvent( options, collection, [ "select:none", diff, collection, stripInternalOptions( options ) ] );
+            queueEvent( options, collection, ["select:none", diff, collection, stripInternalOptions( options )] );
             return;
         }
 
         if ( selectedLength > 0 && selectedLength < length ) {
-            queueEvent( options, collection, [ "select:some", diff, collection, stripInternalOptions( options ) ] );
+            queueEvent( options, collection, ["select:some", diff, collection, stripInternalOptions( options )] );
             return;
         }
     };
 
     function onAdd ( model, collection ) {
         registerCollectionWithModel( model, collection );
-        if ( model.selected ) collection.select( model, {_silentReselect: true, _externalEvent: "add"} );
+        if ( model.selected ) collection.select( model, { _silentReselect: true, _externalEvent: "add" } );
     }
 
     function onRemove ( model, collection, options ) {
-        releaseModel( model, collection, _.extend( {}, options, {_externalEvent: "remove"} ) );
+        releaseModel( model, collection, _.extend( {}, options, { _externalEvent: "remove" } ) );
     }
 
     function releaseModel ( model, collection, options ) {
@@ -457,7 +474,7 @@
             if ( model._pickyCollections && model._pickyCollections.length === 0 ) {
                 collection.deselect( model, options );
             } else {
-                collection.deselect( model, _.extend( {}, options, {_skipModelCall: true} ) );
+                collection.deselect( model, _.extend( {}, options, { _skipModelCall: true } ) );
             }
         }
     }
@@ -467,7 +484,7 @@
             excessiveSelections,
             deselectOnRemove = _.find( options.previousModels, function ( model ) { return model.selected; } );
 
-        if ( deselectOnRemove ) releaseModel( deselectOnRemove, collection, {_silentLocally: true} );
+        if ( deselectOnRemove ) releaseModel( deselectOnRemove, collection, { _silentLocally: true } );
         _.each( options.previousModels, function ( model ) {
             if ( model._pickyCollections ) model._pickyCollections = _.without( model._pickyCollections, collection._pickyCid );
         } );
@@ -478,14 +495,14 @@
         selected = collection.filter( function ( model ) { return model.selected; } );
         excessiveSelections = _.initial( selected );
         if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect(); } );
-        if ( selected.length ) collection.select( _.last( selected ), {silent: true} );
+        if ( selected.length ) collection.select( _.last( selected ), { silent: true } );
     }
 
     function onResetMultiSelect ( collection, options ) {
         var select,
             deselect = _.filter( options.previousModels, function ( model ) { return model.selected; } );
 
-        if ( deselect ) _.each( deselect, function ( model ) { releaseModel( model, collection, {_silentLocally: true} ); } );
+        if ( deselect ) _.each( deselect, function ( model ) { releaseModel( model, collection, { _silentLocally: true } ); } );
 
         _.each( options.previousModels, function ( model ) {
             if ( model._pickyCollections ) model._pickyCollections = _.without( model._pickyCollections, collection._pickyCid );
@@ -495,7 +512,7 @@
             registerCollectionWithModel( model, collection );
         } );
         select = collection.filter( function ( model ) { return model.selected; } );
-        if ( select.length ) _.each( select, function ( model ) { collection.select( model, {silent: true} ); } );
+        if ( select.length ) _.each( select, function ( model ) { collection.select( model, { silent: true } ); } );
     }
 
     function registerCollectionWithModel ( model, collection ) {
@@ -505,7 +522,7 @@
 
     function unregisterCollectionWithModels ( collection ) {
         collection.each( function ( model ) {
-            releaseModel( model, collection, {_silentLocally: true} );
+            releaseModel( model, collection, { _silentLocally: true } );
         } );
     }
 
@@ -648,7 +665,7 @@
     // If `select` is called with a model as first parameter, the `select`
     // method of the mixin is used, otherwise the previous implementation is
     // called.
-    function overloadSelect( oldSelect, context ) {
+    function overloadSelect ( oldSelect, context ) {
 
         context.select = (function () {
             var mixinSelect = context.select;
