@@ -1,2 +1,0 @@
-This directory is for those dependencies of the script which can't be managed by
-Bower. Ideally, the directory should be empty.

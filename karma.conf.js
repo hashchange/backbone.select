@@ -18,8 +18,6 @@ module.exports = function(config) {
       'bower_components/underscore/underscore.js',
       'bower_components/backbone/backbone.js',
 
-      'lib-other/**/*.js',
-
       // Component under test
       'src/backbone.select.js',
 

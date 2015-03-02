@@ -93,16 +93,6 @@ module.exports = function(grunt) {
       components: 'src/**/*.js'
     },
 
-    plato: {
-      component: {
-        src: 'src/*.js',
-        dest: 'reports',
-        options: {
-          jshint: grunt.file.readJSON('.jshintrc')
-        }
-      }
-    },
-
     'sails-linker': {
       options: {
         startTag: '<!--SCRIPTS-->',
@@ -191,7 +181,6 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-plato');
   grunt.loadNpmTasks('grunt-preprocess');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
