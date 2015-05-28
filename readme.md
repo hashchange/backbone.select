@@ -1,6 +1,6 @@
 # Backbone.Select
 
-Backbone.Cycle is a set of mixins for Backbone models and collections. Models gain the ability to be selected, and collections handle those selections.
+Backbone.Select is a set of mixins for Backbone models and collections. Models gain the ability to be selected, and collections handle those selections.
 
 Collections either allow only a single model to be selected ([Backbone.Select.One][] mixin), or cater for multiple selections ([Backbone.Select.Many][]). Events communicate selections and deselections to other parts of your application. In [model-sharing mode][sharing], models can be part of more than one collection. Backbone.Select will keep selections of shared models in sync and guarantee consistency in even the most complex scenarios.
 
