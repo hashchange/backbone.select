@@ -107,8 +107,8 @@
 
                     if ( !reselected.length ) {
                         this.selected[model.cid] = model;
-                        this.selectedLength = _.size( this.selected );
                     }
+                    this.selectedLength = _.size( this.selected );
                     options._processedBy[this._pickyCid] = { done: false };
 
                     if ( !options._processedBy[model.cid] ) model.select( stripLocalOptions( options ) );
@@ -149,7 +149,6 @@
 
                     this.selectedLength = 0;
                     this.each( function ( model ) {
-                        this.selectedLength++;
                         if ( this.selected[model.cid] ) reselected.push( model );
                         this.select( model, _.extend( {}, options, { _silentLocally: true } ) );
                     }, this );
@@ -175,7 +174,6 @@
                     options || (options = {});
 
                     this.each( function ( model ) {
-                        if ( model.selected ) this.selectedLength--;
                         this.deselect( model, _.extend( {}, options, { _silentLocally: true } ) );
                     }, this );
 

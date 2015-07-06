@@ -320,6 +320,31 @@ describe( "multi-select collection: selectAll", function () {
         } );
     } );
 
+    describe( "when all models are selected, and deselecting one and reselecting all", function() {
+
+        var m1, m2, collection;
+
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
+
+            collection = new Collection( [m1, m2] );
+
+            collection.selectAll();
+            collection.deselect(m1);
+            spyOn( collection, "trigger" ).andCallThrough();
+            collection.selectAll();
+        } );
+
+        it( "should have a selected count of collection length", function () {
+            expect( collection.selectedLength ).toBe( collection.length );
+        } );
+
+        it( "should trigger a select:all event", function () {
+            expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [m1], deselected: [] }, collection);
+        } );
+    });
+
     describe( 'custom options', function () {
 
         describe( "when 1 model is selected, and selecting all with a custom option", function () {
