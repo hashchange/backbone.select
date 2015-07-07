@@ -1,4 +1,4 @@
-// Backbone.Select, v1.3.0
+// Backbone.Select, v1.3.1
 // Copyright (c) 2015 Michael Heim
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
@@ -174,12 +174,12 @@
     
                         options || (options = {});
     
-                        this.selectedLength = 0;
                         this.each( function ( model ) {
-                            this.selectedLength++;
                             if ( this.selected[model.cid] ) reselected.push( model );
                             this.select( model, _.extend( {}, options, { _silentLocally: true } ) );
                         }, this );
+    
+                        this.selectedLength = _.size( this.selected );
     
                         options = initOptions( options );
                         triggerMultiSelectEvents( this, prevSelected, options, reselected );
@@ -202,7 +202,6 @@
                         options || (options = {});
     
                         this.each( function ( model ) {
-                            if ( model.selected ) this.selectedLength--;
                             this.deselect( model, _.extend( {}, options, { _silentLocally: true } ) );
                         }, this );
     
@@ -402,6 +401,7 @@
     
                         hostObject._pickyCid = _.uniqueId( 'multiSelect' );
                         hostObject.selected = {};
+                        hostObject.selectedLength = 0;
                         augmentTrigger( hostObject );
                         overloadSelect( oldSelect, hostObject );
     

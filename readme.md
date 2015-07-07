@@ -693,6 +693,7 @@ New test files in the `spec` directory are picked up automatically, no need to e
 ### v1.3.1
 
 * Fixed miscalculation of selectedLength in Backbone.Select.Many ([#6][issue-6])
+* Updated bower.json, package.json for Backbone 1.2.x ([#7][issue-7])
 
 ### v1.3.0
 
@@ -805,6 +806,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [dist-amd-prod]: https://raw.github.com/hashchange/backbone.select/master/dist/amd/backbone.select.min.js "backbone.select.min.js, AMD build"
 
 [issue-6]: https://github.com/hashchange/backbone.select/pull/6 "Backbone.Select, Pull Request #6: select:all not being triggered when expected"
+[issue-7]: https://github.com/hashchange/backbone.select/pull/7 "Backbone.Select, Pull Request #7: Update Backbone dependency for compatibility with 1.2.x"
 
 [muted-solutions]: http://mutedsolutions.com/ "Muted Solutions, LLC"
 [Backbone.Picky]: https://github.com/derickbailey/backbone.picky#readme "Backbone.Picky"
