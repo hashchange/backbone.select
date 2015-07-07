@@ -68,7 +68,7 @@ describe( "multi-select collection: deselectAll", function () {
         } );
     } );
 
-    describe( "when 1 model is selected, and deselecting all", function () {
+    describe( "when 1 model - the first one - is selected, and deselecting all", function () {
         var m1, m2, collection;
 
         beforeEach( function () {
@@ -84,6 +84,42 @@ describe( "multi-select collection: deselectAll", function () {
 
         it( "should trigger a select:none event", function () {
             expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [m1] }, collection );
+        } );
+
+        it( "should not trigger a select:some event", function () {
+            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+        } );
+
+        it( "should not trigger a reselect:any event", function () {
+            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+        } );
+
+        it( "should have a selected count of 0", function () {
+            expect( collection.selectedLength ).toBe( 0 );
+        } );
+
+        it( "should not have any models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 0 );
+        } );
+    } );
+
+    describe( "when 1 model - the last one - is selected, and deselecting all", function () {
+        var m1, m2, collection;
+
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
+
+            collection = new Collection( [m1, m2] );
+            m2.select();
+
+            spyOn( collection, "trigger" ).andCallThrough();
+            collection.deselectAll();
+        } );
+
+        it( "should trigger a select:none event", function () {
+            expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [m2] }, collection );
         } );
 
         it( "should not trigger a select:some event", function () {

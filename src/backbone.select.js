@@ -107,8 +107,8 @@
 
                     if ( !reselected.length ) {
                         this.selected[model.cid] = model;
+                        this.selectedLength = _.size( this.selected );
                     }
-                    this.selectedLength = _.size( this.selected );
                     options._processedBy[this._pickyCid] = { done: false };
 
                     if ( !options._processedBy[model.cid] ) model.select( stripLocalOptions( options ) );
@@ -147,11 +147,12 @@
 
                     options || (options = {});
 
-                    this.selectedLength = 0;
                     this.each( function ( model ) {
                         if ( this.selected[model.cid] ) reselected.push( model );
                         this.select( model, _.extend( {}, options, { _silentLocally: true } ) );
                     }, this );
+
+                    this.selectedLength = _.size( this.selected );
 
                     options = initOptions( options );
                     triggerMultiSelectEvents( this, prevSelected, options, reselected );
@@ -373,6 +374,7 @@
 
                     hostObject._pickyCid = _.uniqueId( 'multiSelect' );
                     hostObject.selected = {};
+                    hostObject.selectedLength = 0;
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
 

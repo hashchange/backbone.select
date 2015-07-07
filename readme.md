@@ -692,7 +692,7 @@ New test files in the `spec` directory are picked up automatically, no need to e
 
 ### v1.3.1
 
-* Fixed bug when selecting all, deselecting one (or more) and selecting all again (`select:all` was not being triggered).
+* Fixed miscalculation of selectedLength in Backbone.Select.Many ([#6][issue-6])
 
 ### v1.3.0
 
@@ -803,6 +803,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [dist-prod]: https://raw.github.com/hashchange/backbone.select/master/dist/backbone.select.min.js "backbone.select.min.js"
 [dist-amd-dev]: https://raw.github.com/hashchange/backbone.select/master/dist/amd/backbone.select.js "backbone.select.js, AMD build"
 [dist-amd-prod]: https://raw.github.com/hashchange/backbone.select/master/dist/amd/backbone.select.min.js "backbone.select.min.js, AMD build"
+
+[issue-6]: https://github.com/hashchange/backbone.select/pull/6 "Backbone.Select, Pull Request #6: select:all not being triggered when expected"
 
 [muted-solutions]: http://mutedsolutions.com/ "Muted Solutions, LLC"
 [Backbone.Picky]: https://github.com/derickbailey/backbone.picky#readme "Backbone.Picky"

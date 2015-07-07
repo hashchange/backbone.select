@@ -128,7 +128,7 @@ describe( "multi-select collection: selectAll", function () {
         } );
     } );
 
-    describe( "when 1 model is selected, and selecting all", function () {
+    describe( "when 1 model - the first one - is selected, and selecting all", function () {
         var m1, m2, collection, reselectedEventState, reselectAnyEventState;
 
         beforeEach( function () {
@@ -186,6 +186,84 @@ describe( "multi-select collection: selectAll", function () {
             // m2 doesn't necessarily have to be part of collection.selected at this
             // time. The point is that events are fired when model and collection
             // states are consistent. When m1 fires the 'reselected' event, only m1
+            // must be part of the collection.
+            expect( reselectedEventState.collection.selectedLength ).toBeGreaterThan( 0 );
+            expect( reselectedEventState.collection.selectedLength ).toEqual( _.size( reselectedEventState.collection.selected ) );
+        } );
+
+        it( 'should trigger the collection\'s reselect:any event after the model status has been updated', function () {
+            expect( reselectAnyEventState.m1.selected ).toEqual( true );
+            expect( reselectAnyEventState.m2.selected ).toEqual( true );
+        } );
+
+        it( 'should trigger the collection\'s reselect:any event after the collection\'s selected models have been updated', function () {
+            expect( reselectAnyEventState.collection.selected[m1.cid] ).toBe( m1 );
+            expect( reselectAnyEventState.collection.selected[m2.cid] ).toBe( m2 );
+        } );
+
+        it( 'should trigger the collection\'s reselect:any event after the collection\'s selected length has been updated', function () {
+            expect( reselectAnyEventState.collection.selectedLength ).toBe( 2 );
+        } );
+    } );
+
+    describe( "when 1 model - the last one - is selected, and selecting all", function () {
+        var m1, m2, collection, reselectedEventState, reselectAnyEventState;
+
+        beforeEach( function () {
+            reselectedEventState = { model: {}, collection: {} };
+            reselectAnyEventState = { m1: {}, m2: {}, collection: {} };
+
+            m1 = new Model();
+            m2 = new Model();
+
+            collection = new Collection( [m1, m2] );
+            m2.select();
+
+            spyOn( collection, "trigger" ).andCallThrough();
+            m2.on( 'reselected', function ( model ) {
+                reselectedEventState.model.selected = model && model.selected;
+                reselectedEventState.collection.selected = _.clone( collection.selected );
+                reselectedEventState.collection.selectedLength = collection.selectedLength;
+            } );
+
+            collection.on( 'reselect:any', function () {
+                reselectAnyEventState.m1.selected = m1.selected;
+                reselectAnyEventState.m2.selected = m2.selected;
+                reselectAnyEventState.collection.selected = _.clone( collection.selected );
+                reselectAnyEventState.collection.selectedLength = collection.selectedLength;
+            } );
+
+            collection.selectAll();
+        } );
+
+        it( "should trigger a select:all event", function () {
+            expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [m1], deselected: [] }, collection );
+        } );
+
+        it( "should not trigger a select:some event", function () {
+            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+        } );
+
+        it( "should trigger a reselect:any event, with an array containing the previously selected model as a parameter", function () {
+            expect( collection.trigger ).toHaveBeenCalledWithInitial( "reselect:any", [m2], collection );
+        } );
+
+        it( "should have a selected count of 2", function () {
+            expect( collection.selectedLength ).toBe( 2 );
+        } );
+
+        it( "should have the first selected model in the selected list", function () {
+            expect( collection.selected[m1.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should have the second selected model in the selected list", function () {
+            expect( collection.selected[m2.cid] ).not.toBeUndefined();
+        } );
+
+        it( 'should trigger a model\'s reselected event when the collection\'s selected length is consistent with its selected models', function () {
+            // m1 doesn't necessarily have to be part of collection.selected at this
+            // time. The point is that events are fired when model and collection
+            // states are consistent. When m2 fires the 'reselected' event, only m2
             // must be part of the collection.
             expect( reselectedEventState.collection.selectedLength ).toBeGreaterThan( 0 );
             expect( reselectedEventState.collection.selectedLength ).toEqual( _.size( reselectedEventState.collection.selected ) );
@@ -319,31 +397,6 @@ describe( "multi-select collection: selectAll", function () {
             expect( collection.selected[m2.cid] ).not.toBeUndefined();
         } );
     } );
-
-    describe( "when all models are selected, and deselecting one and reselecting all", function() {
-
-        var m1, m2, collection;
-
-        beforeEach( function () {
-            m1 = new Model();
-            m2 = new Model();
-
-            collection = new Collection( [m1, m2] );
-
-            collection.selectAll();
-            collection.deselect(m1);
-            spyOn( collection, "trigger" ).andCallThrough();
-            collection.selectAll();
-        } );
-
-        it( "should have a selected count of collection length", function () {
-            expect( collection.selectedLength ).toBe( collection.length );
-        } );
-
-        it( "should trigger a select:all event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [m1], deselected: [] }, collection);
-        } );
-    });
 
     describe( 'custom options', function () {
 
