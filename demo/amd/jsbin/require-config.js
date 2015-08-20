@@ -1,7 +1,5 @@
 requirejs.config( {
 
-    baseUrl: '../../bower_components',
-
     paths: {
         'jquery': 'https://code.jquery.com/jquery-1.11.3',
         'underscore': 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore',
