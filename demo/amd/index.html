@@ -49,7 +49,7 @@
 
         <div class="row">
             <p>Select.One collection: First item of each of the other Select.One collections<br>
-                <small>Because these items are combined in a Select.One collection, you can't select the first item in more than one collections at the same time.</small>
+                <small>Because these items are combined in a Select.One collection, the other collections are affected, too. You can select the first item in one collection at a time, not in multiple ones.</small>
             </p>
         </div>
         <div class="row">
@@ -67,7 +67,12 @@
     </section>
 
     <!-- libraries --><!-- edit and replace with your project libraries as needed -->
-    <script data-main="amd" src="../bower_demo_components/requirejs/require.js"></script>
+    <script src="../bower_demo_components/requirejs/require.js"></script>
+    <script src="require-config.js"></script>
+    <script>
+        // Relative to the baseUrl defined in require-config.js
+        require( ['../demo/amd/amd'] );
+    </script>
 
 </body>
 </html>
