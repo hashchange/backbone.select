@@ -28,10 +28,10 @@ describe( "models shared between multiple collections", function () {
             singleCollectionB = new SingleSelectCollection( [model] );
             multiCollectionA = new MultiSelectCollection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( singleCollectionB, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( singleCollectionB, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.select( model );
         } );
@@ -94,10 +94,10 @@ describe( "models shared between multiple collections", function () {
             singleCollectionB = new SingleSelectCollection( [model] );
             multiCollectionA = new MultiSelectCollection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( singleCollectionB, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( singleCollectionB, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.select( model, {silent: true} );
         } );
@@ -137,10 +137,10 @@ describe( "models shared between multiple collections", function () {
             multiCollectionA = new MultiSelectCollection( [model] );
             multiCollectionB = new MultiSelectCollection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionB, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
             multiCollectionA.select( model );
         } );
@@ -203,10 +203,10 @@ describe( "models shared between multiple collections", function () {
             multiCollectionA = new MultiSelectCollection( [model] );
             multiCollectionB = new MultiSelectCollection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionB, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
             multiCollectionA.select( model, {silent: true} );
         } );
@@ -246,9 +246,9 @@ describe( "models shared between multiple collections", function () {
             singleCollectionA = new SingleSelectCollection( [model] );
             multiCollectionA = new MultiSelectCollection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             model.select();
         } );
@@ -298,9 +298,9 @@ describe( "models shared between multiple collections", function () {
             singleCollectionA = new SingleSelectCollection( [model] );
             multiCollectionA = new MultiSelectCollection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             model.select( {silent: true} );
         } );
@@ -341,10 +341,10 @@ describe( "models shared between multiple collections", function () {
             multiCollectionA.select( model1 );
 
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( singleCollectionB, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( singleCollectionB, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.select( model1 );
         } );
@@ -399,10 +399,10 @@ describe( "models shared between multiple collections", function () {
 
             singleCollectionA.select( model1 );
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( singleCollectionB, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( singleCollectionB, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.select( model1, {silent: true} );
         } );
@@ -453,10 +453,10 @@ describe( "models shared between multiple collections", function () {
 
             multiCollectionA.select( model1 );
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionB, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
             multiCollectionA.select( model1 );
         } );
@@ -508,10 +508,10 @@ describe( "models shared between multiple collections", function () {
 
             multiCollectionA.select( model1 );
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionB, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
             multiCollectionA.select( model1, {silent: true} );
         } );
@@ -562,9 +562,9 @@ describe( "models shared between multiple collections", function () {
 
             model1.select();
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             model1.select();
         } );
@@ -618,9 +618,9 @@ describe( "models shared between multiple collections", function () {
 
             model1.select();
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             model1.select( {silent: true} );
         } );
@@ -664,11 +664,11 @@ describe( "models shared between multiple collections", function () {
 
             model1.select();
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( model2, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( singleCollectionB, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( singleCollectionB, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.select( model2 );
         } );
@@ -760,9 +760,9 @@ describe( "models shared between multiple collections", function () {
 
                 model1.select();
 
-                spyOn( model1, "trigger" ).andCallThrough();
-                spyOn( model2, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 model2.select();
             } );
@@ -820,10 +820,10 @@ describe( "models shared between multiple collections", function () {
 
                 model1.select();
 
-                spyOn( model1, "trigger" ).andCallThrough();
-                spyOn( model2, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 model2.select();
             } );
@@ -901,10 +901,10 @@ describe( "models shared between multiple collections", function () {
 
                 model1.select();
 
-                spyOn( model1, "trigger" ).andCallThrough();
-                spyOn( model2, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 model2.select();
             } );
@@ -983,10 +983,10 @@ describe( "models shared between multiple collections", function () {
 
                 model1.select();
 
-                spyOn( model1, "trigger" ).andCallThrough();
-                spyOn( model2, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 model2.select();
             } );
@@ -1063,11 +1063,11 @@ describe( "models shared between multiple collections", function () {
             multiCollectionA.select( model2 );
             singleCollectionA.select( model1 );
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( model2, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( singleCollectionB, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( singleCollectionB, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.deselect();
         } );
@@ -1127,11 +1127,11 @@ describe( "models shared between multiple collections", function () {
             multiCollectionA.select( model2 );
             multiCollectionA.select( model1 );
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( model2, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionB, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
             multiCollectionA.deselect( model1 );
         } );
@@ -1192,10 +1192,10 @@ describe( "models shared between multiple collections", function () {
                 singleCollectionB = new SingleSelectCollection( [model] );
                 multiCollectionA = new MultiSelectCollection( [model] );
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( singleCollectionB, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( singleCollectionB, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 singleCollectionA.select( model, {foo: "bar"} );
             } );
@@ -1228,10 +1228,10 @@ describe( "models shared between multiple collections", function () {
 
                 model.select();
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( singleCollectionB, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( singleCollectionB, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 singleCollectionA.select( model, {foo: "bar"} );
             } );
@@ -1266,11 +1266,11 @@ describe( "models shared between multiple collections", function () {
 
                 model1.select();
 
-                spyOn( model1, "trigger" ).andCallThrough();
-                spyOn( model2, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( singleCollectionB, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( singleCollectionB, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 singleCollectionA.select( model2, {foo: "bar"} );
             } );
@@ -1319,10 +1319,10 @@ describe( "models shared between multiple collections", function () {
                 multiCollectionA = new MultiSelectCollection( [model] );
                 multiCollectionB = new MultiSelectCollection( [model] );
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionB, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
                 multiCollectionA.select( model, {foo: "bar"} );
             } );
@@ -1356,10 +1356,10 @@ describe( "models shared between multiple collections", function () {
 
                 multiCollectionA.select( model1 );
 
-                spyOn( model1, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionB, "trigger" ).andCallThrough();
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
                 multiCollectionA.select( model1, {foo: "bar"} );
             } );
@@ -1395,11 +1395,11 @@ describe( "models shared between multiple collections", function () {
                 multiCollectionA.select( model2 );
                 multiCollectionA.select( model1 );
 
-                spyOn( model1, "trigger" ).andCallThrough();
-                spyOn( model2, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionB, "trigger" ).andCallThrough();
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
                 multiCollectionA.deselect( model1, {foo: "bar"} );
             } );
@@ -1865,10 +1865,25 @@ describe( "models shared between multiple collections", function () {
 
     describe( 'Aggregation of multi-select events', function () {
 
-        var modelSharedWithSingleA, modelSharedWithSingleB, modelSharedWithAll, modelInMultiOnly,
+        var defaultMaxPrettyPrintDepth,
+            modelSharedWithSingleA, modelSharedWithSingleB, modelSharedWithAll, modelInMultiOnly,
             singleSelectCollectionA, singleSelectCollectionB,
             multiSelectCollectionA, multiSelectCollectionB,
             doCapture;
+
+        beforeAll( function () {
+            // The ListenerMixin creates huge nested structures. By default, they break the pretty printer in Jasmine 2
+            // (was ok in Jasmine 1.3 for some reason).
+            //
+            // We prevent that by limiting the recursion depth of the pretty printer to 10 for this particular group of
+            // tests (default is 40).
+            defaultMaxPrettyPrintDepth = jasmine.MAX_PRETTY_PRINT_DEPTH;
+            jasmine.MAX_PRETTY_PRINT_DEPTH = 10;
+        } );
+
+        afterAll( function () {
+            jasmine.MAX_PRETTY_PRINT_DEPTH = defaultMaxPrettyPrintDepth;
+        } );
 
         beforeEach( function () {
             var observables = [
@@ -1931,8 +1946,8 @@ describe( "models shared between multiple collections", function () {
             singleSelectCollectionB.select( modelSharedWithSingleB );
             modelInMultiOnly.select();
 
-            spyOn( multiSelectCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiSelectCollectionB, "trigger" ).andCallThrough();
+            spyOn( multiSelectCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiSelectCollectionB, "trigger" ).and.callThrough();
 
             doCapture = true;
         } );

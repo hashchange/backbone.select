@@ -115,7 +115,7 @@ ListenerMixin.applyTo = function ( hostObject, observableNames, takeSnapshotMeth
 
 beforeEach( function () {
 
-    this.addMatchers( {
+    jasmine.addMatchers( {
 
         /**
          * Matcher that checks to see if the actual, a Jasmine spy, was called with
@@ -127,26 +127,34 @@ beforeEach( function () {
          *     obj.foo(1, 2, 3);
          *     expect(obj.foo).toHaveBeenCalledWithInitial(1, 2);     // => true
          */
-        toHaveBeenCalledWithInitial: function () {
-            var expectedArgs = jasmine.util.argsToArray( arguments );
-            if ( !jasmine.isSpy( this.actual ) ) {
-                throw new Error( 'Expected a spy, but got ' + jasmine.pp( this.actual ) + '.' );
-            }
-            this.message = function () {
-                var invertedMessage = "Expected spy " + this.actual.identity + " not to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but it was.";
-                var positiveMessage = "";
-                if ( this.actual.callCount === 0 ) {
-                    positiveMessage = "Expected spy " + this.actual.identity + " to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but it was never called.";
-                } else {
-                    positiveMessage = "Expected spy " + this.actual.identity + " to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but actual calls were " + jasmine.pp( this.actual.argsForCall ).replace( /^\[ | \]$/g, '' )
-                }
-                return [positiveMessage, invertedMessage];
-            };
+        toHaveBeenCalledWithInitial: function ( util, customEqualityTesters ) {
 
-            var actualInitial = _.map( this.actual.argsForCall, function ( args ) {
-                return args.slice( 0, expectedArgs.length );
-            } );
-            return this.env.contains_( actualInitial, expectedArgs );
+            return {
+                compare: function ( actual, expected ) {
+
+                    var result = {},
+                        expectedArgs = jasmine.util.argsToArray( arguments ).slice( 1 );
+
+                    if ( !jasmine.isSpy( actual ) ) {
+                        throw new Error( 'Expected a spy, but got ' + jasmine.pp( actual ) + '.' );
+                    }
+
+                    var actualInitial = _.map( actual.calls.allArgs(), function ( args ) {
+                        return args.slice( 0, expectedArgs.length );
+                    } );
+                    result.pass = util.contains( actualInitial, expectedArgs, customEqualityTesters );
+
+                    if ( result.pass ) {
+                        result.message = !actual.calls.any() ?
+                                         "Expected spy " + actual.and.identity() + " to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but it was never called." :
+                                         "Expected spy " + actual.and.identity() + " to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but actual calls were " + jasmine.pp( actual.calls.allArgs() ).replace( /^\[ | \]$/g, '' ) + '.';
+                    } else {
+                        result.message = "Expected spy " + actual.and.identity() + " not to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but it was.";
+                    }
+
+                    return result;
+                }
+            };
         }
 
     } );

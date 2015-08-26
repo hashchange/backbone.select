@@ -55,18 +55,18 @@ describe( "multi-select collection: general", function () {
             model = new Model();
             collection = new EventHandlingCollection( [model] );
 
-            spyOn( collection, "onSelectNone" ).andCallThrough();
-            spyOn( collection, "onSelectSome" ).andCallThrough();
-            spyOn( collection, "onSelectAll" ).andCallThrough();
-            spyOn( collection, "onReselect" ).andCallThrough();
+            spyOn( collection, "onSelectNone" ).and.callThrough();
+            spyOn( collection, "onSelectSome" ).and.callThrough();
+            spyOn( collection, "onSelectAll" ).and.callThrough();
+            spyOn( collection, "onReselect" ).and.callThrough();
 
-            spyOn( collection, "on_select" ).andCallThrough();
-            spyOn( collection, "on_deselect" ).andCallThrough();
+            spyOn( collection, "on_select" ).and.callThrough();
+            spyOn( collection, "on_deselect" ).and.callThrough();
 
-            spyOn( collection, "onAdd" ).andCallThrough();
-            spyOn( collection, "onRemove" ).andCallThrough();
-            spyOn( collection, "onReset" ).andCallThrough();
-            spyOn( collection, "onAll" ).andCallThrough();
+            spyOn( collection, "onAdd" ).and.callThrough();
+            spyOn( collection, "onRemove" ).and.callThrough();
+            spyOn( collection, "onReset" ).and.callThrough();
+            spyOn( collection, "onAll" ).and.callThrough();
         } );
 
         it( 'calls the onSelectNone handler when triggering a select:none event', function () {

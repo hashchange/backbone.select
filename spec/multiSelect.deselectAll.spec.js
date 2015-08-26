@@ -19,7 +19,7 @@ describe( "multi-select collection: deselectAll", function () {
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.deselectAll();
         } );
@@ -49,7 +49,7 @@ describe( "multi-select collection: deselectAll", function () {
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.deselectAll( {silent: true} );
         } );
@@ -78,7 +78,7 @@ describe( "multi-select collection: deselectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.deselectAll();
         } );
 
@@ -114,7 +114,7 @@ describe( "multi-select collection: deselectAll", function () {
             collection = new Collection( [m1, m2] );
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.deselectAll();
         } );
 
@@ -150,7 +150,7 @@ describe( "multi-select collection: deselectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.deselectAll( {silent: true} );
         } );
 
@@ -178,7 +178,7 @@ describe( "multi-select collection: deselectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.selectNone();
         } );
 
@@ -214,7 +214,7 @@ describe( "multi-select collection: deselectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             m1.on( 'deselected', function ( model ) {
                 selectedEventState.model.selected = model && model.selected;
@@ -297,7 +297,7 @@ describe( "multi-select collection: deselectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.selectNone();
         } );
 
@@ -330,7 +330,7 @@ describe( "multi-select collection: deselectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.deselectAll( {silent: true} );
         } );
 
@@ -359,9 +359,9 @@ describe( "multi-select collection: deselectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( m1, "trigger" ).andCallThrough();
-            spyOn( m2, "trigger" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( m1, "trigger" ).and.callThrough();
+            spyOn( m2, "trigger" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.deselectAll( {foo: "bar"} );
         } );

@@ -19,7 +19,7 @@ describe( "multi-select collection: toggleSelectAll", function () {
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.toggleSelectAll();
         } );
@@ -46,7 +46,7 @@ describe( "multi-select collection: toggleSelectAll", function () {
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.toggleSelectAll( {silent: true} );
         } );
@@ -75,7 +75,7 @@ describe( "multi-select collection: toggleSelectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.toggleSelectAll();
         } );
@@ -109,7 +109,7 @@ describe( "multi-select collection: toggleSelectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.toggleSelectAll();
         } );
@@ -139,7 +139,7 @@ describe( "multi-select collection: toggleSelectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.toggleSelectAll( {silent: true} );
         } );
@@ -169,9 +169,9 @@ describe( "multi-select collection: toggleSelectAll", function () {
 
                 collection = new Collection( [m1, m2] );
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( m2, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( m2, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.toggleSelectAll( {foo: "bar"} );
             } );
@@ -199,9 +199,9 @@ describe( "multi-select collection: toggleSelectAll", function () {
                 collection = new Collection( [m1, m2] );
                 collection.selectAll();
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( m2, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( m2, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.toggleSelectAll( {foo: "bar"} );
             } );

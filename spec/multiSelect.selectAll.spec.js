@@ -22,7 +22,7 @@ describe( "multi-select collection: selectAll", function () {
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             m1.on( 'selected', function ( model ) {
                 selectedEventState.model.selected = model && model.selected;
@@ -106,7 +106,7 @@ describe( "multi-select collection: selectAll", function () {
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.selectAll( {silent: true} );
         } );
@@ -141,7 +141,7 @@ describe( "multi-select collection: selectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             m1.on( 'reselected', function ( model ) {
                 reselectedEventState.model.selected = model && model.selected;
                 reselectedEventState.collection.selected = _.clone( collection.selected );
@@ -219,7 +219,7 @@ describe( "multi-select collection: selectAll", function () {
             collection = new Collection( [m1, m2] );
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             m2.on( 'reselected', function ( model ) {
                 reselectedEventState.model.selected = model && model.selected;
                 reselectedEventState.collection.selected = _.clone( collection.selected );
@@ -294,7 +294,7 @@ describe( "multi-select collection: selectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.selectAll( {silent: true} );
         } );
 
@@ -330,7 +330,7 @@ describe( "multi-select collection: selectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.selectAll();
         } );
 
@@ -373,7 +373,7 @@ describe( "multi-select collection: selectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
             collection.selectAll( {silent: true} );
         } );
 
@@ -410,9 +410,9 @@ describe( "multi-select collection: selectAll", function () {
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( m2, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( m2, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.selectAll( {foo: "bar"} );
             } );
@@ -442,9 +442,9 @@ describe( "multi-select collection: selectAll", function () {
                 m2 = new Model();
 
                 collection = new Collection( [m1, m2] );
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( m2, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( m2, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.selectAll( {foo: "bar"} );
             } );

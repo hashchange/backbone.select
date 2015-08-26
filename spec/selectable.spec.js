@@ -26,7 +26,7 @@ describe( "selectable model", function () {
 
         beforeEach( function () {
             model = new Model();
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
 
             model.select();
         } );
@@ -49,7 +49,7 @@ describe( "selectable model", function () {
 
         beforeEach( function () {
             model = new Model();
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
 
             model.select( {silent: true} );
         } );
@@ -70,7 +70,7 @@ describe( "selectable model", function () {
             model = new Model();
             model.select();
 
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
             model.select();
         } );
 
@@ -94,7 +94,7 @@ describe( "selectable model", function () {
             model = new Model();
             model.select();
 
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
             model.select( {silent: true} );
         } );
 
@@ -118,7 +118,7 @@ describe( "selectable model", function () {
             model = new Model();
             model.select();
 
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
             model.deselect();
         } );
 
@@ -138,7 +138,7 @@ describe( "selectable model", function () {
             model = new Model();
             model.select();
 
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
             model.deselect( {silent: true} );
         } );
 
@@ -157,7 +157,7 @@ describe( "selectable model", function () {
         beforeEach( function () {
             model = new Model();
 
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
             model.deselect();
         } );
 
@@ -181,7 +181,7 @@ describe( "selectable model", function () {
             model = new Model();
             model.select();
 
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
             model.toggleSelected();
         } );
 
@@ -200,7 +200,7 @@ describe( "selectable model", function () {
         beforeEach( function () {
             model = new Model();
 
-            spyOn( model, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
             model.toggleSelected();
         } );
 
@@ -220,7 +220,7 @@ describe( "selectable model", function () {
 
             beforeEach( function () {
                 model = new Model();
-                spyOn( model, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
 
                 model.select( {foo: "bar"} );
             } );
@@ -237,7 +237,7 @@ describe( "selectable model", function () {
                 model = new Model();
                 model.select();
 
-                spyOn( model, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
                 model.select( {foo: "bar"} );
             } );
 
@@ -253,7 +253,7 @@ describe( "selectable model", function () {
                 model = new Model();
                 model.select();
 
-                spyOn( model, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
                 model.deselect( {foo: "bar"} );
             } );
 
@@ -269,7 +269,7 @@ describe( "selectable model", function () {
                 model = new Model();
                 model.select();
 
-                spyOn( model, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
                 model.toggleSelected( {foo: "bar"} );
             } );
 
@@ -284,7 +284,7 @@ describe( "selectable model", function () {
             beforeEach( function () {
                 model = new Model();
 
-                spyOn( model, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
                 model.toggleSelected( {foo: "bar"} );
             } );
 
@@ -321,17 +321,17 @@ describe( "selectable model", function () {
 
             model = new EventHandlingModel();
 
-            spyOn( model, "onSelect" ).andCallThrough();
-            spyOn( model, "onDeselect" ).andCallThrough();
-            spyOn( model, "onReselect" ).andCallThrough();
+            spyOn( model, "onSelect" ).and.callThrough();
+            spyOn( model, "onDeselect" ).and.callThrough();
+            spyOn( model, "onReselect" ).and.callThrough();
 
-            spyOn( model, "on_select" ).andCallThrough();
-            spyOn( model, "on_deselect" ).andCallThrough();
+            spyOn( model, "on_select" ).and.callThrough();
+            spyOn( model, "on_deselect" ).and.callThrough();
 
-            spyOn( model, "onAdd" ).andCallThrough();
-            spyOn( model, "onRemove" ).andCallThrough();
-            spyOn( model, "onChange" ).andCallThrough();
-            spyOn( model, "onAll" ).andCallThrough();
+            spyOn( model, "onAdd" ).and.callThrough();
+            spyOn( model, "onRemove" ).and.callThrough();
+            spyOn( model, "onChange" ).and.callThrough();
+            spyOn( model, "onAll" ).and.callThrough();
         } );
 
         it( 'calls the onSelect handler when triggering a selected event on the model', function () {

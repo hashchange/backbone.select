@@ -38,8 +38,8 @@ describe( "single-select collection", function () {
             model = new Model();
             collection = new Collection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             model.on( 'selected', function ( model ) {
                 selectedEventState.model.selected = model && model.selected;
@@ -98,8 +98,8 @@ describe( "single-select collection", function () {
             model = new Model();
             collection = new Collection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             model.select( {silent: true} );
         } );
@@ -127,9 +127,9 @@ describe( "single-select collection", function () {
             model = new Model();
             collection = new Collection( [model] );
 
-            spyOn( collection, "trigger" ).andCallThrough();
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( model, "select" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( model, "select" ).and.callThrough();
 
             model.on( 'selected', function ( model ) {
                 selectedEventState.model.selected = model && model.selected;
@@ -188,8 +188,8 @@ describe( "single-select collection", function () {
             model = new Model();
             collection = new Collection( [model] );
 
-            spyOn( collection, "trigger" ).andCallThrough();
-            spyOn( model, "select" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
+            spyOn( model, "select" ).and.callThrough();
 
             collection.select( model, {silent: true} );
         } );
@@ -216,8 +216,8 @@ describe( "single-select collection", function () {
 
             model.select();
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.select( model );
         } );
@@ -244,8 +244,8 @@ describe( "single-select collection", function () {
 
             model.select();
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.select( model, {silent: true} );
         } );
@@ -268,8 +268,8 @@ describe( "single-select collection", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
-            spyOn( m1, "deselect" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
+            spyOn( m1, "deselect" ).and.callThrough();
 
             m2.select();
         } );
@@ -304,8 +304,8 @@ describe( "single-select collection", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
-            spyOn( m1, "deselect" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
+            spyOn( m1, "deselect" ).and.callThrough();
 
             m2.select( {silent: true} );
         } );
@@ -334,8 +334,8 @@ describe( "single-select collection", function () {
             model = new Model();
             collection = new Collection( [model] );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.deselect();
         } );
@@ -360,7 +360,7 @@ describe( "single-select collection", function () {
             collection = new Collection( [model] );
             model.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             model.on( 'deselected', function ( model ) {
                 deselectedEventState.model.selected = model && model.selected;
@@ -411,7 +411,7 @@ describe( "single-select collection", function () {
             collection = new Collection( [model] );
             model.select();
 
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             model.on( 'deselected', function ( model ) {
                 deselectedEventState.model.selected = model && model.selected;
@@ -459,8 +459,8 @@ describe( "single-select collection", function () {
             collection = new Collection( [model] );
             model.select();
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.deselect( undefined, {silent: true} );
         } );
@@ -487,8 +487,8 @@ describe( "single-select collection", function () {
             collection = new Collection( [m1, m2] );
             collection.select( m1 );
 
-            spyOn( m1, "deselect" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( m1, "deselect" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             collection.deselect( m2 );
         } );
@@ -523,8 +523,8 @@ describe( "single-select collection", function () {
             collection = new Collection( [m1, m2] );
             collection.select( m1 );
 
-            spyOn( m1, "deselect" ).andCallThrough();
-            spyOn( collection, "trigger" ).andCallThrough();
+            spyOn( m1, "deselect" ).and.callThrough();
+            spyOn( collection, "trigger" ).and.callThrough();
 
             m2.deselect();
         } );
@@ -559,8 +559,8 @@ describe( "single-select collection", function () {
                 model = new Model();
                 collection = new Collection( [model] );
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 model.select( {foo: "bar"} );
             } );
@@ -581,8 +581,8 @@ describe( "single-select collection", function () {
                 model = new Model();
                 collection = new Collection( [model] );
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( model, {foo: "bar"} );
             } );
@@ -604,8 +604,8 @@ describe( "single-select collection", function () {
                 collection = new Collection( [model] );
                 model.select();
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 model.select( {foo: "bar"} );
             } );
@@ -627,8 +627,8 @@ describe( "single-select collection", function () {
                 collection = new Collection( [model] );
                 model.select();
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( model, {foo: "bar"} );
             } );
@@ -651,9 +651,9 @@ describe( "single-select collection", function () {
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( m2, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( m2, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.select( {foo: "bar"} );
             } );
@@ -684,9 +684,9 @@ describe( "single-select collection", function () {
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( m2, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( m2, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m2, {foo: "bar"} );
             } );
@@ -716,8 +716,8 @@ describe( "single-select collection", function () {
                 collection = new Collection( [model] );
                 model.select();
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 model.deselect( {foo: "bar"} );
             } );
@@ -739,8 +739,8 @@ describe( "single-select collection", function () {
                 collection = new Collection( [model] );
                 model.select();
 
-                spyOn( model, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( model, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( model, {foo: "bar"} );
             } );
@@ -783,17 +783,17 @@ describe( "single-select collection", function () {
             model = new Model();
             collection = new EventHandlingCollection( [model] );
 
-            spyOn( collection, "onSelect" ).andCallThrough();
-            spyOn( collection, "onDeselect" ).andCallThrough();
-            spyOn( collection, "onReselect" ).andCallThrough();
+            spyOn( collection, "onSelect" ).and.callThrough();
+            spyOn( collection, "onDeselect" ).and.callThrough();
+            spyOn( collection, "onReselect" ).and.callThrough();
 
-            spyOn( collection, "on_select" ).andCallThrough();
-            spyOn( collection, "on_deselect" ).andCallThrough();
+            spyOn( collection, "on_select" ).and.callThrough();
+            spyOn( collection, "on_deselect" ).and.callThrough();
 
-            spyOn( collection, "onAdd" ).andCallThrough();
-            spyOn( collection, "onRemove" ).andCallThrough();
-            spyOn( collection, "onReset" ).andCallThrough();
-            spyOn( collection, "onAll" ).andCallThrough();
+            spyOn( collection, "onAdd" ).and.callThrough();
+            spyOn( collection, "onRemove" ).and.callThrough();
+            spyOn( collection, "onReset" ).and.callThrough();
+            spyOn( collection, "onAll" ).and.callThrough();
         } );
 
         it( 'calls the onSelect handler when triggering a select:one event', function () {

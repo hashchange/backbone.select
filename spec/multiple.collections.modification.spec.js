@@ -78,8 +78,8 @@ describe( "models shared between multiple collections", function () {
             singleCollectionA = new SingleSelectCollection( [model] );
             singleCollectionA.select( model );
 
-            spyOn( model, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
+            spyOn( model, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionB = new LoggedSingleSelectCollection( [model] );
             multiCollectionA = new LoggedMultiSelectCollection( [model] );
@@ -188,7 +188,7 @@ describe( "models shared between multiple collections", function () {
             m1.select();
             m2.select();
 
-            spyOn( m1, "trigger" ).andCallThrough();
+            spyOn( m1, "trigger" ).and.callThrough();
 
             //noinspection JSUnusedAssignment
             collection = new SingleSelectCollection( [m1, m2] );
@@ -214,12 +214,12 @@ describe( "models shared between multiple collections", function () {
             model3.select();
             model4.select();
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( model2, "trigger" ).andCallThrough();
-            spyOn( model3, "trigger" ).andCallThrough();
-            spyOn( model4, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( model3, "trigger" ).and.callThrough();
+            spyOn( model4, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
         } );
 
         it( "should be selected in a single-select collection it is added to", function () {
@@ -356,10 +356,10 @@ describe( "models shared between multiple collections", function () {
 
             model1.select();
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( model2, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
         } );
 
         it( "should no longer be selected in a single-select collection", function () {
@@ -478,7 +478,7 @@ describe( "models shared between multiple collections", function () {
             model3.select();
             model4.select();
 
-            spyOn( multiCollection, "trigger" ).andCallThrough();
+            spyOn( multiCollection, "trigger" ).and.callThrough();
 
             multiCollection.remove( model3 );
             expect( multiCollection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [], deselected: [model3] }, multiCollection );
@@ -515,11 +515,11 @@ describe( "models shared between multiple collections", function () {
             model2.select();
             model3.select();
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( model2, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( singleCollectionB, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( singleCollectionB, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
         } );
 
         it( "should be selected in a single-select collection it is added to", function () {
@@ -687,9 +687,9 @@ describe( "models shared between multiple collections", function () {
 
             model1.select();
 
-            spyOn( model1, "trigger" ).andCallThrough();
-            spyOn( singleCollectionA, "trigger" ).andCallThrough();
-            spyOn( multiCollectionA, "trigger" ).andCallThrough();
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
         } );
 
         it( "should no longer be selected in a single-select collection", function () {
@@ -802,8 +802,8 @@ describe( "models shared between multiple collections", function () {
                 model2.select();
                 model3.select();
 
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
             } );
 
             it( 'should set _externalEvent: "add" in the select:one event when added to a single-select collection', function () {
@@ -851,10 +851,10 @@ describe( "models shared between multiple collections", function () {
 
                 model1.select();
 
-                spyOn( model1, "trigger" ).andCallThrough();
-                spyOn( model2, "trigger" ).andCallThrough();
-                spyOn( singleCollectionA, "trigger" ).andCallThrough();
-                spyOn( multiCollectionA, "trigger" ).andCallThrough();
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
             } );
 
             it( 'should not propagate the _externalEvent: "remove" option to the deselected model when the model is removed from all collections (single-select collection last)', function () {
@@ -887,7 +887,7 @@ describe( "models shared between multiple collections", function () {
                 model3.select();
                 model4.select();
 
-                spyOn( multiCollection, "trigger" ).andCallThrough();
+                spyOn( multiCollection, "trigger" ).and.callThrough();
 
                 multiCollection.remove( model3 );
                 expect( multiCollection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [], deselected: [model3] }, multiCollection, {_externalEvent: "remove", index: 0} );

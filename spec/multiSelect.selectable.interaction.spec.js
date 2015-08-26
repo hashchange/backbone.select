@@ -24,7 +24,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m2 = new Model();
 
                 collection = new Collection( [m1, m2] );
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.on( 'selected', function ( model ) {
                     selectedEventState.model.selected = model.selected;
@@ -94,7 +94,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m2 = new Model();
 
                 collection = new Collection( [m1, m2] );
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select( {silent: true} );
             } );
@@ -126,7 +126,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.select();
             } );
@@ -160,7 +160,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m2 = new Model();
 
                 collection = new Collection( [m1, m2] );
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select( {silent: true} );
                 m2.select( {silent: true} );
@@ -193,7 +193,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1 = new Model();
 
                 collection = new Collection( [m1] );
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select();
 
@@ -264,7 +264,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1 = new Model();
 
                 collection = new Collection( [m1] );
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select( {silent: true} );
                 m1.deselect( {silent: true} );
@@ -301,7 +301,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.select();
             } );
@@ -337,7 +337,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.select( {silent: true} );
             } );
@@ -370,7 +370,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select();
                 m2.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.deselect();
             } );
@@ -407,7 +407,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select();
                 m2.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.deselect( {silent: true} );
             } );
@@ -439,7 +439,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.deselect();
             } );
@@ -468,7 +468,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.deselect( {silent: true} );
             } );
@@ -497,7 +497,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select();
             } );
@@ -522,7 +522,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select( {silent: true} );
             } );
@@ -548,7 +548,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select();
                 m2.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select();
             } );
@@ -574,7 +574,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select();
                 m2.select();
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select( {silent: true} );
             } );
@@ -599,7 +599,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 collection.select( m1 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.deselect();
             } );
@@ -626,10 +626,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 selectAllEventState = { m1: {}, collection: {} };
 
                 m1 = new Model();
-                spyOn( m1, "select" ).andCallThrough();
+                spyOn( m1, "select" ).and.callThrough();
                 collection = new Collection( [m1] );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.on( 'selected', function ( model ) {
                     selectedEventState.model.selected = model && model.selected;
@@ -687,7 +687,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 selectNoneEventState = { m1: {}, collection: {} };
 
                 m1 = new Model();
-                spyOn( m1, "deselect" ).andCallThrough();
+                spyOn( m1, "deselect" ).and.callThrough();
 
                 collection = new Collection( [m1] );
                 m1.select();
@@ -746,7 +746,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 collection.select( m1 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m2 );
             } );
@@ -778,7 +778,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 collection.select( m1 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m2, {silent: true} );
             } );
@@ -811,7 +811,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1 );
                 collection.select( m2 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m1 );
             } );
@@ -848,7 +848,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1 );
                 collection.select( m2 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m1, {silent: true} );
             } );
@@ -880,7 +880,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 collection.select( m1 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m1 );
             } );
@@ -909,7 +909,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 collection.select( m1 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m1, {silent: true} );
             } );
@@ -938,7 +938,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 collection.select( m1 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1 );
             } );
@@ -963,7 +963,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 collection.select( m1 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1, {silent: true} );
             } );
@@ -989,7 +989,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1 );
                 collection.select( m2 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1 );
             } );
@@ -1015,7 +1015,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1 );
                 collection.select( m2 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1, {silent: true} );
             } );
@@ -1040,7 +1040,7 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 collection.select( m1 );
 
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m2 );
             } );
@@ -1068,8 +1068,8 @@ describe( "multi-select collection: interaction with selectable models", functio
 
                 collection = new Collection( [m1, m2] );
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select( {foo: "bar"} );
             } );
@@ -1092,8 +1092,8 @@ describe( "multi-select collection: interaction with selectable models", functio
 
                 collection = new Collection( [m1, m2] );
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1, {foo: "bar"} );
             } );
@@ -1117,8 +1117,8 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select( {foo: "bar"} );
             } );
@@ -1142,8 +1142,8 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection = new Collection( [m1, m2] );
                 m1.select();
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1, {foo: "bar"} );
             } );
@@ -1168,8 +1168,8 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1 );
                 collection.select( m2 );
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.deselect( {foo: "bar"} );
             } );
@@ -1194,8 +1194,8 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1 );
                 collection.select( m2 );
 
-                spyOn( m1, "trigger" ).andCallThrough();
-                spyOn( collection, "trigger" ).andCallThrough();
+                spyOn( m1, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m1, {foo: "bar"} );
             } );
