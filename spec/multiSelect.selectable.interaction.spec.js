@@ -11,6 +11,14 @@ describe( "multi-select collection: interaction with selectable models", functio
         }
     } );
 
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
+
     describe( "select / deselect the model directly", function () {
 
         describe( "when 1 out of 2 models in a collection is being selected", function () {

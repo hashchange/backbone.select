@@ -12,6 +12,14 @@ describe( "single-select collection", function () {
         }
     } );
 
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
+
     describe( 'A Select.One collection instance should identify itself', function () {
         var collection;
 

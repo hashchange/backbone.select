@@ -11,6 +11,14 @@ describe( "multi-select collection: toggleSelectAll", function () {
         }
     } );
 
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
+
     describe( "when no models are selected, and toggling", function () {
         var m1, m2, collection;
 

@@ -5,6 +5,14 @@ describe( "selectable model", function () {
         }
     } );
 
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
+
     describe( 'A selectable model instance should identify itself', function () {
         var model;
 

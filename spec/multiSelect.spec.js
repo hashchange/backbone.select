@@ -11,6 +11,14 @@ describe( "multi-select collection: general", function () {
         }
     } );
 
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
+
     describe( 'A Select.Many collection instance should identify itself', function () {
         var collection;
 

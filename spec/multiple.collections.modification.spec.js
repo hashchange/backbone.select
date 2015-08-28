@@ -18,6 +18,13 @@ describe( "models shared between multiple collections", function () {
         }
     } );
 
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
 
     describe( "when creating additional collections with a model that is already selected", function () {
         var selectLogger, reselectLogger, LoggedSingleSelectCollection, LoggedMultiSelectCollection,

@@ -11,6 +11,14 @@ describe( "multi-select collection: selectAll", function () {
         }
     } );
 
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
+
     describe( "when no models are selected, and selecting all", function () {
         var m1, m2, collection, selectedEventState, selectAllEventState;
 

@@ -18,6 +18,13 @@ describe( "models shared between multiple collections", function () {
         }
     } );
 
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
 
     describe( "when selecting a model in a single-select collection", function () {
         var model, singleCollectionA, singleCollectionB, multiCollectionA;
@@ -1865,8 +1872,7 @@ describe( "models shared between multiple collections", function () {
 
     describe( 'Aggregation of multi-select events', function () {
 
-        var defaultMaxPrettyPrintDepth,
-            modelSharedWithSingleA, modelSharedWithSingleB, modelSharedWithAll, modelInMultiOnly,
+        var modelSharedWithSingleA, modelSharedWithSingleB, modelSharedWithAll, modelInMultiOnly,
             singleSelectCollectionA, singleSelectCollectionB,
             multiSelectCollectionA, multiSelectCollectionB,
             doCapture;
@@ -1877,12 +1883,11 @@ describe( "models shared between multiple collections", function () {
             //
             // We prevent that by limiting the recursion depth of the pretty printer to 10 for this particular group of
             // tests (default is 40).
-            defaultMaxPrettyPrintDepth = jasmine.MAX_PRETTY_PRINT_DEPTH;
-            jasmine.MAX_PRETTY_PRINT_DEPTH = 10;
+            limitJasmineRecursiveScreenOutput( Math.min( jasmine.MAX_PRETTY_PRINT_DEPTH, 10 ) );
         } );
 
         afterAll( function () {
-            jasmine.MAX_PRETTY_PRINT_DEPTH = defaultMaxPrettyPrintDepth;
+            restoreJasmineRecursiveScreenOutput();
         } );
 
         beforeEach( function () {
