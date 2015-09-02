@@ -18,7 +18,8 @@
 
                 // Select a model, deselecting any previously selected model
                 select: function ( model, options ) {
-                    var reselected = model && this.selected === model ? model : undefined;
+                    var label = getLabel( options, this ),
+                        reselected = model && this[label] === model ? model : undefined;
 
                     options = initOptions( options );
                     if ( options._processedBy[this._pickyCid] ) return;
@@ -35,11 +36,11 @@
                             _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
                             { _eventQueueAppendOnly: options._eventQueue }
                         ) );
-                        this.selected = model;
+                        this[label] = model;
                     }
                     options._processedBy[this._pickyCid] = { done: false };
 
-                    if ( !options._processedBy[this.selected.cid] ) this.selected.select( stripLocalOptions( options ) );
+                    if ( !options._processedBy[this[label].cid] ) this[label].select( stripLocalOptions( options ) );
 
                     if ( !(options.silent || options._silentLocally) ) {
 
@@ -58,17 +59,19 @@
                 // Deselect a model, resulting in no model
                 // being selected
                 deselect: function ( model, options ) {
+                    var label = getLabel( options, this );
+
                     options = initOptions( options );
                     if ( options._processedBy[this._pickyCid] ) return;
 
-                    if ( !this.selected ) return;
+                    if ( !this[label] ) return;
 
-                    model = model || this.selected;
-                    if ( this.selected !== model ) return;
+                    model = model || this[label];
+                    if ( this[label] !== model ) return;
 
                     options._processedBy[this._pickyCid] = { done: false };
 
-                    delete this.selected;
+                    delete this[label];
                     if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
                     if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, ["deselect:one", model, this, stripInternalOptions( options )] );
 
@@ -98,16 +101,17 @@
                 // Select a specified model, make sure the model knows it's selected, and
                 // hold on to the selected model.
                 select: function ( model, options ) {
-                    var prevSelected = multiSelectionToArray( this.selected ),
-                        reselected = this.selected[model.cid] ? [model] : [];
+                    var label = getLabel( options, this ),
+                        prevSelected = multiSelectionToArray( this[label] ),
+                        reselected = this[label][model.cid] ? [model] : [];
 
                     options = initOptions( options );
 
                     if ( reselected.length && options._processedBy[this._pickyCid] ) return;
 
                     if ( !reselected.length ) {
-                        this.selected[model.cid] = model;
-                        this.selectedLength = _.size( this.selected );
+                        this[label][model.cid] = model;
+                        setSelectionSize( _.size( this[label] ), this, label );
                     }
                     options._processedBy[this._pickyCid] = { done: false };
 
@@ -121,17 +125,18 @@
                 // Deselect a specified model, make sure the model knows it has been deselected,
                 // and remove the model from the selected list.
                 deselect: function ( model, options ) {
-                    var prevSelected = multiSelectionToArray( this.selected );
+                    var label = getLabel( options, this ),
+                        prevSelected = multiSelectionToArray( this[label] );
 
                     options = initOptions( options );
                     if ( options._processedBy[this._pickyCid] ) return;
 
-                    if ( !this.selected[model.cid] ) return;
+                    if ( !this[label][model.cid] ) return;
 
                     options._processedBy[this._pickyCid] = { done: false };
 
-                    delete this.selected[model.cid];
-                    this.selectedLength = _.size( this.selected );
+                    delete this[label][model.cid];
+                    setSelectionSize( _.size( this[label] ), this, label );
 
                     if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
                     triggerMultiSelectEvents( this, prevSelected, options );
@@ -142,17 +147,18 @@
 
                 // Select all models in this collection
                 selectAll: function ( options ) {
-                    var prevSelected = multiSelectionToArray( this.selected ),
+                    var label = getLabel( options, this ),
+                        prevSelected = multiSelectionToArray( this[label] ),
                         reselected = [];
 
                     options || (options = {});
 
                     this.each( function ( model ) {
-                        if ( this.selected[model.cid] ) reselected.push( model );
+                        if ( this[label][model.cid] ) reselected.push( model );
                         this.select( model, _.extend( {}, options, { _silentLocally: true } ) );
                     }, this );
 
-                    this.selectedLength = _.size( this.selected );
+                    setSelectionSize( _.size( this[label] ), this, label );
 
                     options = initOptions( options );
                     triggerMultiSelectEvents( this, prevSelected, options, reselected );
@@ -167,10 +173,11 @@
 
                 // Deselect all models in this collection
                 deselectAll: function ( options ) {
-                    var prevSelected;
+                    var prevSelected,
+                        label = getLabel( options, this );
 
-                    if ( this.selectedLength === 0 ) return;
-                    prevSelected = multiSelectionToArray( this.selected );
+                    if ( getSelectionSize( this, label ) === 0 ) return;
+                    prevSelected = multiSelectionToArray( this[label] );
 
                     options || (options = {});
 
@@ -178,7 +185,7 @@
                         this.deselect( model, _.extend( {}, options, { _silentLocally: true } ) );
                     }, this );
 
-                    this.selectedLength = 0;
+                    setSelectionSize( 0, this, label );
 
                     options = initOptions( options );
                     triggerMultiSelectEvents( this, prevSelected, options );
@@ -198,7 +205,9 @@
                 // Toggle select all / none. If some are selected, it will select all. If all
                 // are selected, it will select none. If none are selected, it will select all.
                 toggleSelectAll: function ( options ) {
-                    if ( this.selectedLength === this.length ) {
+                    var label = getLabel( options, this );
+
+                    if ( getSelectionSize( this, label ) === this.length ) {
                         this.deselectAll( options );
                     } else {
                         this.selectAll( options );
@@ -225,13 +234,14 @@
                 // Select this model, and tell our
                 // collection that we're selected
                 select: function ( options ) {
-                    var reselected = this.selected;
+                    var label = getLabel( options, this ),
+                        reselected = this[label];
 
                     options = initOptions( options );
                     if ( options._processedBy[this.cid] ) return;
 
                     options._processedBy[this.cid] = { done: false };
-                    this.selected = true;
+                    this[label] = true;
 
                     if ( this._pickyCollections ) {
                         // Model-sharing mode: notify collections with an event
@@ -256,13 +266,15 @@
 
                 // Deselect this model, and tell our collection that we're deselected
                 deselect: function ( options ) {
+                    var label = getLabel( options, this );
+
                     options = initOptions( options );
                     if ( options._processedBy[this.cid] ) return;
 
-                    if ( !this.selected ) return;
+                    if ( !this[label] ) return;
 
                     options._processedBy[this.cid] = { done: false };
-                    this.selected = false;
+                    this[label] = false;
 
                     if ( this._pickyCollections ) {
                         // Model-sharing mode: notify collections with an event
@@ -282,7 +294,9 @@
                 // Change selected to the opposite of what
                 // it currently is
                 toggleSelected: function ( options ) {
-                    if ( this.selected ) {
+                    var label = getLabel( options, this );
+
+                    if ( this[label] ) {
                         this.deselect( options );
                     } else {
                         this.select( options );
@@ -303,6 +317,10 @@
                     if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
 
                     _.extend( hostObject, Mixins.SelectMe );
+
+                    hostObject._pickyLabels = {};
+                    ensureLabelIsRegistered( "selected", hostObject );
+
                     augmentTrigger( hostObject );
                 }
 
@@ -325,6 +343,10 @@
                     _.extend( hostObject, Mixins.SelectOne );
 
                     hostObject._pickyCid = _.uniqueId( 'singleSelect' );
+
+                    hostObject._pickyLabels = {};
+                    ensureLabelIsRegistered( "selected", hostObject );
+
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
 
@@ -333,10 +355,14 @@
                         // model-sharing mode
                         _.each( models || [], function ( model ) {
                             registerCollectionWithModel( model, hostObject );
-                            if ( model.selected ) {
-                                if ( hostObject.selected ) hostObject.selected.deselect();
-                                hostObject.selected = model;
-                            }
+
+                            forEachLabelInModelOrCollection( model, hostObject, function ( label ) {
+                                if ( model[label] ) {
+                                    ensureLabelIsRegistered( label, hostObject );
+                                    if ( hostObject[label] ) hostObject[label].deselect();
+                                    hostObject[label] = model;
+                                }
+                            } );
                         } );
 
                         hostObject.listenTo( hostObject, '_selected', hostObject.select );
@@ -373,8 +399,10 @@
                     _.extend( hostObject, Mixins.SelectMany );
 
                     hostObject._pickyCid = _.uniqueId( 'multiSelect' );
-                    hostObject.selected = {};
-                    hostObject.selectedLength = 0;
+
+                    hostObject._pickyLabels = {};
+                    ensureLabelIsRegistered( "selected", hostObject );
+
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
 
@@ -383,7 +411,11 @@
                         // model-sharing mode
                         _.each( models || [], function ( model ) {
                             registerCollectionWithModel( model, hostObject );
-                            if ( model.selected ) hostObject.selected[model.cid] = model;
+
+                            forEachLabelInModelOrCollection( model, hostObject, function ( label ) {
+                                ensureLabelIsRegistered( label, hostObject );
+                                if ( model[label] ) hostObject[label][model.cid] = model;
+                            } );
                         } );
 
                         hostObject.listenTo( hostObject, '_selected', hostObject.select );
@@ -423,13 +455,14 @@
 
         if ( options.silent || options._silentLocally ) return;
 
-        var selectedLength = collection.selectedLength,
+        var label = getLabel( options, collection ),
+            selectionSize = getSelectionSize( collection, label ),
             length = collection.length,
             prevSelectedCids = _.keys( prevSelected ),
-            selectedCids = _.keys( collection.selected ),
+            selectedCids = _.keys( collection[label] ),
             addedCids = _.difference( selectedCids, prevSelectedCids ),
             removedCids = _.difference( prevSelectedCids, selectedCids ),
-            unchanged = (selectedLength === prevSelectedCids.length && addedCids.length === 0 && removedCids.length === 0),
+            unchanged = (selectionSize === prevSelectedCids.length && addedCids.length === 0 && removedCids.length === 0),
             diff;
 
         if ( reselected && reselected.length && !options._silentReselect ) {
@@ -443,17 +476,17 @@
             deselected: mapCidsToModels( removedCids, collection, prevSelected )
         };
 
-        if ( selectedLength === length ) {
+        if ( selectionSize === length ) {
             queueEvent( options, collection, ["select:all", diff, collection, stripInternalOptions( options )] );
             return;
         }
 
-        if ( selectedLength === 0 ) {
+        if ( selectionSize === 0 ) {
             queueEvent( options, collection, ["select:none", diff, collection, stripInternalOptions( options )] );
             return;
         }
 
-        if ( selectedLength > 0 && selectedLength < length ) {
+        if ( selectionSize > 0 && selectionSize < length ) {
             queueEvent( options, collection, ["select:some", diff, collection, stripInternalOptions( options )] );
             return;
         }
@@ -461,7 +494,14 @@
 
     function onAdd ( model, collection ) {
         registerCollectionWithModel( model, collection );
-        if ( model.selected ) collection.select( model, { _silentReselect: true, _externalEvent: "add" } );
+        forEachLabelInModelOrCollection( model, collection, function ( label ) {
+            var selectOptions = label === "selected" ?
+            { _silentReselect: true, _externalEvent: "add" } :
+            { _silentReselect: true, _externalEvent: "add", label: label };
+
+            if ( model[label] ) collection.select( model, selectOptions );
+        } );
+
     }
 
     function onRemove ( model, collection, options ) {
@@ -470,37 +510,63 @@
 
     function releaseModel ( model, collection, options ) {
         if ( model._pickyCollections ) model._pickyCollections = _.without( model._pickyCollections, collection._pickyCid );
-        if ( model.selected ) {
-            if ( model._pickyCollections && model._pickyCollections.length === 0 ) {
-                collection.deselect( model, options );
-            } else {
-                collection.deselect( model, _.extend( {}, options, { _skipModelCall: true } ) );
+
+        forEachLabelInCollection( collection, function ( label ) {
+            var deselectOptions,
+                labelOptions = label === "selected" ? {} : { label: label };
+
+            if ( model[label] ) {
+
+                if ( model._pickyCollections && model._pickyCollections.length === 0 ) {
+                    deselectOptions = _.extend( {}, options, labelOptions );
+                } else {
+                    deselectOptions = _.extend( {}, options, labelOptions, { _skipModelCall: true } );
+                }
+
+                collection.deselect( model, deselectOptions );
             }
-        }
+
+        } );
     }
 
     function onResetSingleSelect ( collection, options ) {
         var selected,
             excessiveSelections,
-            deselectOnRemove = _.find( options.previousModels, function ( model ) { return model.selected; } );
+            deselectOnRemove = {};
+        
+        forEachLabelInCollection( collection, function ( label ) {
+            var removeThis = _.find( options.previousModels, function ( model ) { return model[label]; } );
+            if ( removeThis ) deselectOnRemove[removeThis.cid] = removeThis; 
+        } );
 
-        if ( deselectOnRemove ) releaseModel( deselectOnRemove, collection, { _silentLocally: true } );
+        _.each( deselectOnRemove, function ( model ) {
+            releaseModel( model, collection, { _silentLocally: true } );
+        } );
+
         _.each( options.previousModels, function ( model ) {
             if ( model._pickyCollections ) model._pickyCollections = _.without( model._pickyCollections, collection._pickyCid );
         } );
 
         collection.each( function ( model ) {
             registerCollectionWithModel( model, collection );
+            ensureModelLabelsInCollection( model, collection );
         } );
-        selected = collection.filter( function ( model ) { return model.selected; } );
-        excessiveSelections = _.initial( selected );
-        if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect(); } );
-        if ( selected.length ) collection.select( _.last( selected ), { silent: true } );
+
+        forEachLabelInCollection( collection, function ( label ) {
+
+            var labelOptions = label === "selected" ? {} : { label: label };
+
+            selected = collection.filter( function ( model ) { return model[label]; } );
+            excessiveSelections = _.initial( selected );
+            if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect( labelOptions ); } );
+            if ( selected.length ) collection.select( _.last( selected ), _.extend ( { silent: true }, labelOptions ) );
+
+        } );
     }
 
     function onResetMultiSelect ( collection, options ) {
         var select,
-            deselect = _.filter( options.previousModels, function ( model ) { return model.selected; } );
+            deselect = _.filter( options.previousModels, function ( model ) { return isModelSelectedWithAnyCollectionLabel( model, collection ); } );
 
         if ( deselect ) _.each( deselect, function ( model ) { releaseModel( model, collection, { _silentLocally: true } ); } );
 
@@ -510,9 +576,15 @@
 
         collection.each( function ( model ) {
             registerCollectionWithModel( model, collection );
+            ensureModelLabelsInCollection( model, collection );
         } );
-        select = collection.filter( function ( model ) { return model.selected; } );
-        if ( select.length ) _.each( select, function ( model ) { collection.select( model, { silent: true } ); } );
+
+        forEachLabelInCollection( collection, function ( label ) {
+            var selectOptions = label === "selected" ? { silent: true } : { silent: true, label: label };
+
+            select = collection.filter( function ( model ) { return model[label]; } );
+            if ( select.length ) _.each( select, function ( model ) { collection.select( model, selectOptions ); } );
+        } );
     }
 
     function registerCollectionWithModel ( model, collection ) {
@@ -532,6 +604,77 @@
 
     function stripInternalOptions ( options ) {
         return _.omit( options, "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
+    }
+
+    function getLabel ( options, obj ) {
+        var customPropName = options && options.label;
+
+        ensureLabelIsRegistered( customPropName, obj );
+        return customPropName || "selected";
+    }
+
+    function ensureLabelIsRegistered ( name, obj ) {
+        if ( name && !obj._pickyLabels[name] ) {
+            obj._pickyLabels[name] = true;
+
+            if ( obj._pickyType === "Backbone.Select.Many" ) {
+                obj[name] = {};
+                setSelectionSize( 0, obj, name );
+            }
+        }
+    }
+
+    function ensureModelLabelsInCollection ( model, collection ) {
+        forEachLabelInModel( model, function ( label ) {
+            ensureLabelIsRegistered( label, collection );
+        } );
+    }
+
+    function isModelSelectedWithAnyCollectionLabel ( model, collection ) {
+        var hasCollectionLabel = false;
+
+        forEachLabelInCollection( collection, function ( label ) {
+            hasCollectionLabel || ( hasCollectionLabel = model[label] );
+        } );
+
+        return hasCollectionLabel;
+    }
+
+    function getSelectionSizeProp ( label ) {
+        // For Select.Many collections only
+        return ( label || "selected" ) + "Length";
+    }
+
+    function getSelectionSize( collection, label ) {
+        // For Select.Many collections only
+        return collection[getSelectionSizeProp( label )];
+    }
+
+    function setSelectionSize( size, collection, label ) {
+        // For Select.Many collections only
+        collection[getSelectionSizeProp( label )] = size;
+    }
+
+    function forEachLabelInModelOrCollection ( model, collection, callback ) {
+        var labels = _.keys( _.extend( {}, collection._pickyLabels, model._pickyLabels ) );
+        _.each( labels, function ( label, index ) {
+            callback( label, model, collection, index, labels );
+        } );
+    }
+    
+    function forEachLabelInCollection ( collection, callback ) {
+        _forEachEntityLabel( collection, callback );
+    }
+
+    function forEachLabelInModel ( model, callback ) {
+        _forEachEntityLabel( model, callback );
+    }
+
+    function _forEachEntityLabel ( collectionOrModel, callback ) {
+        var labels = _.keys( collectionOrModel._pickyLabels );
+        _.each( labels, function ( label, index ) {
+            callback( label, collectionOrModel, index, labels );
+        } );
     }
 
     function multiSelectionToArray ( selectionsHash ) {
