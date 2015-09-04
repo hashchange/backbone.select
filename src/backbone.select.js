@@ -18,11 +18,13 @@
 
                 // Select a model, deselecting any previously selected model
                 select: function ( model, options ) {
-                    var label = getLabel( options, this ),
-                        reselected = model && this[label] === model ? model : undefined;
+                    var label, reselected, eventOptions;
 
                     options = initOptions( options );
                     if ( options._processedBy[this._pickyCid] ) return;
+
+                    label = getLabel( options, this );
+                    reselected = model && this[label] === model ? model : undefined;
 
                     if ( !reselected ) {
                         this.deselect( undefined, _.extend(
@@ -44,10 +46,11 @@
 
                     if ( !(options.silent || options._silentLocally) ) {
 
+                        eventOptions = toEventOptions( options, label, this );
                         if ( reselected ) {
-                            if ( !options._silentReselect ) queueEvent( options, this, ["reselect:one", model, this, stripInternalOptions( options )] );
+                            if ( !options._silentReselect ) queueEventSet( "reselect:one", label, [ model, this, eventOptions ], this, options );
                         } else {
-                            queueEvent( options, this, ["select:one", model, this, stripInternalOptions( options )] );
+                            queueEventSet( "select:one", label, [ model, this, eventOptions ], this, options );
                         }
 
                     }
@@ -59,11 +62,12 @@
                 // Deselect a model, resulting in no model
                 // being selected
                 deselect: function ( model, options ) {
-                    var label = getLabel( options, this );
+                    var label;
 
                     options = initOptions( options );
                     if ( options._processedBy[this._pickyCid] ) return;
 
+                    label = getLabel( options, this );
                     if ( !this[label] ) return;
 
                     model = model || this[label];
@@ -73,7 +77,7 @@
 
                     delete this[label];
                     if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
-                    if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, ["deselect:one", model, this, stripInternalOptions( options )] );
+                    if ( !(options.silent || options._silentLocally) ) queueEventSet( "deselect:one", label, [ model, this, toEventOptions( options, label, this ) ], this, options );
 
                     options._processedBy[this._pickyCid].done = true;
                     processEventQueue( options );
@@ -101,11 +105,13 @@
                 // Select a specified model, make sure the model knows it's selected, and
                 // hold on to the selected model.
                 select: function ( model, options ) {
-                    var label = getLabel( options, this ),
-                        prevSelected = multiSelectionToArray( this[label] ),
-                        reselected = this[label][model.cid] ? [model] : [];
+                    var label, prevSelected, reselected;
 
                     options = initOptions( options );
+                    label = getLabel( options, this );
+
+                    prevSelected = multiSelectionToArray( this[label] );
+                    reselected = this[label][model.cid] ? [model] : [];
 
                     if ( reselected.length && options._processedBy[this._pickyCid] ) return;
 
@@ -125,11 +131,13 @@
                 // Deselect a specified model, make sure the model knows it has been deselected,
                 // and remove the model from the selected list.
                 deselect: function ( model, options ) {
-                    var label = getLabel( options, this ),
-                        prevSelected = multiSelectionToArray( this[label] );
+                    var label, prevSelected;
 
                     options = initOptions( options );
                     if ( options._processedBy[this._pickyCid] ) return;
+
+                    label = getLabel( options, this );
+                    prevSelected = multiSelectionToArray( this[label] );
 
                     if ( !this[label][model.cid] ) return;
 
@@ -147,11 +155,12 @@
 
                 // Select all models in this collection
                 selectAll: function ( options ) {
-                    var label = getLabel( options, this ),
-                        prevSelected = multiSelectionToArray( this[label] ),
+                    var label, prevSelected,
                         reselected = [];
 
-                    options || (options = {});
+                    options || ( options = {} );
+                    label = getLabel( options, this );
+                    prevSelected = multiSelectionToArray( this[label] );
 
                     this.each( function ( model ) {
                         if ( this[label][model.cid] ) reselected.push( model );
@@ -173,13 +182,14 @@
 
                 // Deselect all models in this collection
                 deselectAll: function ( options ) {
-                    var prevSelected,
-                        label = getLabel( options, this );
+                    var prevSelected, label;
+
+                    options || ( options = {} );
+                    label = getLabel( options, this );
 
                     if ( getSelectionSize( this, label ) === 0 ) return;
                     prevSelected = multiSelectionToArray( this[label] );
 
-                    options || (options = {});
 
                     this.each( function ( model ) {
                         this.deselect( model, _.extend( {}, options, { _silentLocally: true } ) );
@@ -205,7 +215,10 @@
                 // Toggle select all / none. If some are selected, it will select all. If all
                 // are selected, it will select none. If none are selected, it will select all.
                 toggleSelectAll: function ( options ) {
-                    var label = getLabel( options, this );
+                    var label;
+
+                    options || ( options = {} );
+                    label = getLabel( options, this );
 
                     if ( getSelectionSize( this, label ) === this.length ) {
                         this.deselectAll( options );
@@ -234,13 +247,15 @@
                 // Select this model, and tell our
                 // collection that we're selected
                 select: function ( options ) {
-                    var label = getLabel( options, this ),
-                        reselected = this[label];
+                    var label, reselected, eventOptions;
 
                     options = initOptions( options );
                     if ( options._processedBy[this.cid] ) return;
 
                     options._processedBy[this.cid] = { done: false };
+
+                    label = getLabel( options, this );
+                    reselected = this[label];
                     this[label] = true;
 
                     if ( this._pickyCollections ) {
@@ -253,10 +268,12 @@
                     }
 
                     if ( !(options.silent || options._silentLocally) ) {
+                        eventOptions = toEventOptions( options, label, this );
+
                         if ( reselected ) {
-                            if ( !options._silentReselect ) queueEvent( options, this, ["reselected", this, stripInternalOptions( options )] );
+                            if ( !options._silentReselect ) queueEventSet( "reselected", label, [ this, eventOptions ], this, options );
                         } else {
-                            queueEvent( options, this, ["selected", this, stripInternalOptions( options )] );
+                            queueEventSet( "selected", label, [ this, eventOptions ], this, options );
                         }
                     }
 
@@ -266,11 +283,12 @@
 
                 // Deselect this model, and tell our collection that we're deselected
                 deselect: function ( options ) {
-                    var label = getLabel( options, this );
+                    var label;
 
                     options = initOptions( options );
                     if ( options._processedBy[this.cid] ) return;
 
+                    label = getLabel( options, this );
                     if ( !this[label] ) return;
 
                     options._processedBy[this.cid] = { done: false };
@@ -285,7 +303,7 @@
                         this.collection.deselect( this, stripLocalOptions( options ) );
                     }
 
-                    if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, ["deselected", this, stripInternalOptions( options )] );
+                    if ( !(options.silent || options._silentLocally) ) queueEventSet( "deselected", label, [ this, toEventOptions( options, label, this ) ], this, options );
 
                     options._processedBy[this.cid].done = true;
                     processEventQueue( options );
@@ -294,7 +312,10 @@
                 // Change selected to the opposite of what
                 // it currently is
                 toggleSelected: function ( options ) {
-                    var label = getLabel( options, this );
+                    var label;
+
+                    options || ( options = {} );
+                    label = getLabel( options, this );
 
                     if ( this[label] ) {
                         this.deselect( options );
@@ -313,13 +334,14 @@
 
             Me: {
 
-                applyTo: function ( hostObject ) {
+                applyTo: function ( hostObject, options ) {
                     if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
 
                     _.extend( hostObject, Mixins.SelectMe );
 
                     hostObject._pickyLabels = {};
-                    ensureLabelIsRegistered( "selected", hostObject );
+                    hostObject._pickyDefaultLabel = options && options.defaultLabel || "selected";
+                    ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
 
                     augmentTrigger( hostObject );
                 }
@@ -345,7 +367,8 @@
                     hostObject._pickyCid = _.uniqueId( 'singleSelect' );
 
                     hostObject._pickyLabels = {};
-                    ensureLabelIsRegistered( "selected", hostObject );
+                    hostObject._pickyDefaultLabel = options && options.defaultLabel || "selected";
+                    ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
 
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
@@ -401,7 +424,8 @@
                     hostObject._pickyCid = _.uniqueId( 'multiSelect' );
 
                     hostObject._pickyLabels = {};
-                    ensureLabelIsRegistered( "selected", hostObject );
+                    hostObject._pickyDefaultLabel = options && options.defaultLabel || "selected";
+                    ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
 
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
@@ -455,18 +479,21 @@
 
         if ( options.silent || options._silentLocally ) return;
 
-        var label = getLabel( options, collection ),
+        var diff,
+            label = getLabel( options, collection ),
+
             selectionSize = getSelectionSize( collection, label ),
             length = collection.length,
+
             prevSelectedCids = _.keys( prevSelected ),
             selectedCids = _.keys( collection[label] ),
             addedCids = _.difference( selectedCids, prevSelectedCids ),
             removedCids = _.difference( prevSelectedCids, selectedCids ),
-            unchanged = (selectionSize === prevSelectedCids.length && addedCids.length === 0 && removedCids.length === 0),
-            diff;
+
+            unchanged = (selectionSize === prevSelectedCids.length && addedCids.length === 0 && removedCids.length === 0);
 
         if ( reselected && reselected.length && !options._silentReselect ) {
-            queueEvent( options, collection, ["reselect:any", reselected, collection, stripInternalOptions( options )] );
+            queueEventSet( "reselect:any", label, [ reselected, collection, toEventOptions( options, label, collection ) ], collection, options );
         }
 
         if ( unchanged ) return;
@@ -477,17 +504,17 @@
         };
 
         if ( selectionSize === length ) {
-            queueEvent( options, collection, ["select:all", diff, collection, stripInternalOptions( options )] );
+            queueEventSet( "select:all", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
             return;
         }
 
         if ( selectionSize === 0 ) {
-            queueEvent( options, collection, ["select:none", diff, collection, stripInternalOptions( options )] );
+            queueEventSet( "select:none", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
             return;
         }
 
         if ( selectionSize > 0 && selectionSize < length ) {
-            queueEvent( options, collection, ["select:some", diff, collection, stripInternalOptions( options )] );
+            queueEventSet( "select:some", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
             return;
         }
     };
@@ -602,15 +629,40 @@
         return _.omit( options, "_silentLocally", "_externalEvent" );
     }
 
+    function toEventOptions ( options, label, context ) {
+        var eventOptions = stripInternalOptions( options );
+
+        // The default label is used for a select/deselect action unless the label has been passed in explicitly. More
+        // precisely, what gets used is the default label of the object on which select/deselect has initially been
+        // called.
+        //
+        // But other objects may have been created with another default label. So it can happen that the default label
+        // of the ongoing operation, initiated elsewhere, is different from the default label of the object which is
+        // processed right now.
+        //
+        // Detect that difference. If the default labels don't match, the currently processed object must make the label
+        // explicit in its event options.
+        if ( !options.label && label !== context._pickyDefaultLabel ) _.extend( eventOptions, { label: label } );
+
+        return eventOptions;
+    }
+
     function stripInternalOptions ( options ) {
-        return _.omit( options, "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
+        return _.omit( options, "_defaultLabel", "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
     }
 
     function getLabel ( options, obj ) {
         var customPropName = options && options.label;
 
+        // getLabel must be called before any work gets done in a select/deselect method. Therefore, it is also tasked
+        // with a few side jobs regarding proper initialization:
+        //
+        // - It ensures that the label is registered
+        // - It ensures that the default label for the action is picked up and passed along
         ensureLabelIsRegistered( customPropName, obj );
-        return customPropName || "selected";
+        options._defaultLabel || ( options._defaultLabel = obj._pickyDefaultLabel );
+
+        return customPropName || options._defaultLabel;
     }
 
     function ensureLabelIsRegistered ( name, obj ) {
@@ -696,14 +748,20 @@
         return options;
     }
 
-    function queueEvent ( storage, actor, triggerArgs ) {
+    function queueEventSet ( eventName, label, eventArgs, context, storage ) {
+        // Queue two events which are identical, except that one is namespaced to the label.
+        queueEvent( storage, context, [ eventName ].concat( eventArgs ) );
+        queueEvent( storage, context, [ eventName + ":" + label ].concat( eventArgs ) );
+    }
+
+    function queueEvent ( storage, context, triggerArgs ) {
         // Use either _eventQueue, which will eventually be processed by the calling
         // object, or _eventQueueAppendOnly, which is another object's event queue
         // and resolved elsewhere. _eventQueueAppendOnly exists only when needed,
         // and thus takes precedence.
         var queue = storage._eventQueueAppendOnly || storage._eventQueue;
         queue.push( {
-            actor: actor,
+            context: context,
             triggerArgs: triggerArgs
         } );
     }
@@ -720,7 +778,7 @@
                 mergeMultiSelectEvents( storage._eventQueue );
                 while ( storage._eventQueue.length ) {
                     eventData = storage._eventQueue.pop();
-                    eventData.actor.trigger.apply( eventData.actor, eventData.triggerArgs );
+                    eventData.context.trigger.apply( eventData.context, eventData.triggerArgs );
                 }
             }
         }
@@ -736,15 +794,21 @@
 
         // Create merged data for each multi-select collection
         _.each( queue, function ( event, index ) {
-            var extractedData, diff, opts,
-                actor = event.actor,
+            var label, datasetId, extractedData, diff, opts,
+                context = event.context,
                 eventName = event.triggerArgs[0];
 
-            if ( actor._pickyType === "Backbone.Select.Many" && eventName !== "reselect:any" ) {
+            // Only act on queue entries for Backbone.Select.Many, and ignore their "reselect:any" events.
+            if ( context._pickyType === "Backbone.Select.Many" && eventName.indexOf( "reselect:any" ) === -1 ) {
 
-                extractedData = multiSelectCollections[actor._pickyCid];
-                if ( !extractedData ) extractedData = multiSelectCollections[actor._pickyCid] = {
-                    actor: actor,
+                // NB Label (= event namespace) is an empty string for the non-namespaced event
+                label = eventName.replace( /^select:(all|some|none):?/, "" );
+                datasetId = context._pickyCid + "-ns-" + label;
+
+                extractedData = multiSelectCollections[datasetId];
+                if ( !extractedData ) extractedData = multiSelectCollections[datasetId] = {
+                    context: context,
+                    label: label,
                     indexes: [],
                     merged: {
                         selected: [],
@@ -789,11 +853,11 @@
             // one or more deselects. By definition, that translates into a
             // select:some event (and never into select:all, select:none).
             queue.push( {
-                actor: extractedData.actor,
+                context: extractedData.context,
                 triggerArgs: [
-                    "select:some",
+                    extractedData.label ? "select:some:" + extractedData.label : "select:some",
                     { selected: extractedData.merged.selected, deselected: extractedData.merged.deselected },
-                    extractedData.actor,
+                    extractedData.context,
                     extractedData.merged.options
                 ]
             } );
