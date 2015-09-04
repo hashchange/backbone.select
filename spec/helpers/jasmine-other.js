@@ -31,11 +31,11 @@ jasmine._addTheseCustomMatchers.toHaveBeenCalledWithInitial = function ( util, c
             result.pass = util.contains( actualInitial, expectedArgs, customEqualityTesters );
 
             if ( result.pass ) {
+                result.message = "Expected spy " + actual.and.identity() + " not to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but it was.";
+            } else {
                 result.message = !actual.calls.any() ?
                                  "Expected spy " + actual.and.identity() + " to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but it was never called." :
                                  "Expected spy " + actual.and.identity() + " to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but actual calls were " + jasmine.pp( actual.calls.allArgs() ).replace( /^\[ | \]$/g, '' ) + '.';
-            } else {
-                result.message = "Expected spy " + actual.and.identity() + " not to have been called with initial arguments " + jasmine.pp( expectedArgs ) + " but it was.";
             }
 
             return result;
