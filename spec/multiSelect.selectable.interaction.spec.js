@@ -50,7 +50,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:some event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:some", { selected: [m1], deselected: [] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [m1], deselected: [] }, collection, { label: "selected" } );
             } );
 
             it( "should not trigger a reselect:any event", function () {
@@ -140,7 +140,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:all event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [m2], deselected: [] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m2], deselected: [] }, collection, { label: "selected" } );
             } );
 
             it( "should not trigger a reselect:any event", function () {
@@ -221,15 +221,15 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:none event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [m1] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
             } );
 
             it( "should trigger a 'selected' event with the selected model", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "selected", m1 );
+                expect( collection.trigger ).toHaveBeenCalledWith( "selected", m1, { label: "selected" } );
             } );
 
             it( "should trigger a 'deselected' event with the deselected model", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "deselected", m1 );
+                expect( collection.trigger ).toHaveBeenCalledWith( "deselected", m1, { label: "selected" } );
             } );
 
             it( "should have a selected count of 0", function () {
@@ -315,7 +315,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:all event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [m2], deselected: [] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m2], deselected: [] }, collection, { label: "selected" } );
             } );
 
             it( "should not trigger a reselect:any event", function () {
@@ -384,7 +384,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:some event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:some", { selected: [], deselected: [m1] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
             } );
 
             it( "should not trigger a reselect:any event", function () {
@@ -453,7 +453,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:none event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [m1] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
             } );
 
             it( "should have a selected count of 0", function () {
@@ -516,7 +516,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a reselect:any event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "reselect:any", [m1], collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, { label: "selected" } );
             } );
         } );
 
@@ -567,7 +567,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a reselect:any event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "reselect:any", [m1], collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, { label: "selected" } );
             } );
         } );
 
@@ -760,7 +760,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:all event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [m2], deselected: [] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m2], deselected: [] }, collection, { label: "selected" } );
             } );
 
             it( "should have a selected count of 2", function () {
@@ -825,7 +825,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:some event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:some", { selected: [], deselected: [m1] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
             } );
 
             it( "should not trigger a reselect:any event", function () {
@@ -894,7 +894,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a select:none event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [m1] }, collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
             } );
 
             it( "should have a selected count of 0", function () {
@@ -957,7 +957,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a reselect:any event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "reselect:any", [m1], collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, { label: "selected" } );
             } );
         } );
 
@@ -1008,7 +1008,7 @@ describe( "multi-select collection: interaction with selectable models", functio
             } );
 
             it( "should trigger a reselect:any event", function () {
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "reselect:any", [m1], collection );
+                expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, { label: "selected" } );
             } );
         } );
 
@@ -1082,12 +1082,12 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select( {foo: "bar"} );
             } );
 
-            it( "should trigger a selected event and pass the options object along as the last parameter", function () {
-                expect( m1.trigger ).toHaveBeenCalledWith( "selected", m1, {foo: "bar"} );
+            it( "should trigger a selected event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( m1.trigger ).toHaveBeenCalledWith( "selected", m1, { foo: "bar", label: "selected" } );
             } );
 
-            it( "should trigger a select:some event and pass the options object along as the last parameter", function () {
-                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [m1], deselected: [] }, collection, {foo: "bar"} );
+            it( "should trigger a select:some event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [m1], deselected: [] }, collection, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -1106,12 +1106,12 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1, {foo: "bar"} );
             } );
 
-            it( "should trigger a selected event and pass the options object along as the last parameter", function () {
-                expect( m1.trigger ).toHaveBeenCalledWith( "selected", m1, {foo: "bar"} );
+            it( "should trigger a selected event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( m1.trigger ).toHaveBeenCalledWith( "selected", m1, { foo: "bar", label: "selected" } );
             } );
 
-            it( "should trigger a select:some event and pass the options object along as the last parameter", function () {
-                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [m1], deselected: [] }, collection, {foo: "bar"} );
+            it( "should trigger a select:some event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [m1], deselected: [] }, collection, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -1131,12 +1131,12 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select( {foo: "bar"} );
             } );
 
-            it( "should trigger a reselected event and pass the options object along as the last parameter", function () {
-                expect( m1.trigger ).toHaveBeenCalledWith( "reselected", m1, {foo: "bar"} );
+            it( "should trigger a reselected event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( m1.trigger ).toHaveBeenCalledWith( "reselected", m1, { foo: "bar", label: "selected" } );
             } );
 
-            it( "should trigger a reselect:any event and pass the options object along as the last parameter", function () {
-                expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, {foo: "bar"} );
+            it( "should trigger a reselect:any event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -1156,12 +1156,12 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1, {foo: "bar"} );
             } );
 
-            it( "should trigger a reselected event and pass the options object along as the last parameter", function () {
-                expect( m1.trigger ).toHaveBeenCalledWith( "reselected", m1, {foo: "bar"} );
+            it( "should trigger a reselected event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( m1.trigger ).toHaveBeenCalledWith( "reselected", m1, { foo: "bar", label: "selected" } );
             } );
 
-            it( "should trigger a reselect:any event and pass the options object along as the last parameter", function () {
-                expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, {foo: "bar"} );
+            it( "should trigger a reselect:any event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -1182,12 +1182,12 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.deselect( {foo: "bar"} );
             } );
 
-            it( "should trigger a deselected event and pass the options object along as the last parameter", function () {
-                expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, {foo: "bar"} );
+            it( "should trigger a deselected event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, { foo: "bar", label: "selected" } );
             } );
 
-            it( "should trigger a select:some event and pass the options object along as the last parameter", function () {
-                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [m1] }, collection, {foo: "bar"} );
+            it( "should trigger a select:some event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [m1] }, collection, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -1208,12 +1208,12 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.deselect( m1, {foo: "bar"} );
             } );
 
-            it( "should trigger a deselected event and pass the options object along as the last parameter", function () {
-                expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, {foo: "bar"} );
+            it( "should trigger a deselected event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, { foo: "bar", label: "selected" } );
             } );
 
-            it( "should trigger a select:some event and pass the options object along as the last parameter", function () {
-                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [m1] }, collection, {foo: "bar"} );
+            it( "should trigger a select:some event and pass the custom option along in the options object (the last parameter)", function () {
+                expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [m1] }, collection, { foo: "bar", label: "selected" } );
             } );
         } );
 

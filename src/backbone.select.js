@@ -629,7 +629,7 @@
         return _.omit( options, "_silentLocally", "_externalEvent" );
     }
 
-    function toEventOptions ( options, label, context ) {
+    function toEventOptions ( options, label ) {
         var eventOptions = stripInternalOptions( options );
 
         // The default label is used for a select/deselect action unless the label has been passed in explicitly. More
@@ -640,9 +640,8 @@
         // of the ongoing operation, initiated elsewhere, is different from the default label of the object which is
         // processed right now.
         //
-        // Detect that difference. If the default labels don't match, the currently processed object must make the label
-        // explicit in its event options.
-        if ( !options.label && label !== context._pickyDefaultLabel ) _.extend( eventOptions, { label: label } );
+        // Therefore, in order to avoid ambiguity, the label is always exposed in the event options.
+        _.extend( eventOptions, { label: label } );
 
         return eventOptions;
     }

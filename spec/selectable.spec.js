@@ -43,8 +43,8 @@ describe( "selectable model", function () {
             expect( model.selected ).toBe( true );
         } );
 
-        it( "should notify of selection", function () {
-            expect( model.trigger ).toHaveBeenCalledWithInitial( "selected", model );
+        it( "should trigger a selected event", function () {
+            expect( model.trigger ).toHaveBeenCalledWith( "selected", model, { label: "selected" } );
         } );
 
         it( "should not trigger a reselected event", function () {
@@ -66,7 +66,7 @@ describe( "selectable model", function () {
             expect( model.selected ).toBe( true );
         } );
 
-        it( "should not notify of selection", function () {
+        it( "should not trigger a selected event", function () {
             expect( model.trigger ).not.toHaveBeenCalledWithInitial( "selected" );
         } );
     } );
@@ -86,12 +86,12 @@ describe( "selectable model", function () {
             expect( model.selected ).toBe( true );
         } );
 
-        it( "should not notify of selection", function () {
+        it( "should not trigger a selected event", function () {
             expect( model.trigger ).not.toHaveBeenCalledWithInitial( "selected" );
         } );
 
         it( "should trigger a reselected event", function () {
-            expect( model.trigger ).toHaveBeenCalledWithInitial( "reselected", model );
+            expect( model.trigger ).toHaveBeenCalledWith( "reselected", model, { label: "selected" } );
         } );
     } );
 
@@ -110,7 +110,7 @@ describe( "selectable model", function () {
             expect( model.selected ).toBe( true );
         } );
 
-        it( "should not notify of selection", function () {
+        it( "should not trigger a selected event", function () {
             expect( model.trigger ).not.toHaveBeenCalledWithInitial( "selected" );
         } );
 
@@ -134,8 +134,8 @@ describe( "selectable model", function () {
             expect( model.selected ).toBe( false );
         } );
 
-        it( "should notify of deselection", function () {
-            expect( model.trigger ).toHaveBeenCalledWithInitial( "deselected", model );
+        it( "should trigger a deselected event", function () {
+            expect( model.trigger ).toHaveBeenCalledWith( "deselected", model, { label: "selected" } );
         } );
     } );
 
@@ -154,7 +154,7 @@ describe( "selectable model", function () {
             expect( model.selected ).toBe( false );
         } );
 
-        it( "should not notify of deselection", function () {
+        it( "should not trigger a deselected event", function () {
             expect( model.trigger ).not.toHaveBeenCalledWithInitial( "deselected" );
         } );
     } );
@@ -173,7 +173,7 @@ describe( "selectable model", function () {
             expect( model.selected ).toBeFalsy();
         } );
 
-        it( "should not notify of deselection", function () {
+        it( "should not trigger a deselected event", function () {
             expect( model.trigger ).not.toHaveBeenCalledWithInitial( "deselected" );
         } );
 
@@ -197,8 +197,8 @@ describe( "selectable model", function () {
             expect( model.selected ).toBe( false );
         } );
 
-        it( "should notify of deselection", function () {
-            expect( model.trigger ).toHaveBeenCalledWithInitial( "deselected", model );
+        it( "should trigger a deselected event", function () {
+            expect( model.trigger ).toHaveBeenCalledWith( "deselected", model, { label: "selected" } );
         } );
     } );
 
@@ -216,8 +216,8 @@ describe( "selectable model", function () {
             expect( model.selected ).toBe( true );
         } );
 
-        it( "should notify of selection", function () {
-            expect( model.trigger ).toHaveBeenCalledWithInitial( "selected", model );
+        it( "should trigger a selected event", function () {
+            expect( model.trigger ).toHaveBeenCalledWith( "selected", model, { label: "selected" } );
         } );
     } );
 
@@ -233,8 +233,8 @@ describe( "selectable model", function () {
                 model.select( {foo: "bar"} );
             } );
 
-            it( "should trigger a selected event and pass the the options object along as the last parameter", function () {
-                expect( model.trigger ).toHaveBeenCalledWith( "selected", model, {foo: "bar"} );
+            it( "should trigger a selected event and pass the the custom option along in the options object (the last parameter)", function () {
+                expect( model.trigger ).toHaveBeenCalledWith( "selected", model, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -249,8 +249,8 @@ describe( "selectable model", function () {
                 model.select( {foo: "bar"} );
             } );
 
-            it( "should trigger a reselected event and pass the the options object along as the last parameter", function () {
-                expect( model.trigger ).toHaveBeenCalledWith( "reselected", model, {foo: "bar"} );
+            it( "should trigger a reselected event and pass the the custom option along in the options object (the last parameter)", function () {
+                expect( model.trigger ).toHaveBeenCalledWith( "reselected", model, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -265,8 +265,8 @@ describe( "selectable model", function () {
                 model.deselect( {foo: "bar"} );
             } );
 
-            it( "should trigger a deselected event and pass the the options object along as the last parameter", function () {
-                expect( model.trigger ).toHaveBeenCalledWith( "deselected", model, {foo: "bar"} );
+            it( "should trigger a deselected event and pass the the custom option along in the options object (the last parameter)", function () {
+                expect( model.trigger ).toHaveBeenCalledWith( "deselected", model, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -281,8 +281,8 @@ describe( "selectable model", function () {
                 model.toggleSelected( {foo: "bar"} );
             } );
 
-            it( "should trigger a deselected event and pass the the options object along as the last parameter", function () {
-                expect( model.trigger ).toHaveBeenCalledWith( "deselected", model, {foo: "bar"} );
+            it( "should trigger a deselected event and pass the the custom option along in the options object (the last parameter)", function () {
+                expect( model.trigger ).toHaveBeenCalledWith( "deselected", model, { foo: "bar", label: "selected" } );
             } );
         } );
 
@@ -296,8 +296,8 @@ describe( "selectable model", function () {
                 model.toggleSelected( {foo: "bar"} );
             } );
 
-            it( "should trigger a selected event and pass the the options object along as the last parameter", function () {
-                expect( model.trigger ).toHaveBeenCalledWith( "selected", model, {foo: "bar"} );
+            it( "should trigger a selected event and pass the the custom option along in the options object (the last parameter)", function () {
+                expect( model.trigger ).toHaveBeenCalledWith( "selected", model, { foo: "bar", label: "selected" } );
             } );
         } );
 
