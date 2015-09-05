@@ -49,11 +49,13 @@ require( [
                 _.bindAll( this, "select", "onModelSelect", "render" );
                 this.collection = options.collection;
 
-                this.listenTo( this.collection, "selected", this.onModelSelect );
+                this.listenTo( this.collection, "selected", this.onModelSelectWithAnyLabel );
+                this.listenTo( this.collection, "selected:selected", this.onModelSelect );    // with default label "selected" only
                 this.listenTo( this.collection, "deselected", this.onModelDeselect );
 
                 this.render();
             },
+
             getEl: function ( modelId ) {
                 // Return the DOM node representing the model, as a jQuery object
                 return this.$el
@@ -62,38 +64,42 @@ require( [
                         return $( this ).text() === String( modelId );
                     } );
             },
+
             select: function ( event ) {
                 var id = $( event.target ).text();
                 if ( event ) event.preventDefault();
                 this.collection.get( id ).select();
             },
-            onModelSelect: function ( model, options ) {
-                var trailing,
+
+            // Runs when a model is selected with any label. Labels are "selected" (default) or "trailing"
+            onModelSelectWithAnyLabel: function ( model, options ) {
+                // Set a "selected" class to an element which is selected, and a "trailing" class to an element which
+                // is selected with label "trailing".
+                this.getEl( model.id ).addClass( options.label );
+            },
+
+            // Only runs when a model is selected with the default label, not with the custom label "trailing"
+            onModelSelect: function ( model ) {
+                var trailing = this.collection.trailing && this.collection.trailing.id || this.collection.first().id,
                     view = this,
-                    label = options && options.label || "selected",
 
                     cbUpdateTrailing = function () {
                         view.collection.get( Math.round( this.trailingId ) ).select( { label: "trailing" } );
                     };
 
-                // Set a "selected" class to an element which is selected, and a "trailing" class to an element which
-                // is selected with label "trailing".
-                this.getEl( model.id ).addClass( label );
-
-                // If an element is selected, animate the trailing element and make it catch up. Use the .select()
-                // method with the label "trailing".
-                if ( label === "selected" ) {
-                    trailing = this.collection.trailing && this.collection.trailing.id || this.collection.first().id;
-                    $( { trailingId: trailing } ).animate(
-                        { trailingId: model.id },
-                        { step: cbUpdateTrailing, done: cbUpdateTrailing, duration: trailingLag }
-                    );
-                }
+                // Animate the trailing element and make it catch up. Use the .select() method with the label
+                // "trailing".
+                $( { trailingId: trailing } ).animate(
+                    { trailingId: model.id },
+                    { step: cbUpdateTrailing, done: cbUpdateTrailing, duration: trailingLag }
+                );
             },
+
             onModelDeselect: function ( model, options ) {
                 var label = options && options.label || "selected";
                 this.getEl( model.id ).removeClass( label );
             },
+
             render: function () {
                 // Render the collection content
                 this.$el.empty();
