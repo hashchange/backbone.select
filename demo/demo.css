@@ -4,3 +4,16 @@ body {
     margin: 0.25rem;
 }
 
+#header {
+    margin: 1.25rem 0;
+}
+
+ul {
+    list-style: none;
+    margin-left: 0;
+}
+li {
+    padding: 0;
+    margin: 0;
+}
+

@@ -5,25 +5,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AMD setup - Demo and Playground</title>
+    <title>Backbone.Select: Basic demo, with model sharing (AMD)</title>
 
     <!-- ATTN Foundation loaded without JS - stay clear of JS-driven widgets, or add the JS setup -->
     <link rel="stylesheet" href="../bower_demo_components/foundation/css/normalize.css">
     <link rel="stylesheet" href="../bower_demo_components/foundation/css/foundation.css">
 
+    <link rel="stylesheet" href="../common.css">
     <link rel="stylesheet" href="amd.css">
 </head>
 <body>
     <!-- check that 'bower install' has been run in the demo dir if bower.json isn't empty -->
     <script src="../bower-check.js"></script>
 
-    <!-- body content here... -->
     <section id="header">
-        <h1 class="row">AMD setup</h1>
+        <h1 class="row">Backbone.Select</h1>
+        <h2 class="row">Basic demo, with model sharing (AMD)</h2>
 
-        <p class="row">This page uses the AMD build in the <code>dist</code> directory, not the files in
-            <code>src</code>. In other words, run the <code>grunt</code> command first to build a current version.</p>
+        <p id="build-info" class="row">
+            <a href="#" id="close-build-info">×</a>
+            This page uses the AMD build in the <code>dist</code> directory, not the files in
+            <code>src</code>. In other words, run the <code>grunt</code> command first to build a current version.
+        </p>
     </section>
+
     <section>
 
         <div class="row">
@@ -74,5 +79,6 @@
         require( ['../demo/amd/amd'] );
     </script>
 
+    <script src="../close-build-info.js"></script>
 </body>
 </html>

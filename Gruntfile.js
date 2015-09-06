@@ -135,8 +135,8 @@ module.exports = function(grunt) {
     connect: {
       options: {
         port: HTTP_PORT,
-        // change this from 'localhost' to '*' to access the server from outside
-        hostname: 'localhost',
+        // For restricting access to localhost only, change the hostname from '*' to 'localhost'
+        hostname: '*',
         open: true,
         base: '.'
       },

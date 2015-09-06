@@ -1,13 +1,5 @@
 @charset "utf-8";
 
-body {
-    margin: 0.25rem;
-}
-
-#header {
-    margin-bottom: 2rem;
-}
-
 .list {
     margin-bottom: 1rem;
     text-align: center;
@@ -25,11 +17,11 @@ body {
     border: 0.2rem solid #007b9f;
 }
 
-.item a.selected, .item a.trailing.selected {
+.trailing.selected a {
     background-color: rgba(0, 123, 159, 0.2);
 }
 
-.item a.selected, .item a.trailing {
+.selected a, .trailing a {
     background-color: rgba(0, 123, 159, 0.09);
 }
 

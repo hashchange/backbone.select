@@ -46,7 +46,7 @@ require( [
             },
 
             initialize: function ( options ) {
-                _.bindAll( this, "select", "onModelSelect", "render" );
+                _.bindAll( this, "select", "render" );
                 this.collection = options.collection;
 
                 this.listenTo( this.collection, "selected", this.onModelSelectWithAnyLabel );
@@ -56,17 +56,17 @@ require( [
                 this.render();
             },
 
-            getEl: function ( modelId ) {
+            getModelEl: function ( modelId ) {
                 // Return the DOM node representing the model, as a jQuery object
                 return this.$el
-                    .find( "a" )
+                    .find( ".item" )
                     .filter( function () {
                         return $( this ).text() === String( modelId );
                     } );
             },
 
             select: function ( event ) {
-                var id = $( event.target ).text();
+                var id = $( event.currentTarget ).text();
                 if ( event ) event.preventDefault();
                 this.collection.get( id ).select();
             },
@@ -75,7 +75,7 @@ require( [
             onModelSelectWithAnyLabel: function ( model, options ) {
                 // Set a "selected" class to an element which is selected, and a "trailing" class to an element which
                 // is selected with label "trailing".
-                this.getEl( model.id ).addClass( options.label );
+                this.getModelEl( model.id ).addClass( options.label );
             },
 
             // Only runs when a model is selected with the default label, not with the custom label "trailing"
@@ -96,8 +96,7 @@ require( [
             },
 
             onModelDeselect: function ( model, options ) {
-                var label = options && options.label || "selected";
-                this.getEl( model.id ).removeClass( label );
+                this.getModelEl( model.id ).removeClass( options.label );
             },
 
             render: function () {
@@ -112,9 +111,9 @@ require( [
             }
         } );
 
+    new ListView( { collection: collection, el: "#list" } );
+
     // Initial selection
     collection.first().select();
-
-    new ListView( { collection: collection, el: "#list" } );
 
 } );

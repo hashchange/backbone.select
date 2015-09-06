@@ -15,13 +15,13 @@ require( [
             }
         } ),
 
-        SingleSelectCollection = Backbone.Collection.extend( {
+        SelectOneCollection = Backbone.Collection.extend( {
             initialize: function ( models ) {
                 Backbone.Select.One.applyTo( this, models, {enableModelSharing: true} );
             }
         } ),
 
-        MultiSelectCollection = Backbone.Collection.extend( {
+        SelectManyCollection = Backbone.Collection.extend( {
             initialize: function ( models ) {
                 Backbone.Select.Many.applyTo( this, models, {enableModelSharing: true} );
             }
@@ -46,56 +46,61 @@ require( [
         modelsAlphaLC = createModels( modelCount, "a" ),
         modelsAlphaUC = createModels( modelCount, "A" ),
 
-        selectOneNum = new SingleSelectCollection( modelsNumeric ),
-        selectOneAlphaLC = new SingleSelectCollection( modelsAlphaLC ),
-        selectOneAlphaUC = new SingleSelectCollection( modelsAlphaUC ),
-        selectOneFirst = new SingleSelectCollection( [
+        selectOneNum = new SelectOneCollection( modelsNumeric ),
+        selectOneAlphaLC = new SelectOneCollection( modelsAlphaLC ),
+        selectOneAlphaUC = new SelectOneCollection( modelsAlphaUC ),
+        selectOneFirst = new SelectOneCollection( [
             selectOneNum.first(),
             selectOneAlphaLC.first(),
             selectOneAlphaUC.first()
         ] ),
-        selectMany = new MultiSelectCollection(
+        selectMany = new SelectManyCollection(
             modelsNumeric.concat( modelsAlphaLC, modelsAlphaUC )
         ),
 
 
         ListView = Backbone.View.extend( {
             events: {
-                "click .item": "select"
+                "click .item": "toggleSelected"
             },
 
             initialize: function ( options ) {
-                _.bindAll( this, "select", "onSelect", "render" );
+                _.bindAll( this, "toggleSelected", "render" );
                 this.collection = options.collection;
 
                 // The view is used for both collection types, Select.One and
                 // Select.Many. Because their select:* events differ in their
                 // signature, it is easier to listen to the model events, which
                 // bubble up to the collection.
-                this.listenTo( this.collection, "selected", this.onSelect );
-                this.listenTo( this.collection, "deselected", this.onDeselect );
+                this.listenTo( this.collection, "selected", this.onModelSelect );
+                this.listenTo( this.collection, "deselected", this.onModelDeselect );
 
                 this.render();
             },
-            getEl: function ( modelId ) {
+
+            getModelEl: function ( modelId ) {
                 // Return the DOM node representing the model, as a jQuery object
                 return this.$el
-                    .find( "a" )
+                    .find( ".item" )
                     .filter( function () {
                         return $( this ).text() === String( modelId );
                     } );
             },
-            select: function ( event ) {
-                var id = $( event.target ).text();
+
+            toggleSelected: function ( event ) {
+                var id = $( event.currentTarget ).text();
                 if ( event ) event.preventDefault();
-                this.collection.get( id ).select();
+                this.collection.get( id ).toggleSelected();
             },
-            onSelect: function ( model ) {
-                this.getEl( model.id ).addClass( "selected" );
+
+            onModelSelect: function ( model ) {
+                this.getModelEl( model.id ).addClass( "selected" );
             },
-            onDeselect: function ( model ) {
-                this.getEl( model.id ).removeClass( "selected" );
+
+            onModelDeselect: function ( model ) {
+                this.getModelEl( model.id ).removeClass( "selected" );
             },
+
             render: function () {
                 // Render the collection content
                 this.$el.empty();
@@ -106,12 +111,12 @@ require( [
                 // Mark up selected elements
                 if ( this.collection._pickyType === "Backbone.Select.One" && this.collection.selected ) {
 
-                    this.onSelect( this.collection.selected );
+                    this.onModelSelect( this.collection.selected );
 
                 } else if ( this.collection._pickyType === "Backbone.Select.Many" && _.size( this.collection.selected ) ) {
 
                     _.each( this.collection.selected, function ( model ) {
-                        this.onSelect( model );
+                        this.onModelSelect( model );
                     }, this );
 
                 }
