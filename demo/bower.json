@@ -25,6 +25,7 @@
     "backbone.picky": "~0.2.0",
     "foundation": "~5.5.2",
     "jquery": "~2.1.4",
+    "outline.js": "https://github.com/lindsayevans/outline.js.git#0d16b1edc9139854d2870989962ded04a488832f",
     "requirejs": "~2.1.20"
   }
 }

@@ -1,0 +1,109 @@
+@charset "utf-8";
+
+h3.row {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.list {
+    margin-bottom: 1rem;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.item .content a {
+    box-sizing: border-box;
+    display: inline-block;
+    width: 100%;
+}
+
+#list .content:hover,
+#list .content:active {
+    border: 0.2rem solid #007b9f;
+}
+
+small {
+    font-size: 80%;
+}
+
+.content {
+    border: 0.2rem solid #008cba;
+}
+
+.pick .content {
+    border-color: #b0d0e0;
+}
+
+.content, .status {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.star, .heart, .trash {
+    font: normal normal normal 1em/1 FontAwesome;
+    display: inline-block;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: lightgray;
+}
+
+.star {
+    float: left;
+    margin-left: 22.5%;
+}
+
+.heart {
+    float: right;
+    margin-right: 22.5%;
+
+    padding-top: 0.03em;
+    font-size: 0.965em;
+}
+
+.trash {
+    float: right;
+    margin-right: 0.25em;
+}
+
+.selected .content {
+    background-color: rgba(0, 123, 159, 0.2);
+}
+
+.loved .heart {
+    color: red;
+}
+
+.starred .star {
+    color: orange;
+}
+
+i {
+    font: normal normal normal 0.8em/1 FontAwesome;
+}
+
+.selected-icon {
+    color: rgba(0, 123, 159, 0.5);
+}
+
+.starred-icon {
+    color: orange;
+}
+
+.loved-icon {
+    color: red;
+}
+
+.items {
+    min-height: 6.1875rem;
+}
+
+/**
+ * Font Awesome
+ */
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('fonts/fontawesome-webfont.eot?v=4.4.0');
+    src: url('fonts/fontawesome-webfont.eot?#iefix&v=4.4.0') format('embedded-opentype'), url('fonts/fontawesome-webfont.woff2?v=4.4.0') format('woff2'), url('fonts/fontawesome-webfont.woff?v=4.4.0') format('woff'), url('fonts/fontawesome-webfont.ttf?v=4.4.0') format('truetype'), url('fonts/fontawesome-webfont.svg?v=4.4.0#fontawesomeregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

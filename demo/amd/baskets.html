@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Backbone.Select: Custom label demo for a Select.Many collection (AMD)</title>
+
+    <!-- ATTN Foundation loaded without JS - stay clear of JS-driven widgets, or add the JS setup -->
+    <link rel="stylesheet" href="../bower_demo_components/foundation/css/normalize.css">
+    <link rel="stylesheet" href="../bower_demo_components/foundation/css/foundation.css">
+
+    <link rel="stylesheet" href="../common.css">
+    <link rel="stylesheet" href="baskets.css">
+
+    <script id="item" type="text/x-template">
+        <li class="item"><div class="content"><a href="#"><%= id %></a></div><div class="status"><a href="#" class="star"></a><a href="#" class="heart"></a></div></li>
+    </script>
+
+    <script id="pick" type="text/x-template">
+        <li class="item pick"><div class="content"><%= id %></div><div class="action"><a href="#" class="trash"></a></div></li>
+    </script>
+</head>
+<body>
+    <!-- check that 'bower install' has been run in the demo dir if bower.json isn't empty -->
+    <script src="../bower-check.js"></script>
+
+    <section id="header">
+        <h1 class="row">Backbone.Select</h1>
+        <h2 class="row">Custom label demo for a Select.Many collection (AMD)</h2>
+
+        <p id="build-info" class="row">
+            <a href="#" id="close-build-info">×</a>
+            This page uses the AMD build in the <code>dist</code> directory, not the files in
+            <code>src</code>. In other words, run the <code>grunt</code> command first to build a current version.
+        </p>
+    </section>
+
+    <section>
+
+        <h3 class="row">Select.Many collection</h3>
+
+        <div class="items row">
+            <ul id="list" class="small-block-grid-3 medium-block-grid-6 large-block-grid-6 list"></ul>
+        </div>
+
+        <h3 class="row">Selected <i class="selected-icon"></i></h3>
+
+        <div class="items row">
+            <ul id="selected" class="small-block-grid-3 medium-block-grid-6 large-block-grid-6 list"></ul>
+        </div>
+
+        <h3 class="row">Starred <i class="starred-icon"></i></h3>
+
+        <div class="items row">
+            <ul id="starred" class="small-block-grid-3 medium-block-grid-6 large-block-grid-6 list"></ul>
+        </div>
+
+        <h3 class="row">Loved <i class="loved-icon"></i></h3>
+
+        <div class="items row">
+            <ul id="loved" class="small-block-grid-3 medium-block-grid-6 large-block-grid-6 list"></ul>
+        </div>
+
+    </section>
+
+    <!-- libraries -->
+    <script src="../bower_demo_components/requirejs/require.js"></script>
+    <script src="require-config.js"></script>
+    <script>
+        // Relative to the baseUrl defined in require-config.js
+        require( ['../demo/amd/baskets'] );
+    </script>
+
+    <script src="../bower_demo_components/outline.js/outline.js"></script>
+    <script src="../close-build-info.js"></script>
+</body>
+</html>
