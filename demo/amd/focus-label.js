@@ -15,6 +15,7 @@ require( [
 
             initialize: function () {
                 Backbone.Select.Me.applyTo( this );
+                this.listenTo( this, "selected:inFocus", this.onFocus );
             },
 
             focus: function ( options ) {
@@ -23,6 +24,14 @@ require( [
 
             defocus: function ( options ) {
                 this.deselect( _.extend( {}, options, { label: "inFocus" } ) );
+            },
+
+            onFocus: function ( model, options ) {
+                if ( !this.selected ) this.select( _.extend( {}, options, { label: "selected" } ) );
+            },
+
+            onDeselect: function ( model, options ) {
+                if ( this.inFocus ) this.defocus( options );
             }
 
         } ),
@@ -44,7 +53,6 @@ require( [
                             } );
 
                             this.listenTo( this.tracked, "selected:selected", this.onModelSelect );
-                            this.listenTo( this.tracked, "selected:inFocus", this.onModelFocus );
                             this.listenTo( this.tracked, "deselected:selected", this.onModelDeselect );
                             this.listenTo( this.tracked, "reset", this.onReset );
                         },
@@ -54,16 +62,11 @@ require( [
                         },
 
                         onModelDeselect: function ( model ) {
-                            if ( model.inFocus ) model.defocus();
                             this.remove( model );
                         },
 
                         onReset: function () {
                             this.reset( _.toArray( this.tracked.selected ) );
-                        },
-
-                        onModelFocus: function ( model ) {
-                            if ( !model.selected ) model.select();
                         }
 
                     } );
@@ -80,11 +83,11 @@ require( [
             },
 
             focus: function ( model, options ) {
-                this.select( model, _.extend( {}, options, { label: "inFocus" } ) );
+                model.focus( options );
             },
 
             defocus: function ( model, options ) {
-                this.deselect( model, _.extend( {}, options, { label: "inFocus" } ) );
+                model.defocus( options );
             }
 
         } ),
@@ -262,7 +265,7 @@ require( [
     }
 
     // Initial selection
-    //collection.first().select();
+    collection.first().select();
 
     new ListView( { collection: collection, el: "#list", template: "#item-template" } );
     new SelectionView( { collection: collection, el: "#selected", template: "#selected-template" } );
