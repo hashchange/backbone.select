@@ -24,6 +24,8 @@
                     if ( options._processedBy[this._pickyCid] ) return;
 
                     label = getLabel( options, this );
+                    if ( isIgnoredLabel( label, this ) ) return;
+
                     reselected = model && this[label] === model ? model : undefined;
 
                     if ( !reselected ) {
@@ -68,7 +70,7 @@
                     if ( options._processedBy[this._pickyCid] ) return;
 
                     label = getLabel( options, this );
-                    if ( !this[label] ) return;
+                    if ( isIgnoredLabel( label, this ) || !this[label] ) return;
 
                     model = model || this[label];
                     if ( this[label] !== model ) return;
@@ -109,6 +111,7 @@
 
                     options = initOptions( options );
                     label = getLabel( options, this );
+                    if ( isIgnoredLabel( label, this ) ) return;
 
                     prevSelected = multiSelectionToArray( this[label] );
                     reselected = this[label][model.cid] ? [model] : [];
@@ -137,6 +140,8 @@
                     if ( options._processedBy[this._pickyCid] ) return;
 
                     label = getLabel( options, this );
+                    if ( isIgnoredLabel( label, this ) ) return;
+
                     prevSelected = multiSelectionToArray( this[label] );
 
                     if ( !this[label][model.cid] ) return;
@@ -160,6 +165,8 @@
 
                     options || ( options = {} );
                     label = getLabel( options, this );
+                    if ( isIgnoredLabel( label, this ) ) return;
+
                     prevSelected = multiSelectionToArray( this[label] );
 
                     this.each( function ( model ) {
@@ -186,6 +193,7 @@
 
                     options || ( options = {} );
                     label = getLabel( options, this );
+                    if ( isIgnoredLabel( label, this ) ) return;
 
                     if ( getSelectionSize( this, label ) === 0 ) return;
                     prevSelected = multiSelectionToArray( this[label] );
@@ -219,6 +227,7 @@
 
                     options || ( options = {} );
                     label = getLabel( options, this );
+                    if ( isIgnoredLabel( label, this ) ) return;
 
                     if ( getSelectionSize( this, label ) === this.length ) {
                         this.deselectAll( options );
@@ -368,6 +377,7 @@
 
                     hostObject._pickyLabels = {};
                     hostObject._pickyDefaultLabel = options && options.defaultLabel || "selected";
+                    registerIgnoredLabels( options && options.ignoreLabel, hostObject );
                     ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
 
                     augmentTrigger( hostObject );
@@ -380,8 +390,8 @@
                             registerCollectionWithModel( model, hostObject );
 
                             forEachLabelInModelOrCollection( model, hostObject, function ( label ) {
-                                if ( model[label] ) {
-                                    ensureLabelIsRegistered( label, hostObject );
+                                ensureLabelIsRegistered( label, hostObject );
+                                if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
                                     if ( hostObject[label] ) hostObject[label].deselect();
                                     hostObject[label] = model;
                                 }
@@ -425,6 +435,7 @@
 
                     hostObject._pickyLabels = {};
                     hostObject._pickyDefaultLabel = options && options.defaultLabel || "selected";
+                    registerIgnoredLabels( options && options.ignoreLabel, hostObject );
                     ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
 
                     augmentTrigger( hostObject );
@@ -438,7 +449,9 @@
 
                             forEachLabelInModelOrCollection( model, hostObject, function ( label ) {
                                 ensureLabelIsRegistered( label, hostObject );
-                                if ( model[label] ) hostObject[label][model.cid] = model;
+                                if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
+                                    hostObject[label][model.cid] = model;
+                                }
                             } );
                         } );
 
@@ -522,11 +535,7 @@
     function onAdd ( model, collection ) {
         registerCollectionWithModel( model, collection );
         forEachLabelInModelOrCollection( model, collection, function ( label ) {
-            var selectOptions = label === "selected" ?
-            { _silentReselect: true, _externalEvent: "add" } :
-            { _silentReselect: true, _externalEvent: "add", label: label };
-
-            if ( model[label] ) collection.select( model, selectOptions );
+            if ( model[label] ) collection.select( model, { _silentReselect: true, _externalEvent: "add", label: label } );
         } );
 
     }
@@ -539,15 +548,14 @@
         if ( model._pickyCollections ) model._pickyCollections = _.without( model._pickyCollections, collection._pickyCid );
 
         forEachLabelInCollection( collection, function ( label ) {
-            var deselectOptions,
-                labelOptions = label === "selected" ? {} : { label: label };
+            var deselectOptions;
 
             if ( model[label] ) {
 
                 if ( model._pickyCollections && model._pickyCollections.length === 0 ) {
-                    deselectOptions = _.extend( {}, options, labelOptions );
+                    deselectOptions = _.extend( {}, options, { label: label } );
                 } else {
-                    deselectOptions = _.extend( {}, options, labelOptions, { _skipModelCall: true } );
+                    deselectOptions = _.extend( {}, options, { label: label, _skipModelCall: true } );
                 }
 
                 collection.deselect( model, deselectOptions );
@@ -581,12 +589,10 @@
 
         forEachLabelInCollection( collection, function ( label ) {
 
-            var labelOptions = label === "selected" ? {} : { label: label };
-
             selected = collection.filter( function ( model ) { return model[label]; } );
             excessiveSelections = _.initial( selected );
-            if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect( labelOptions ); } );
-            if ( selected.length ) collection.select( _.last( selected ), _.extend ( { silent: true }, labelOptions ) );
+            if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect( { label: label } ); } );
+            if ( selected.length ) collection.select( _.last( selected ), { silent: true, label: label } );
 
         } );
     }
@@ -607,10 +613,8 @@
         } );
 
         forEachLabelInCollection( collection, function ( label ) {
-            var selectOptions = label === "selected" ? { silent: true } : { silent: true, label: label };
-
             select = collection.filter( function ( model ) { return model[label]; } );
-            if ( select.length ) _.each( select, function ( model ) { collection.select( model, selectOptions ); } );
+            if ( select.length ) _.each( select, function ( model ) { collection.select( model, { silent: true, label: label } ); } );
         } );
     }
 
@@ -647,25 +651,23 @@
     }
 
     function stripInternalOptions ( options ) {
-        return _.omit( options, "_defaultLabel", "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
+        return _.omit( options, "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
     }
 
     function getLabel ( options, obj ) {
-        var customPropName = options && options.label;
-
         // getLabel must be called before any work gets done in a select/deselect method. Therefore, it is also tasked
         // with a few side jobs regarding proper initialization:
         //
+        // - It ensures that the label is explicit in the options object, from here on out
         // - It ensures that the label is registered
-        // - It ensures that the default label for the action is picked up and passed along
-        ensureLabelIsRegistered( customPropName, obj );
-        options._defaultLabel || ( options._defaultLabel = obj._pickyDefaultLabel );
+        options.label || ( options.label = obj._pickyDefaultLabel );
+        ensureLabelIsRegistered( options.label, obj );
 
-        return customPropName || options._defaultLabel;
+        return options.label;
     }
 
     function ensureLabelIsRegistered ( name, obj ) {
-        if ( name && !obj._pickyLabels[name] ) {
+        if ( name && !obj._pickyLabels[name] && !isIgnoredLabel( name, obj ) ) {
             obj._pickyLabels[name] = true;
 
             if ( obj._pickyType === "Backbone.Select.Many" ) {
@@ -691,9 +693,26 @@
         return hasCollectionLabel;
     }
 
+    function registerIgnoredLabels ( labels, collection ) {
+        labels || ( labels = [] );
+        if ( _.isString( labels ) ) labels = [ labels ];
+
+        if ( !_.isArray( labels ) ) throw new Error( "ignoreLabel option: illegal value. Expected a string or an array of strings but got the value " + labels );
+        if ( _.contains( labels, collection._pickyDefaultLabel ) ) throw new Error( "ignoreLabel option: illegal value. Can't ignore the default label, \"" + collection._pickyDefaultLabel + "\", of a collection (_pickyCid: " + collection._pickyCid + ")" );
+
+        collection._pickyIgnoredLabels = labels;
+    }
+
+    function isIgnoredLabel ( label, collection ) {
+        // - The query only really makes sense for collections. Labels can be ignored in collections.
+        // - A model doesn't ignore labels and doesn't have a _pickyIgnoredLabels property, so return false for a model.
+        // - If the label is undefined, return false, too.
+        return ( label && collection._pickyIgnoredLabels ) ? _.contains( collection._pickyIgnoredLabels, label ) : false;
+    }
+
     function getSelectionSizeProp ( label ) {
         // For Select.Many collections only
-        return ( label || "selected" ) + "Length";
+        return label + "Length";
     }
 
     function getSelectionSize( collection, label ) {
