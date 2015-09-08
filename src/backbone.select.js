@@ -118,6 +118,12 @@
 
                     if ( reselected.length && options._processedBy[this._pickyCid] ) return;
 
+                    if ( options.exclusive ) {
+                        this.each( function ( iteratedModel ) {
+                            if ( iteratedModel !== model ) this.deselect( iteratedModel, _.extend( {}, options, { _silentLocally: true } ) );
+                        }, this );
+                    }
+
                     if ( !reselected.length ) {
                         this[label][model.cid] = model;
                         setSelectionSize( _.size( this[label] ), this, label );
