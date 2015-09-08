@@ -27,7 +27,7 @@ require( [
             },
 
             onFocus: function ( model, options ) {
-                if ( !this.selected ) this.select( _.extend( {}, options, { label: "selected" } ) );
+                if ( !this.selected ) this.select( _.extend( {}, options, { label: "selected", exclusive: false } ) );
             },
 
             onDeselect: function ( model, options ) {
@@ -103,11 +103,12 @@ require( [
             },
 
             toggleSelected: function ( event ) {
-                var label = event.ctrlKey ? "inFocus" : "selected",
+                var isFocusEvent =  event.ctrlKey,
+                    label = isFocusEvent ? "inFocus" : "selected",
                     id = this.getEventItemId( event );
 
                 event.preventDefault();
-                this.collection.get( id ).toggleSelected( { label: label } );
+                this.collection.get( id ).toggleSelected( { label: label, exclusive: isFocusEvent } );
             },
 
             onModelSelect: function ( model, options ) {
@@ -207,7 +208,7 @@ require( [
                 var id = this.getEventItemId( event );
 
                 event.preventDefault();
-                this.collection.get( id ).toggleSelected( { label: "inFocus" } );
+                this.collection.get( id ).toggleSelected( { label: "inFocus", exclusive: true } );
             }
 
         } ),
