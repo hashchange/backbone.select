@@ -116,6 +116,102 @@ jasmine._addTheseCustomMatchers.toBeAtMost = function ( util, customEqualityTest
     }
 };
 
+jasmine._addTheseCustomMatchers.toHaveBeenCalledOnce = function ( util, customEqualityTesters ) {
+    return {
+        compare: function ( actual ) {
+            var result = {},
+                callCount;
+
+            if ( !jasmine.isSpy( actual ) ) {
+                throw new Error( 'Expected a spy, but got ' + jasmine.pp( actual ) + '.' );
+            }
+
+            callCount = actual.calls.count();
+            result.pass = util.equals( callCount === 1, true, customEqualityTesters );
+
+            result.message = "Expected spy " + actual.and.identity();
+            if ( result.pass ) {
+                result.message += " not to have been called once, but it was.";
+            } else {
+                result.message += " to have been called once, but it was called " + callCount + " times.";
+            }
+            return result;
+        }
+    }
+};
+
+jasmine._addTheseCustomMatchers.toHaveBeenCalledTwice = function ( util, customEqualityTesters ) {
+    return {
+        compare: function ( actual ) {
+            var result = {},
+                callCount;
+
+            if ( !jasmine.isSpy( actual ) ) {
+                throw new Error( 'Expected a spy, but got ' + jasmine.pp( actual ) + '.' );
+            }
+
+            callCount = actual.calls.count();
+            result.pass = util.equals( callCount === 2, true, customEqualityTesters );
+
+            result.message = "Expected spy " + actual.and.identity();
+            if ( result.pass ) {
+                result.message += " not to have been called twice, but it was.";
+            } else {
+                result.message += " to have been called twice, but it was called " + callCount + " times.";
+            }
+            return result;
+        }
+    }
+};
+
+jasmine._addTheseCustomMatchers.toHaveBeenCalledThrice = function ( util, customEqualityTesters ) {
+    return {
+        compare: function ( actual ) {
+            var result = {},
+                callCount;
+
+            if ( !jasmine.isSpy( actual ) ) {
+                throw new Error( 'Expected a spy, but got ' + jasmine.pp( actual ) + '.' );
+            }
+
+            callCount = actual.calls.count();
+            result.pass = util.equals( callCount === 3, true, customEqualityTesters );
+
+            result.message = "Expected spy " + actual.and.identity();
+            if ( result.pass ) {
+                result.message += " not to have been called three times, but it was.";
+            } else {
+                result.message += " to have been called three times, but it was called " + callCount + " times.";
+            }
+            return result;
+        }
+    }
+};
+
+jasmine._addTheseCustomMatchers.toHaveCallCount = function ( util, customEqualityTesters ) {
+    return {
+        compare: function ( actual, expected ) {
+            var result = {},
+                callCount;
+
+            if ( !jasmine.isSpy( actual ) ) {
+                throw new Error( 'Expected a spy, but got ' + jasmine.pp( actual ) + '.' );
+            }
+
+            callCount = actual.calls.count();
+            result.pass = util.equals( callCount === expected, true, customEqualityTesters );
+
+            result.message = "Expected spy " + actual.and.identity();
+            if ( result.pass ) {
+                result.message += " not to have been called " + expected + " times, but it was.";
+            } else {
+                result.message += " to have been called " + expected + " times, but it was called " + callCount + " times.";
+            }
+            return result;
+        }
+    }
+};
+
 beforeEach( function () {
 
     // When beforeEach is called outside of a `describe` scope, the matchers are available globally.

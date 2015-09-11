@@ -431,7 +431,7 @@ describe( "single-select collection", function () {
                 deselectOneEventState.collection.selected = collection.selected;
             } );
 
-            collection.deselect();
+            collection.deselect( model );
         } );
 
         it( "should not hang on to the currently selected model", function () {
