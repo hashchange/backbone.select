@@ -72,6 +72,10 @@
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) || !this[label] ) return;
 
+                    // The _messageOnly flag is used for a noop which is supposed to convey the label name only, and
+                    // make sure it is registered. That's done, so we can bail out now.
+                    if ( options._messageOnly ) return;
+
                     model = model || this[label];
                     if ( this[label] !== model ) return;
 
@@ -147,6 +151,10 @@
 
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) ) return;
+
+                    // The _messageOnly flag is used for a noop which is supposed to convey the label name only, and
+                    // make sure it is registered. That's done, so we can bail out now.
+                    if ( options._messageOnly ) return;
 
                     prevSelected = multiSelectionToArray( this[label] );
 
@@ -298,25 +306,29 @@
 
                 // Deselect this model, and tell our collection that we're deselected
                 deselect: function ( options ) {
-                    var label;
+                    var label, isNoop;
 
                     options = initOptions( options );
                     if ( options._processedBy[this.cid] ) return;
 
                     label = getLabel( options, this );
-                    if ( !this[label] ) return;
+                    isNoop = !this[label];
 
-                    options._processedBy[this.cid] = { done: false };
+                    options._processedBy[this.cid] = { done: isNoop };
                     this[label] = false;
 
                     if ( this._pickyCollections ) {
                         // Model-sharing mode: notify collections with an event
+                        if ( isNoop ) options = _.extend( options, { _messageOnly: true } );
                         this.trigger( "_deselected", this, stripLocalOptions( options ) );
                     } else if ( this.collection ) {
                         // Single collection only: no event listeners set up in collection, call
                         // it directly
+                        if ( isNoop ) options = _.extend( options, { _messageOnly: true } );
                         this.collection.deselect( this, stripLocalOptions( options ) );
                     }
+
+                    if ( isNoop ) return;
 
                     if ( !(options.silent || options._silentLocally) ) queueEventSet( "deselected", label, [ this, toEventOptions( options, label, this ) ], this, options );
 
@@ -395,10 +407,10 @@
                         _.each( models || [], function ( model ) {
                             registerCollectionWithModel( model, hostObject );
 
-                            forEachLabelInModelOrCollection( model, hostObject, function ( label ) {
+                            forEachLabelInModel( model, function ( label ) {
                                 ensureLabelIsRegistered( label, hostObject );
                                 if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
-                                    if ( hostObject[label] ) hostObject[label].deselect();
+                                    if ( hostObject[label] ) hostObject[label].deselect( { label: label } );
                                     hostObject[label] = model;
                                 }
                             } );
@@ -424,7 +436,8 @@
             Many: {
 
                 applyTo: function ( hostObject, models, options ) {
-                    var oldSelect;
+                    var oldSelect,
+                        enableModelSharing = options && options.enableModelSharing;
 
                     if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
                     if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
@@ -447,13 +460,24 @@
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
 
-                    if ( options && options.enableModelSharing ) {
+                    if ( !enableModelSharing ) {
+
+                        // The default label of the models may not be the same as the default label of the collection.
+                        // So we need to make sure the default label of the models is acknowledged, and the collection
+                        // property for that label is available and initialized with an empty hash.
+                        //
+                        // To keep things fast, we just handle the first model here. We expect the default label of all
+                        // models to be the same. If not, model-sharing mode must be used instead, which scans all
+                        // models for labels.
+                        if ( models && models[0] ) ensureLabelIsRegistered( models[0]._pickyDefaultLabel, hostObject );
+
+                    } else {
 
                         // model-sharing mode
                         _.each( models || [], function ( model ) {
                             registerCollectionWithModel( model, hostObject );
 
-                            forEachLabelInModelOrCollection( model, hostObject, function ( label ) {
+                            forEachLabelInModel( model, function ( label ) {
                                 ensureLabelIsRegistered( label, hostObject );
                                 if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
                                     hostObject[label][model.cid] = model;
@@ -540,7 +564,20 @@
 
     function onAdd ( model, collection ) {
         registerCollectionWithModel( model, collection );
-        forEachLabelInModelOrCollection( model, collection, function ( label ) {
+        forEachLabelInModel( model, function ( label ) {
+            // We want to keep the list of registered labels as small as possible in the collection, in order to keep
+            // the processing overhead low.
+            //
+            // In Select.One collections, there is no need to register a label before we encounter a model which is
+            // selected with it. The collection property for the label does not have to be created before - it would be
+            // left undefined anyway. (Below, a collection.select() call handles label creation when it is required.)
+            //
+            // In Select.Many collections, however, existing labels should be registered even if no model is selected
+            // with that label at the moment. We want the collection property for the label to exist, even if it is just
+            // an empty hash. That way, we don't have to guard against the property being undefined when it is queried
+            // in client code.
+            if ( collection._pickyType === "Backbone.Select.Many" ) ensureLabelIsRegistered( label, collection );
+
             if ( model[label] ) collection.select( model, { _silentReselect: true, _externalEvent: "add", label: label } );
         } );
 
@@ -657,7 +694,7 @@
     }
 
     function stripInternalOptions ( options ) {
-        return _.omit( options, "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
+        return _.omit( options, "_messageOnly", "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
     }
 
     function getLabel ( options, obj ) {
