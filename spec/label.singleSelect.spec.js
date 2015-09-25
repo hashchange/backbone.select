@@ -30,14 +30,7 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 collection = new Collection( [model] );
 
                 events = getEventSpies( [model, collection], ["selected", "starred"] );
-
-                eventStates = recordSelectionStatesForEvents( {
-                    model: model,
-                    collection: collection,
-                    modelEvents: ["selected", "selected:starred", "selected:selected"],
-                    collectionEvents: ["select:one", "select:one:starred", "select:one:selected"],
-                    labels: "starred"
-                } );
+                eventStates = getEventStateStore( [model, collection], "starred" );
 
                 model.select( { label: "starred" } );
             } );
@@ -87,35 +80,35 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
             } );
 
             it( "should trigger the model's selected event after the model status has been updated", function () {
-                expect( eventStates["selected"].model.starred ).toEqual( true );
+                expect( eventStates.getEvent( model, "selected" ).stateOf( model ).starred ).toBe( true );
             } );
 
             it( "should trigger the model's selected:starred event after the model status has been updated", function () {
-                expect( eventStates["selected:starred"].model.starred ).toEqual( true );
+                expect( eventStates.getEvent( model, "selected:starred" ).stateOf( model ).starred ).toBe( true );
             } );
 
             it( "should trigger the model's selected event after the collection status has been updated", function () {
-                expect( eventStates["selected"].collection.starred ).toBe( model );
+                expect( eventStates.getEvent( model, "selected" ).stateOf( collection ).starred ).toBe( model );
             } );
 
             it( "should trigger the model's selected:starred event after the collection status has been updated", function () {
-                expect( eventStates["selected:starred"].collection.starred ).toBe( model );
+                expect( eventStates.getEvent( model, "selected:starred" ).stateOf( collection ).starred ).toBe( model );
             } );
 
             it( "should trigger the collection's select:one event after the model status has been updated", function () {
-                expect( eventStates["select:one"].model.starred ).toEqual( true );
+                expect( eventStates.getEvent( collection, "select:one" ).stateOf( model ).starred ).toBe( true );
             } );
 
             it( "should trigger the collection's select:one:starred event after the model status has been updated", function () {
-                expect( eventStates["select:one:starred"].model.starred ).toEqual( true );
+                expect( eventStates.getEvent( collection, "select:one:starred" ).stateOf( model ).starred ).toBe( true );
             } );
 
             it( "should trigger the collection's select:one event after the collection status has been updated", function () {
-                expect( eventStates["select:one"].collection.starred ).toBe( model );
+                expect( eventStates.getEvent( collection, "select:one" ).stateOf( collection ).starred ).toBe( model );
             } );
 
             it( "should trigger the collection's select:one:starred event after the collection status has been updated", function () {
-                expect( eventStates["select:one:starred"].collection.starred ).toBe( model );
+                expect( eventStates.getEvent( collection, "select:one:starred" ).stateOf( collection ).starred ).toBe( model );
             } );
 
             it( "should not trigger a reselect:one event, including any of the namespaces", function () {
@@ -170,15 +163,8 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 collection = new Collection( [model] );
 
                 events = getEventSpies( [model, collection], ["selected", "starred"] );
+                eventStates = getEventStateStore( [model, collection], ["selected", "starred"] );
                 spyOn( model, "select" ).and.callThrough();
-
-                eventStates = recordSelectionStatesForEvents( {
-                    model: model,
-                    collection: collection,
-                    modelEvents: ["selected", "selected:starred", "selected:selected"],
-                    collectionEvents: ["select:one", "select:one:starred", "select:one:selected"],
-                    labels: "starred"
-                } );
 
                 collection.select( model, { label: "starred" } );
             } );
@@ -212,35 +198,35 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
             } );
 
             it( "should trigger the model's selected event after the model status has been updated", function () {
-                expect( eventStates["selected"].model.starred ).toEqual( true );
+                expect( eventStates.getEvent( model, "selected" ).stateOf( model ).starred ).toBe( true );
             } );
 
             it( "should trigger the model's selected:starred event after the model status has been updated", function () {
-                expect( eventStates["selected:starred"].model.starred ).toEqual( true );
+                expect( eventStates.getEvent( model, "selected:starred" ).stateOf( model ).starred ).toBe( true );
             } );
 
             it( "should trigger the model's selected event after the collection status has been updated", function () {
-                expect( eventStates["selected"].collection.starred ).toBe( model );
+                expect( eventStates.getEvent( model, "selected" ).stateOf( collection ).starred ).toBe( model );
             } );
 
             it( "should trigger the model's selected:starred event after the collection status has been updated", function () {
-                expect( eventStates["selected:starred"].collection.starred ).toBe( model );
+                expect( eventStates.getEvent( model, "selected:starred" ).stateOf( collection ).starred ).toBe( model );
             } );
 
             it( "should trigger the collection's select:one event after the model status has been updated", function () {
-                expect( eventStates["select:one"].model.starred ).toEqual( true );
+                expect( eventStates.getEvent( collection, "select:one" ).stateOf( model ).starred ).toBe( true );
             } );
 
             it( "should trigger the collection's select:one:starred event after the model status has been updated", function () {
-                expect( eventStates["select:one:starred"].model.starred ).toEqual( true );
+                expect( eventStates.getEvent( collection, "select:one:starred" ).stateOf( model ).starred ).toBe( true );
             } );
 
             it( "should trigger the collection's select:one event after the collection status has been updated", function () {
-                expect( eventStates["select:one"].collection.starred ).toBe( model );
+                expect( eventStates.getEvent( collection, "select:one" ).stateOf( collection ).starred ).toBe( model );
             } );
 
             it( "should trigger the collection's select:one:starred event after the collection status has been updated", function () {
-                expect( eventStates["select:one:starred"].collection.starred ).toBe( model );
+                expect( eventStates.getEvent( collection, "select:one:starred" ).stateOf( collection ).starred ).toBe( model );
             } );
 
         } );
@@ -281,7 +267,7 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
         } );
 
         describe( 'when selecting a model via the model\'s select, while it is already selected with the default label ("selected")', function () {
-            var model, collection, events, eventStates;
+            var model, collection, events;
 
             beforeEach( function () {
                 model = new Model();
@@ -290,14 +276,6 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select();
 
                 events = getEventSpies( [model, collection], ["selected", "starred"] );
-
-                eventStates = recordSelectionStatesForEvents( {
-                    model: model,
-                    collection: collection,
-                    modelEvents: ["selected", "selected:starred", "selected:selected"],
-                    collectionEvents: ["select:one", "select:one:starred", "select:one:selected"],
-                    labels: "starred"
-                } );
 
                 model.select( { label: "starred" } );
             } );
@@ -353,7 +331,7 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
         } );
 
         describe( 'when selecting a model via the model\'s select, while it is already selected with another custom label ("picked")', function () {
-            var model, collection, events, eventStates;
+            var model, collection, events;
 
             beforeEach( function () {
                 model = new Model();
@@ -362,14 +340,6 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select( { label: "picked" } );
 
                 events = getEventSpies( [model, collection], ["selected", "picked", "starred"] );
-
-                eventStates = recordSelectionStatesForEvents( {
-                    model: model,
-                    collection: collection,
-                    modelEvents: ["selected", "selected:starred", "selected:selected"],
-                    collectionEvents: ["select:one", "select:one:starred", "select:one:selected"],
-                    labels: "starred"
-                } );
 
                 model.select( { label: "starred" } );
             } );
@@ -621,14 +591,7 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select( { label: "starred" } );
 
                 events = getEventSpies( [collection], ["selected", "starred"] );
-
-                eventStates = recordSelectionStatesForEvents( {
-                    model: model,
-                    collection: collection,
-                    modelEvents: ["deselected", "deselected:starred", "deselected:selected"],
-                    collectionEvents: ["deselect:one", "deselect:one:starred", "deselect:one:selected"],
-                    labels: "starred"
-                } );
+                eventStates = getEventStateStore( [model, collection], ["selected", "starred"] );
 
                 model.deselect( { label: "starred" } );
             } );
@@ -654,35 +617,35 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
             } );
 
             it( "should trigger the model's deselected event after the model status has been updated", function () {
-                expect( eventStates["deselected"].model.starred ).toEqual( false );
+                expect( eventStates.getEvent( model, "deselected" ).stateOf( model ).starred ).toBe( false );
             } );
 
             it( "should trigger the model's deselected event after the collection status has been updated", function () {
-                expect( eventStates["deselected"].collection.starred ).toBeUndefined();
+                expect( eventStates.getEvent( model, "deselected" ).stateOf( collection ).starred ).toBeUndefined();
             } );
 
             it( "should trigger the model's deselected:starred event after the model status has been updated", function () {
-                expect( eventStates["deselected:starred"].model.starred ).toEqual( false );
+                expect( eventStates.getEvent( model, "deselected:starred" ).stateOf( model ).starred ).toBe( false );
             } );
 
             it( "should trigger the model's deselected event after the collection status has been updated", function () {
-                expect( eventStates["deselected:starred"].collection.starred ).toBeUndefined();
+                expect( eventStates.getEvent( model, "deselected:starred" ).stateOf( collection ).starred ).toBeUndefined();
             } );
 
             it( "should trigger the collection's deselect:one event after the model status has been updated", function () {
-                expect( eventStates["deselect:one"].model.starred ).toEqual( false );
+                expect( eventStates.getEvent( collection, "deselect:one" ).stateOf( model ).starred ).toBe( false );
             } );
 
             it( "should trigger the collection's deselect:one event after the collection status has been updated", function () {
-                expect( eventStates["deselect:one"].collection.starred ).toBeUndefined();
+                expect( eventStates.getEvent( collection, "deselect:one" ).stateOf( collection ).starred ).toBeUndefined();
             } );
 
             it( "should trigger the collection's deselect:one:starred event after the model status has been updated", function () {
-                expect( eventStates["deselect:one:starred"].model.starred ).toEqual( false );
+                expect( eventStates.getEvent( collection, "deselect:one:starred" ).stateOf( model ).starred ).toBe( false );
             } );
 
             it( "should trigger the collection's deselect:one:starred event after the collection status has been updated", function () {
-                expect( eventStates["deselect:one:starred"].collection.starred ).toBeUndefined();
+                expect( eventStates.getEvent( collection, "deselect:one:starred" ).stateOf( collection ).starred ).toBeUndefined();
             } );
 
         } );
@@ -696,14 +659,7 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select( { label: "starred" } );
 
                 events = getEventSpies( [collection], ["selected", "starred"] );
-
-                eventStates = recordSelectionStatesForEvents( {
-                    model: model,
-                    collection: collection,
-                    modelEvents: ["deselected", "deselected:starred", "deselected:selected"],
-                    collectionEvents: ["deselect:one", "deselect:one:starred", "deselect:one:selected"],
-                    labels: "starred"
-                } );
+                eventStates = getEventStateStore( [model, collection], ["selected", "starred"] );
 
                 collection.deselect( model, { label: "starred" } );
             } );
@@ -729,35 +685,35 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
             } );
 
             it( "should trigger the model's deselected event after the model status has been updated", function () {
-                expect( eventStates["deselected"].model.starred ).toEqual( false );
+                expect( eventStates.getEvent( model, "deselected" ).stateOf( model ).starred ).toBe( false );
             } );
 
             it( "should trigger the model's deselected event after the collection status has been updated", function () {
-                expect( eventStates["deselected"].collection.starred ).toBeUndefined();
+                expect( eventStates.getEvent( model, "deselected" ).stateOf( collection ).starred ).toBeUndefined();
             } );
 
             it( "should trigger the model's deselected:starred event after the model status has been updated", function () {
-                expect( eventStates["deselected:starred"].model.starred ).toEqual( false );
+                expect( eventStates.getEvent( model, "deselected:starred" ).stateOf( model ).starred ).toBe( false );
             } );
 
             it( "should trigger the model's deselected event after the collection status has been updated", function () {
-                expect( eventStates["deselected:starred"].collection.starred ).toBeUndefined();
+                expect( eventStates.getEvent( model, "deselected:starred" ).stateOf( collection ).starred ).toBeUndefined();
             } );
 
             it( "should trigger the collection's deselect:one event after the model status has been updated", function () {
-                expect( eventStates["deselect:one"].model.starred ).toEqual( false );
+                expect( eventStates.getEvent( collection, "deselect:one" ).stateOf( model ).starred ).toBe( false );
             } );
 
             it( "should trigger the collection's deselect:one event after the collection status has been updated", function () {
-                expect( eventStates["deselect:one"].collection.starred ).toBeUndefined();
+                expect( eventStates.getEvent( collection, "deselect:one" ).stateOf( collection ).starred ).toBeUndefined();
             } );
 
             it( "should trigger the collection's deselect:one:starred event after the model status has been updated", function () {
-                expect( eventStates["deselect:one:starred"].model.starred ).toEqual( false );
+                expect( eventStates.getEvent( collection, "deselect:one:starred" ).stateOf( model ).starred ).toBe( false );
             } );
 
             it( "should trigger the collection's deselect:one:starred event after the collection status has been updated", function () {
-                expect( eventStates["deselect:one:starred"].collection.starred ).toBeUndefined();
+                expect( eventStates.getEvent( collection, "deselect:one:starred" ).stateOf( collection ).starred ).toBeUndefined();
             } );
 
         } );
@@ -794,7 +750,7 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
         } );
 
         describe( 'when deselecting a model via the model\'s deselect, while it is also selected with the default label ("selected")', function () {
-            var model, collection, events, eventStates;
+            var model, collection, events;
 
             beforeEach( function () {
                 model = new Model();
@@ -804,14 +760,6 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select( { label: "starred" } );
 
                 events = getEventSpies( [model, collection], ["selected", "starred"] );
-
-                eventStates = recordSelectionStatesForEvents( {
-                    model: model,
-                    collection: collection,
-                    modelEvents: ["selected", "selected:starred", "selected:selected"],
-                    collectionEvents: ["select:one", "select:one:starred", "select:one:selected"],
-                    labels: "starred"
-                } );
 
                 model.deselect( { label: "starred" } );
             } );
@@ -867,7 +815,7 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
         } );
 
         describe( 'when deselecting a model via the model\'s deselect, while it is also selected with another custom label ("picked")', function () {
-            var model, collection, events, eventStates;
+            var model, collection, events;
 
             beforeEach( function () {
                 model = new Model();
@@ -877,14 +825,6 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select( { label: "starred" } );
 
                 events = getEventSpies( [model, collection], ["selected", "picked", "starred"] );
-
-                eventStates = recordSelectionStatesForEvents( {
-                    model: model,
-                    collection: collection,
-                    modelEvents: ["selected", "selected:starred", "selected:selected"],
-                    collectionEvents: ["select:one", "select:one:starred", "select:one:selected"],
-                    labels: "starred"
-                } );
 
                 model.deselect( { label: "starred" } );
             } );

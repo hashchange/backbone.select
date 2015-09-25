@@ -20,14 +20,14 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when no models are selected, and deselecting all", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
 
             collection.deselectAll();
         } );
@@ -36,7 +36,7 @@ describe( "multi-select collection: deselectAll", function () {
             // NB This is a change in the spec. Up to version 0.2.0, it _did_ trigger
             // a select:none event. But an event triggered by a no-op didn't make
             // sense and was inconsistent with the behaviour elsewhere.
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:none" );
+            expect( events["select:none:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {
@@ -50,20 +50,20 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when no models are selected, and deselecting all, with options.silent enabled", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
 
             collection.deselectAll( {silent: true} );
         } );
 
         it( "should not trigger a select:none event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:none" );
+            expect( events["select:none:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {
@@ -77,7 +77,7 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when 1 model - the first one - is selected, and deselecting all", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -86,20 +86,21 @@ describe( "multi-select collection: deselectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.deselectAll();
         } );
 
         it( "should trigger a select:none event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
+            expect( events["select:none"] ).toHaveBeenCalledOnce();
+            expect( events["select:none"] ).toHaveBeenCalledWith( { selected: [], deselected: [m1] }, collection, { label: "selected" } );
         } );
 
         it( "should not trigger a select:some event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+            expect( events["select:some:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should not trigger a reselect:any event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {
@@ -113,7 +114,7 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when 1 model - the last one - is selected, and deselecting all", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -122,20 +123,21 @@ describe( "multi-select collection: deselectAll", function () {
             collection = new Collection( [m1, m2] );
             m2.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.deselectAll();
         } );
 
         it( "should trigger a select:none event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m2] }, collection, { label: "selected" } );
+            expect( events["select:none"] ).toHaveBeenCalledOnce();
+            expect( events["select:none"] ).toHaveBeenCalledWith( { selected: [], deselected: [m2] }, collection, { label: "selected" } );
         } );
 
         it( "should not trigger a select:some event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+            expect( events["select:some:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should not trigger a reselect:any event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {
@@ -149,7 +151,7 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when 1 model is selected, and deselecting all, with options.silent enabled", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -158,12 +160,12 @@ describe( "multi-select collection: deselectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.deselectAll( {silent: true} );
         } );
 
         it( "should not trigger a select:none event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:none" );
+            expect( events["select:none:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {
@@ -177,7 +179,7 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when 1 model is selected, and deselecting all (selectNone)", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -186,16 +188,17 @@ describe( "multi-select collection: deselectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.selectNone();
         } );
 
         it( "should trigger a select:none event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
+            expect( events["select:none"] ).toHaveBeenCalledOnce();
+            expect( events["select:none"] ).toHaveBeenCalledWith( { selected: [], deselected: [m1] }, collection, { label: "selected" } );
         } );
 
         it( "should not trigger a reselect:any event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {
@@ -209,7 +212,7 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when all models are selected, and deselecting all", function () {
-        var m1, m2, collection, selectedEventState, selectNoneEventState;
+        var m1, m2, collection, events, selectedEventState, selectNoneEventState;
 
         beforeEach( function () {
             selectedEventState = { model: {}, collection: {} };
@@ -222,7 +225,7 @@ describe( "multi-select collection: deselectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
 
             m1.on( 'deselected', function ( model ) {
                 selectedEventState.model.selected = model && model.selected;
@@ -241,15 +244,16 @@ describe( "multi-select collection: deselectAll", function () {
         } );
 
         it( "should trigger a select:none event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1, m2] }, collection, { label: "selected" } );
+            expect( events["select:none"] ).toHaveBeenCalledOnce();
+            expect( events["select:none"] ).toHaveBeenCalledWith( { selected: [], deselected: [m1, m2] }, collection, { label: "selected" } );
         } );
 
         it( "should not trigger a select:some event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+            expect( events["select:some:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should not trigger a reselect:any event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {
@@ -295,7 +299,7 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when all models are selected, and deselecting all (selectNone)", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -305,16 +309,17 @@ describe( "multi-select collection: deselectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.selectNone();
         } );
 
         it( "should trigger a select:none event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1, m2] }, collection, { label: "selected" } );
+            expect( events["select:none"] ).toHaveBeenCalledOnce();
+            expect( events["select:none"] ).toHaveBeenCalledWith( { selected: [], deselected: [m1, m2] }, collection, { label: "selected" } );
         } );
 
         it( "should not trigger a reselect:any event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {
@@ -328,7 +333,7 @@ describe( "multi-select collection: deselectAll", function () {
     } );
 
     describe( "when all models are selected, and deselecting all, with options.silent enabled", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -338,12 +343,12 @@ describe( "multi-select collection: deselectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.deselectAll( {silent: true} );
         } );
 
         it( "should not trigger a select:none event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:none" );
+            expect( events["select:none:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 0", function () {

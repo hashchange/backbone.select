@@ -1,4 +1,4 @@
-describe( 'Custom label options: defaultLabel.', function () {
+describe( 'Custom label options: ignoreLabel.', function () {
 
     var Model = Backbone.Model.extend( {
             initialize: function ( attributes, options ) {
@@ -377,6 +377,5 @@ describe( 'Custom label options: defaultLabel.', function () {
         } );
 
     } );
-
 
 } );

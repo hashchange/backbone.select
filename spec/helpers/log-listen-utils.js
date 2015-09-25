@@ -17,120 +17,144 @@ _.extend( Logger.prototype, {
     }
 } );
 
-// --- Recording selection states for an object at given events ---
+// --- Recording selection states for a set of objects when selection events occur ---
 
 /**
- * Sets up a container recording the selection states for a model and/or a collection whenever a given event occurs.
+ * Sets up a container recording the selection states for models and/or collections whenever a selection-related event
+ * occurs.
+ *
+ * The list of objects passed to the method
  *
  * +++ ATTN +++
  *
- * Only keeps one record for each event name. Ie, it records the state for the last event of a given name (e.g. the last
- * "select:one" event). The record for preceding "select:one" events is overwritten.
+ * Only keeps the last event of a given type for each object (ie, it keeps the last "select:one:selected" event which
+ * was triggered on object m1, but not previous "select:one:selected" events triggered on object m1). Older records are
+ * overwritten.
+ *
+ * +++
+ *
+ * Creating the store:
+ *
+ * - The method takes an observed object, or an array of objects, as the first argument. These objects can be Select.Me
+ *   models and Select.One/Select.Many collections.
+ *
+ * - Optionally, it takes a namespace or an array of namespaces as the second argument. If unspecified, the "selected"
+ *   namespace is used.
+ *
+ * Observed events, recorded values:
+ *
+ * - The store observes all base event types, like "selected", "deselected", "select:one" etc, and their namespaced
+ *   variants. The whole set is covered for each observed object, regardless of its type.
+ *
+ * - Whenever an event occurs on any of the observed models or collections, the selection state of all these models and
+ *   collections is recorded.
+ *
+ *   (In other words, there is just one list of items: the items are observed for their events, and at the same time,
+ *   they are also the items of which snapshots are made whenever an event occurs.)
+ *
+ * - The base event types are hard-coded. The list must be modified when new event types are created.
+ *
+ * Retrieving a value:
+ *
+ * - First, you declare which model or collection has emitted the event, and the event name. You get the event data with
+ *   `eventData = store.getEvent( emitter, eventName )`
+ *
+ * - Second, you retrieve the model or collection which you want to examine the state of. You get the snapshot from the
+ *   event data with `entityState = eventData.stateOf( capturedEntity )`
+ *
+ * - Finally, you query the snapshot for the label you are interested in: `entityState.selected`
  *
  * Usage example:
  *
- *     var model, collection, eventStates;
- *
  *     beforeEach( function () {
- *         model = new Model();
- *         collection = new Collection( [model] );
+ *         ...
  *
- *         eventStates = recordSelectionStatesForEvents( {
- *             model: model,
- *             collection: collection,
- *             modelEvents: [ "selected", "selected:starred", "selected:selected" ],
- *             collectionEvents: [ "select:one", "select:one:starred", "select:one:selected" ],
- *             labels: "starred"
- *         } );
+ *         eventStates = getEventStateStore( [m1, m2, m3, collection], ["selected", "starred"] );
  *
- *         model.select( { label: "starred" } );
+ *        ...
  *     } );
  *
- *     it( 'when the selected event of the model fires, the model is starred', function () {
- *         expect( eventStates["selected"].model.starred ).toEqual( true );
+ *     it( 'when the selected event of model m2 fires, the model is starred', function () {
+ *         expect( eventStates.getEvent( m2, "selected" ).stateOf( m2 ).starred ).toBe( true );
  *     } );
  *
- *     it( 'when the selected:starred event of the model fires, the model is starred in the collection', function () {
- *         expect( eventStates["selected:starred"].collection.starred ).toBe( model );
+ *     it( 'when the selected:starred event of the model fires, the model is starred in the Select.One collection', function () {
+ *         expect( eventStates.getEvent( m2, "selected:starred" ).stateOf( collection ).starred ).toBe( m2 );
  *     } );
  *
- *     it( 'when the select:one event of the collection fires, the model is starred in the collection', function () {
- *         expect( eventStates["select:one"].collection.starred ).toBe( model );
+ *     it( 'when the select:one event of the collection fires, only model m3 is selected', function () {
+ *         var event = eventStates.getEvent( collection, "select:one" );
+ *         expect( event.stateOf( m1 ).selected ).toBe( false );
+ *         expect( event.stateOf( m2 ).selected ).toBeFalsy();
+ *         expect( event.stateOf( m3 ).selected ).toBe( true );
  *     } );
  *
- *     it( 'when the select:one:starred event of the collection fires, the model is starred', function () {
- *         expect( eventStates["select:one:starred"].model.starred ).toEqual( true );
- *     } );
- *
- *
- * @param   {Object}                             options
- * @param   {Backbone.Model}                     [options.model]
- * @param   {Backbone.Collection}                [options.collection]
- * @param   {string[]}                           [options.modelEvents=[]]
- * @param   {string[]}                           [options.collectionEvents=[]]
- * @param   {string|string[]}                    [options.labels="selected"]
- * @param   {Object}                             [options.container={}]
+ * @param   {Backbone.Model|Backbone.Collection|Array} entities             a Select.Me, Select.One or Select.Many entity,
+ *                                                                          or an array of them (may be mixed object types)
+ * @param   {string|string[]}                          [labels="selected"]
  * @returns {Object}
  */
-function recordSelectionStatesForEvents ( options ) {
-    var model = options.model,
-        collection = options.collection,
-        modelEvents = options.modelEvents || [],
-        collectionEvents = options.collectionEvents || [],
-        labels = options.labels || [ "selected" ],
-        eventStatesContainer = options.container || {};
+function getEventStateStore ( entities, labels ) {
+    var events,
+        store = new HashTableForBackboneEntities();
 
-    if ( _.isString( labels ) ) labels = [ labels ];
+    // Using getEvent() as an alias of get(), makes more sense when reading tests
+    store.getEvent = store.get;
 
-    _.each( modelEvents.concat( collectionEvents ), function ( eventName ) {
-        eventStatesContainer[eventName] = { model: {}, collection: {} };
-    } );
+    function Capture ( entities, captureFunc ) {
+        var states = new HashTableForBackboneEntities();
 
-    _.each( labels, function ( label ) {
+        _.each( entities, function ( entity ) {
+            var entityState = {};
+            _.each( labels, function ( label ) {
+                entityState[label] = captureFunc( entity, label );
+            } );
+            states._set( entity, entityState );
+        } );
 
-        if ( model ) {
+        this._states = states;
+    }
 
-            _.each( modelEvents, function ( eventName ) {
+    Capture.prototype.stateOf = function ( entity ) {
+        return this._states.get( entity )
+    };
 
-                model.on( eventName, function ( model ) {
-                    eventStatesContainer[eventName].model[label] = model && model[label];
-                    if ( collection ) eventStatesContainer[eventName].collection[label] = collection[label];
-                } );
+    if ( !_.isArray( entities ) ) entities = [entities];
 
+    labels || ( labels = ["selected"] );
+    if ( _.isString( labels ) ) labels = [labels];
+
+    events = _getAllEventNames( _getBackboneSelectBaseEventNames(), labels );
+
+    _.each( entities, function ( entity ) {
+        var eventCaptures = {};
+
+        _.each( events, function ( eventName ) {
+
+            // Set the default value for each captured entity, for each entity-event combination in the store
+            eventCaptures[eventName] = new Capture( entities, function ( entity, label ) {
+                return 'The "' + eventName + '" event for label "' + label + '" has not been triggered on ' + entity._pickyType + ' entity ' + _getEntityId( entity );
             } );
 
-        }
+            // Set up the listener to capture the event state
+            entity.listenTo( entity, eventName, function () {
+                 eventCaptures[eventName] = new Capture( entities, function ( entity, label ) {
+                     if ( !entity ) return "Entity not defined at time of capture";
 
-        if ( collection ) {
+                     var value = entity[label],
+                         isPlainObject = _.isObject( value ) && !_.isFunction( value ) && !_.isArray( value ) && !value.initialize;
 
-            if ( collection._pickyType === "Backbone.Select.One" ) {
+                     // Clone hashes stored by Select.Many collections in order to protect them from subsequent changes;
+                     // pass all other values directly (boolean for Select.Me models, a model or undefined for Select.One).
+                     return isPlainObject ? _.clone( entity[label] ) : entity[label];
+                 } );
+            } );
+        } );
 
-                _.each( collectionEvents, function ( eventName ) {
-
-                    collection.on( eventName, function ( model, collection ) {
-                        eventStatesContainer[eventName].model[label] = model[label];
-                        eventStatesContainer[eventName].collection[label] = collection[label];
-                    } );
-
-                } );
-
-            } else {
-
-                _.each( collectionEvents, function ( eventName ) {
-
-                    collection.on( eventName, function ( diff, collection ) {
-                        if ( model ) eventStatesContainer[eventName].model[label] = model[label];
-                        eventStatesContainer[eventName].collection[label] = collection[label];
-                    } );
-
-                } );
-
-            }
-        }
-
+        store._set( entity, eventCaptures );
     } );
 
-    return eventStatesContainer;
+    return store;
 }
 
 // --- Recording event arguments for select/deselect events ---
@@ -185,36 +209,10 @@ function recordSelectionStatesForEvents ( options ) {
  */
 function getEventSpies ( observed, namespaces ) {
     var eventSpies,
-        baseEventNames = [
-            "selected", "deselected", "reselected",
-            "select:one", "deselect:one", "reselect:one",
-            "select:none", "select:some", "select:all", "reselect:any"
-        ];
-
-    function EventSpiesHashTable () {
-        this._eventSpiesTable = {};
-    }
-
-    EventSpiesHashTable.prototype._set = function ( observed, eventSpies ) {
-        this._eventSpiesTable[_getObservedId( observed )] = eventSpies;
-    };
-
-    EventSpiesHashTable.prototype.get = function ( observed, eventName ) {
-        return this._eventSpiesTable[_getObservedId( observed )][eventName];
-    };
-
-    function _getNamespacedEventNames ( baseEventName, namespaces ) {
-        return _.map( namespaces, function ( namespace ) {
-            return baseEventName + ":" + namespace;
-        } );
-    }
-
-    function _getObservedId ( observed ) {
-        return observed._pickyCid || "model " + observed.cid;
-    }
+        baseEventNames = _getBackboneSelectBaseEventNames();
 
     function _getTargetedEventSpies ( observed, eventNames ) {
-        var observedId = _getObservedId( observed ),
+        var observedId = _getEntityId( observed ),
             eventSpies = jasmine.createSpyObj( observedId + ': event', eventNames );
 
         _.each( eventNames, function ( eventName ) {
@@ -225,7 +223,7 @@ function getEventSpies ( observed, namespaces ) {
     }
 
     function _getWildcardEventSpies ( observed, baseEventNames, namespaces ) {
-        var observedId = _getObservedId( observed ),
+        var observedId = _getEntityId( observed ),
             wildcardEventNames = _.map( baseEventNames, function ( baseEventName ) {
                 return baseEventName + ":*";
             } ),
@@ -242,7 +240,7 @@ function getEventSpies ( observed, namespaces ) {
     }
 
     function _getStarEventSpy ( observed, eventNames ) {
-        var observedId = _getObservedId( observed ),
+        var observedId = _getEntityId( observed ),
             eventSpy = jasmine.createSpy( observedId + ': event.*' );
 
         _.each( eventNames, function ( eventName ) {
@@ -254,12 +252,7 @@ function getEventSpies ( observed, namespaces ) {
 
     function _getEventSpies( observed, baseEventNames, namespaces ) {
         var targetedEventSpies, wildcardEventSpies, starEventSpy,
-            eventNames = baseEventNames;
-
-        _.each( baseEventNames, function ( baseEventName ) {
-            var namespacedEventNames = _getNamespacedEventNames( baseEventName, namespaces );
-            eventNames = eventNames.concat( namespacedEventNames );
-        } );
+            eventNames = _getAllEventNames( baseEventNames, namespaces );
 
         targetedEventSpies = _getTargetedEventSpies( observed, eventNames );
         wildcardEventSpies = _getWildcardEventSpies( observed, baseEventNames, namespaces );
@@ -272,7 +265,7 @@ function getEventSpies ( observed, namespaces ) {
     if ( _.isString( namespaces ) ) namespaces = [ namespaces ];
 
     if ( _.isArray( observed ) ) {
-        eventSpies = new EventSpiesHashTable();
+        eventSpies = new HashTableForBackboneEntities();
         _.each( observed, function ( singleObserved ) {
             eventSpies._set( singleObserved, _getEventSpies( singleObserved, baseEventNames, namespaces ) );
         } );
@@ -283,98 +276,47 @@ function getEventSpies ( observed, namespaces ) {
     return eventSpies;
 }
 
-// --- ListenerMixin ---
+// --- Helpers ---
 
-var ListenerMixin = function ( observableNames, takeSnapshotMethod ) {
+function HashTableForBackboneEntities () {
+    this._hashTable = {};
+}
 
-    var createContainer = function () {
-        var container = {
-            calls: 0
-        };
-        _.each( observableNames, function ( name ) {
-            container[name] = {}
-        } );
-
-        return container;
-    };
-
-    this.snapshots = {
-        onSelected: _.extend( {}, createContainer() ),
-        onDeselected: _.extend( {}, createContainer() ),
-        onSelectOne: _.extend( {}, createContainer() ),
-        onDeselectOne: _.extend( {}, createContainer() ),
-        onSelectNone: _.extend( {}, createContainer() ),
-        onSelectSome: _.extend( {}, createContainer() ),
-        onSelectAll: _.extend( {}, createContainer() )
-    };
-
-    this.takeSnapshot = takeSnapshotMethod;
+HashTableForBackboneEntities.prototype._set = function ( entity, entry ) {
+    this._hashTable[_getEntityId( entity )] = entry;
 };
 
-_.extend( ListenerMixin.prototype, {
-
-    bindEvents: function () {
-        this.listenTo( this, "selected", this.captureOnSelected );
-        this.listenTo( this, "deselected", this.captureOnDeselected );
-        this.listenTo( this, "select:one", this.captureOnSelectOne );
-        this.listenTo( this, "deselect:one", this.captureOnDeselectOne );
-        this.listenTo( this, "select:none", this.captureOnSelectNone );
-        this.listenTo( this, "select:some", this.captureOnSelectSome );
-        this.listenTo( this, "select:all", this.captureOnSelectAll );
-        _.bindAll( this, "takeSnapshot" );
-    },
-
-    captureOnSelected: function () {
-        this.takeSnapshot( this.snapshots.onSelected );
-    },
-
-    captureOnDeselected: function () {
-        this.takeSnapshot( this.snapshots.onDeselected );
-    },
-
-    captureOnSelectOne: function () {
-        this.takeSnapshot( this.snapshots.onSelectOne );
-    },
-
-    captureOnDeselectOne: function () {
-        this.takeSnapshot( this.snapshots.onDeselectOne );
-    },
-
-    captureOnSelectNone: function () {
-        this.takeSnapshot( this.snapshots.onSelectNone );
-    },
-
-    captureOnSelectSome: function () {
-        this.takeSnapshot( this.snapshots.onSelectSome );
-    },
-
-    captureOnSelectAll: function () {
-        this.takeSnapshot( this.snapshots.onSelectAll );
-    },
-
-    takeSnapshot: function ( container ) {
-
-        // Implement takeSnapshot as suggested in the section below and add to
-        // the prototype.
-
-        // NB doCapture: just a suggested name. Use some var which is in scope, a
-        // boolean, to activate the capturing.
-
-        //noinspection JSUnresolvedVariable
-        if ( doCapture ) {
-            container.calls++;
-
-//          container.model1.selected = model1.selected;
-//          container.model2.selected = model2.selected;
-//          container.someSingleSelectCollection.selected = someSingleSelectCollection.selected;
-//          container.someMultiSelectCollection.selected = _.clone( someMultiSelectCollection.selected );
-        }
-
-    }
-} );
-
-ListenerMixin.applyTo = function ( hostObject, observableNames, takeSnapshotMethod ) {
-    Backbone.Select.Me.applyTo( this );
-    deepExtend( hostObject, new ListenerMixin( observableNames, takeSnapshotMethod ) );
-    hostObject.bindEvents();
+HashTableForBackboneEntities.prototype.get = function ( entity, category ) {
+    return category === undefined ? this._hashTable[_getEntityId( entity )] : this._hashTable[_getEntityId( entity )][category];
 };
+
+function _getNamespacedEventNames ( baseEventName, namespaces ) {
+    return _.map( namespaces, function ( namespace ) {
+        return baseEventName + ":" + namespace;
+    } );
+}
+
+function _getBackboneSelectBaseEventNames () {
+    return [
+        "selected", "deselected", "reselected",
+        "select:one", "deselect:one", "reselect:one",
+        "select:none", "select:some", "select:all", "reselect:any"
+    ];
+}
+
+function _getEntityId ( entity ) {
+    return entity._pickyCid || "model " + entity.cid;
+}
+
+function _getAllEventNames ( baseEventNames, namespaces ) {
+    var eventNames = baseEventNames;
+
+    _.each( baseEventNames, function ( baseEventName ) {
+        var namespacedEventNames = _getNamespacedEventNames( baseEventName, namespaces );
+        eventNames = eventNames.concat( namespacedEventNames );
+    } );
+
+    return eventNames;
+}
+
+

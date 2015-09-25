@@ -20,7 +20,7 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when no models are selected, and selecting all", function () {
-        var m1, m2, collection, selectedEventState, selectAllEventState;
+        var m1, m2, collection, events, selectedEventState, selectAllEventState;
 
         beforeEach( function () {
             selectedEventState = { model: {}, collection: {} };
@@ -30,7 +30,7 @@ describe( "multi-select collection: selectAll", function () {
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
 
             m1.on( 'selected', function ( model ) {
                 selectedEventState.model.selected = model && model.selected;
@@ -49,15 +49,16 @@ describe( "multi-select collection: selectAll", function () {
         } );
 
         it( "should trigger a select:all event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m1, m2], deselected: [] }, collection, { label: "selected" } );
+            expect( events["select:all"] ).toHaveBeenCalledOnce();
+            expect( events["select:all"] ).toHaveBeenCalledWith( { selected: [m1, m2], deselected: [] }, collection, { label: "selected" } );
         } );
 
         it( "should not trigger a select:some event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+            expect( events["select:some:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should not trigger a reselect:any event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 2", function () {
@@ -107,20 +108,20 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when no models are selected, and selecting all, with options.silent enabled", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
 
             collection.selectAll( {silent: true} );
         } );
 
         it( "should not trigger an 'all' selected event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
+            expect( events["select:all:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 2", function () {
@@ -137,7 +138,7 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when 1 model - the first one - is selected, and selecting all", function () {
-        var m1, m2, collection, reselectedEventState, reselectAnyEventState;
+        var m1, m2, collection, events, reselectedEventState, reselectAnyEventState;
 
         beforeEach( function () {
             reselectedEventState = { model: {}, collection: {} };
@@ -149,7 +150,7 @@ describe( "multi-select collection: selectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             m1.on( 'reselected', function ( model ) {
                 reselectedEventState.model.selected = model && model.selected;
                 reselectedEventState.collection.selected = _.clone( collection.selected );
@@ -167,15 +168,17 @@ describe( "multi-select collection: selectAll", function () {
         } );
 
         it( "should trigger a select:all event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m2], deselected: [] }, collection, { label: "selected" } );
+            expect( events["select:all"] ).toHaveBeenCalledOnce();
+            expect( events["select:all"] ).toHaveBeenCalledWith( { selected: [m2], deselected: [] }, collection, { label: "selected" } );
         } );
 
         it( "should not trigger a select:some event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+            expect( events["select:some:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should trigger a reselect:any event, with an array containing the previously selected model as a parameter", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1], collection, { label: "selected" } );
+            expect( events["reselect:any"] ).toHaveBeenCalledOnce();
+            expect( events["reselect:any"] ).toHaveBeenCalledWith( [m1], collection, { label: "selected" } );
         } );
 
         it( "should have a selected count of 2", function () {
@@ -215,7 +218,7 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when 1 model - the last one - is selected, and selecting all", function () {
-        var m1, m2, collection, reselectedEventState, reselectAnyEventState;
+        var m1, m2, collection, events, reselectedEventState, reselectAnyEventState;
 
         beforeEach( function () {
             reselectedEventState = { model: {}, collection: {} };
@@ -227,7 +230,7 @@ describe( "multi-select collection: selectAll", function () {
             collection = new Collection( [m1, m2] );
             m2.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             m2.on( 'reselected', function ( model ) {
                 reselectedEventState.model.selected = model && model.selected;
                 reselectedEventState.collection.selected = _.clone( collection.selected );
@@ -245,15 +248,17 @@ describe( "multi-select collection: selectAll", function () {
         } );
 
         it( "should trigger a select:all event", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m1], deselected: [] }, collection, { label: "selected" } );
+            expect( events["select:all"] ).toHaveBeenCalledOnce();
+            expect( events["select:all"] ).toHaveBeenCalledWith( { selected: [m1], deselected: [] }, collection, { label: "selected" } );
         } );
 
         it( "should not trigger a select:some event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+            expect( events["select:some:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should trigger a reselect:any event, with an array containing the previously selected model as a parameter", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m2], collection, { label: "selected" } );
+            expect( events["reselect:any"] ).toHaveBeenCalledOnce();
+            expect( events["reselect:any"] ).toHaveBeenCalledWith( [m2], collection, { label: "selected" } );
         } );
 
         it( "should have a selected count of 2", function () {
@@ -293,7 +298,7 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when 1 model is selected, and selecting all, with options.silent enabled", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -302,16 +307,16 @@ describe( "multi-select collection: selectAll", function () {
             collection = new Collection( [m1, m2] );
             m1.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.selectAll( {silent: true} );
         } );
 
         it( "should not trigger an 'all' selected event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
+            expect( events["select:all:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should not trigger a reselect:any event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 2", function () {
@@ -328,7 +333,7 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when all models are selected, and selecting all", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -338,7 +343,7 @@ describe( "multi-select collection: selectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.selectAll();
         } );
 
@@ -346,15 +351,16 @@ describe( "multi-select collection: selectAll", function () {
             // NB This is a change in the spec. Up to version 0.2.0, it _did_ trigger
             // a select:all event. But an event triggered by a no-op didn't make sense
             // and was inconsistent with the behaviour elsewhere.
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
+            expect( events["select:all:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should not trigger a select:some event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+            expect( events["select:some:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should trigger a reselect:any event, with an array containing all models as a parameter", function () {
-            expect( collection.trigger ).toHaveBeenCalledWith( "reselect:any", [m1, m2], collection, { label: "selected" } );
+            expect( events["reselect:any"] ).toHaveBeenCalledOnce();
+            expect( events["reselect:any"] ).toHaveBeenCalledWith( [m1, m2], collection, { label: "selected" } );
         } );
 
         it( "should have a selected count of 2", function () {
@@ -371,7 +377,7 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when all models are selected, and selecting all, with options.silent enabled", function () {
-        var m1, m2, collection;
+        var m1, m2, collection, events;
 
         beforeEach( function () {
             m1 = new Model();
@@ -381,16 +387,16 @@ describe( "multi-select collection: selectAll", function () {
             m1.select();
             m2.select();
 
-            spyOn( collection, "trigger" ).and.callThrough();
+            events = getEventSpies( collection );
             collection.selectAll( {silent: true} );
         } );
 
         it( "should not trigger a select:all event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
+            expect( events["select:all:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should not trigger a reselect:any event", function () {
-            expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
         } );
 
         it( "should have a selected count of 2", function () {
