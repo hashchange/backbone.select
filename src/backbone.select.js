@@ -3,20 +3,12 @@
 
     var Mixins = {
 
-            // Select.One
-            // ----------
-            // A single-select mixin for Backbone.Collection, allowing a single
-            // model to be selected within a collection. Selection of another
-            // model within the collection causes the previous model to be
-            // deselected.
-
             SelectOne: {
 
-                // Type indicator, undocumented, but part of the API (monitored by tests).
-                // Can be queried safely by other components. Use it read-only.
+                // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                // other components. Use it read-only.
                 _pickyType: "Backbone.Select.One",
 
-                // Select a model, deselecting any previously selected model
                 select: function ( model, options ) {
                     var label, reselected, eventOptions;
 
@@ -32,11 +24,9 @@
                         this.deselect( undefined, _.extend(
                             // _eventQueue vs _eventQueueAppendOnly:
                             //
-                            // When a deselect sub action is initiated from a select action, the
-                            // deselection events are added to the common event queue. But the
-                            // event queue must not be resolved prematurely during the
-                            // deselection phase. Resolution is prevented by naming the queue
-                            // differently.
+                            // When a deselect sub action is initiated from a select action, the deselection events are
+                            // added to the common event queue. But the event queue must not be resolved prematurely
+                            // during the deselection phase. Resolution is prevented by naming the queue differently.
                             _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
                             { _eventQueueAppendOnly: options._eventQueue }
                         ) );
@@ -61,8 +51,6 @@
                     processEventQueue( options );
                 },
 
-                // Deselect a model, resulting in no model
-                // being selected
                 deselect: function ( model, options ) {
                     var label;
 
@@ -96,20 +84,12 @@
 
             },
 
-            // Select.Many
-            // -----------
-            // A multi-select mixin for Backbone.Collection, allowing a collection to
-            // have multiple items selected, including `selectAll` and `deselectAll`
-            // capabilities.
-
             SelectMany: {
 
-                // Type indicator, undocumented, but part of the API (monitored by tests).
-                // Can be queried safely by other components. Use it read-only.
+                // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                // other components. Use it read-only.
                 _pickyType: "Backbone.Select.Many",
 
-                // Select a specified model, make sure the model knows it's selected, and
-                // hold on to the selected model.
                 select: function ( model, options ) {
                     var label, prevSelected, reselected;
 
@@ -141,8 +121,6 @@
                     processEventQueue( options );
                 },
 
-                // Deselect a specified model, make sure the model knows it has been deselected,
-                // and remove the model from the selected list.
                 deselect: function ( model, options ) {
                     var label, prevSelected;
 
@@ -172,7 +150,6 @@
                     processEventQueue( options );
                 },
 
-                // Select all models in this collection
                 selectAll: function ( options ) {
                     var label, prevSelected,
                         reselected = [];
@@ -201,7 +178,6 @@
                     processEventQueue( options );
                 },
 
-                // Deselect all models in this collection
                 deselectAll: function ( options ) {
                     var prevSelected, label;
 
@@ -234,8 +210,8 @@
                     this.deselectAll( options );
                 },
 
-                // Toggle select all / none. If some are selected, it will select all. If all
-                // are selected, it will select none. If none are selected, it will select all.
+                // Toggle select all / none. If some are selected, it will select all. If all are selected, it will
+                // select none. If none are selected, it will select all.
                 toggleSelectAll: function ( options ) {
                     var label;
 
@@ -256,19 +232,12 @@
                 }
             },
 
-            // Select.Me
-            // ---------
-            // A selectable mixin for Backbone.Model, allowing a model to be selected,
-            // enabling it to work with Select.One or Select.Many, or on it's own.
-
             SelectMe: {
 
-                // Type indicator, undocumented, but part of the API (monitored by tests).
-                // Can be queried safely by other components. Use it read-only.
+                // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                // other components. Use it read-only.
                 _pickyType: "Backbone.Select.Me",
 
-                // Select this model, and tell our
-                // collection that we're selected
                 select: function ( options ) {
                     var label, reselected, eventOptions;
 
@@ -285,8 +254,7 @@
                         // Model-sharing mode: notify collections with an event
                         this.trigger( "_selected", this, stripLocalOptions( options ) );
                     } else if ( this.collection ) {
-                        // Single collection only: no event listeners set up in collection, call
-                        // it directly
+                        // Single collection only: no event listeners set up in collection, call it directly
                         if ( !options._processedBy[this.collection._pickyCid] ) this.collection.select( this, stripLocalOptions( options ) );
                     }
 
@@ -304,7 +272,6 @@
                     processEventQueue( options );
                 },
 
-                // Deselect this model, and tell our collection that we're deselected
                 deselect: function ( options ) {
                     var label, isNoop;
 
@@ -322,8 +289,7 @@
                         if ( isNoop ) options = _.extend( options, { _messageOnly: true } );
                         this.trigger( "_deselected", this, stripLocalOptions( options ) );
                     } else if ( this.collection ) {
-                        // Single collection only: no event listeners set up in collection, call
-                        // it directly
+                        // Single collection only: no event listeners set up in collection, call it directly
                         if ( isNoop ) options = _.extend( options, { _messageOnly: true } );
                         this.collection.deselect( this, stripLocalOptions( options ) );
                     }
@@ -336,8 +302,6 @@
                     processEventQueue( options );
                 },
 
-                // Change selected to the opposite of what
-                // it currently is
                 toggleSelected: function ( options ) {
                     var label;
 
@@ -384,9 +348,8 @@
                     if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
                     if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
 
-                    // Store a reference to the existing select method (most likely the
-                    // default Backbone.Collection.select method). Used to overload the new
-                    // select method.
+                    // Store a reference to the existing select method (most likely the default
+                    // Backbone.Collection.select method). Used to overload the new select method.
                     oldSelect = hostObject.select;
 
                     _.extend( hostObject, Mixins.SelectOne );
@@ -423,8 +386,8 @@
                         hostObject.listenTo( hostObject, 'add', onAdd );
                         hostObject.listenTo( hostObject, 'remove', onRemove );
 
-                        // Mode flag, undocumented, but part of the API (monitored by tests). Can
-                        // be queried safely by other components. Use it read-only.
+                        // Mode flag, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                        // other components. Use it read-only.
                         hostObject._modelSharingEnabled = true;
 
                     }
@@ -443,9 +406,8 @@
                     if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
                     if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
 
-                    // Store a reference to the existing select method (most likely the
-                    // default Backbone.Collection.select method). Used to overload the new
-                    // select method.
+                    // Store a reference to the existing select method (most likely the default
+                    // Backbone.Collection.select method). Used to overload the new select method.
                     oldSelect = hostObject.select;
 
                     _.extend( hostObject, Mixins.SelectMany );
@@ -492,8 +454,8 @@
                         hostObject.listenTo( hostObject, 'add', onAdd );
                         hostObject.listenTo( hostObject, 'remove', onRemove );
 
-                        // Mode flag, undocumented, but part of the API (monitored by tests). Can
-                        // be queried safely by other components. Use it read-only.
+                        // Mode flag, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                        // other components. Use it read-only.
                         hostObject._modelSharingEnabled = true;
 
                     }
@@ -512,8 +474,8 @@
     var triggerMultiSelectEvents = function ( collection, prevSelected, options, reselected ) {
         function mapCidsToModels ( cids, collection, previousSelection ) {
             function mapper ( cid ) {
-                // Find the model in the collection. If not found, it has been removed,
-                // so get it from the array of previously selected models.
+                // Find the model in the collection. If not found, it has been removed, so get it from the array of
+                // previously selected models.
                 return collection.get( cid ) || previousSelection[cid];
             }
 
@@ -845,11 +807,11 @@
         }
     }
 
-    // Merges separate (sub-)events of a Select.Many collection into a single,
-    // summary event, and cleans up the event queue.
+    // Merges separate (sub-)events of a Select.Many collection into a single, summary event, and cleans up the event
+    // queue.
     //
-    // NB "reselect:any" events stand on their own and are not merged into a joint
-    // select:some event. They only occur once per collection in the event queue.
+    // NB "reselect:any" events stand on their own and are not merged into a joint select:some event. They only occur
+    // once per collection in the event queue.
     function mergeMultiSelectEvents ( queue ) {
         var multiSelectCollections = {};
 
@@ -889,11 +851,9 @@
             }
         } );
 
-        // If there are multiple event entries for a collection, remove them from
-        // the queue and append a merged event.
+        // If there are multiple event entries for a collection, remove them from the queue and append a merged event.
 
-        // - Don't touch the queued events for multi-select collections which have
-        //   just one entry.
+        // - Don't touch the queued events for multi-select collections which have just one entry.
         multiSelectCollections = _.filter( multiSelectCollections, function ( entry ) {
             return entry.indexes.length > 1;
         } );
@@ -910,9 +870,8 @@
         // - Append merged event entry.
         _.each( multiSelectCollections, function ( extractedData ) {
 
-            // NB Multiple entries only occur if a select has been accompanied by
-            // one or more deselects. By definition, that translates into a
-            // select:some event (and never into select:all, select:none).
+            // NB Multiple entries only occur if a select has been accompanied by one or more deselects. By definition,
+            // that translates into a select:some event (and never into select:all, select:none).
             queue.push( {
                 context: extractedData.context,
                 triggerArgs: [
@@ -927,12 +886,11 @@
 
     }
 
-    // Overloads the select method. Provides access to the previous, legacy
-    // implementation, based on the arguments passed to the method.
+    // Overloads the select method. Provides access to the previous, legac implementation, based on the arguments passed
+    // to the method.
     //
-    // If `select` is called with a model as first parameter, the `select`
-    // method of the mixin is used, otherwise the previous implementation is
-    // called.
+    // If `select` is called with a model as first parameter, the `select` method of the mixin is used, otherwise the
+    // previous implementation is called.
     function overloadSelect ( oldSelect, context ) {
 
         context.select = (function () {
@@ -948,8 +906,8 @@
 
     }
 
-    // Creates a new trigger method which calls the predefined event handlers
-    // (onDeselect etc) as well as triggering the event.
+    // Creates a new trigger method which calls the predefined event handlers (onDeselect etc) as well as triggering the
+    // event.
     //
     // Adapted from Marionette.triggerMethod.
     function augmentTrigger ( context ) {
@@ -958,8 +916,7 @@
 
             var origTrigger = context.trigger;
 
-            // Return an augmented trigger method implementation, in order to replace
-            // the original trigger method
+            // Return an augmented trigger method implementation, in order to replace the original trigger method
             return function ( event, eventArgs ) {
 
                 if ( isSelectionEvent( event ) ) {
@@ -988,14 +945,12 @@
 
     // Helpers for augmentTrigger
 
-    // Checks if the event is generated by Backbone.Select. Excludes internal
-    // events like `_selected`.
+    // Checks if the event is generated by Backbone.Select. Excludes internal events like `_selected`.
     function isSelectionEvent ( eventName ) {
         return ( /^([rd]e)?select(ed)?($|:)/ ).test( eventName );
     }
 
-    // Take the event section ("section1:section2:section3") and turn it
-    // into an uppercase name
+    // Take the event section ("section1:section2:section3") and turn it into an uppercase name
     //noinspection JSUnusedLocalSymbols
     function getEventName ( match, prefix, eventName ) {
         return eventName.toUpperCase();
