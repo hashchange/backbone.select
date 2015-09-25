@@ -27,8 +27,10 @@
                             // When a deselect sub action is initiated from a select action, the deselection events are
                             // added to the common event queue. But the event queue must not be resolved prematurely
                             // during the deselection phase. Resolution is prevented by naming the queue differently.
+                            //
+                            // See getActiveQueue() for a detailed description of the process.
                             _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
-                            { _eventQueueAppendOnly: options._eventQueue }
+                            { _eventQueueAppendOnly: getActiveQueue( options ) }
                         ) );
                         this[label] = model;
                     }
@@ -97,7 +99,7 @@
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) ) return;
 
-                    prevSelected = multiSelectionToArray( this[label] );
+                    prevSelected = _.clone( this[label] );
                     reselected = this[label][model.cid] ? [model] : [];
 
                     if ( reselected.length && options._processedBy[this._pickyCid] ) return;
@@ -134,7 +136,7 @@
                     // make sure it is registered. That's done, so we can bail out now.
                     if ( options._messageOnly ) return;
 
-                    prevSelected = multiSelectionToArray( this[label] );
+                    prevSelected = _.clone( this[label] );
 
                     if ( !this[label][model.cid] ) return;
 
@@ -158,7 +160,7 @@
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) ) return;
 
-                    prevSelected = multiSelectionToArray( this[label] );
+                    prevSelected = _.clone( this[label] );
 
                     this.each( function ( model ) {
                         if ( this[label][model.cid] ) reselected.push( model );
@@ -186,7 +188,7 @@
                     if ( isIgnoredLabel( label, this ) ) return;
 
                     if ( getSelectionSize( this, label ) === 0 ) return;
-                    prevSelected = multiSelectionToArray( this[label] );
+                    prevSelected = _.clone( this[label] );
 
 
                     this.each( function ( model ) {
@@ -730,13 +732,6 @@
         collection[getSelectionSizeProp( label )] = size;
     }
 
-    function forEachLabelInModelOrCollection ( model, collection, callback ) {
-        var labels = _.keys( _.extend( {}, collection._pickyLabels, model._pickyLabels ) );
-        _.each( labels, function ( label, index ) {
-            callback( label, model, collection, index, labels );
-        } );
-    }
-    
     function forEachLabelInCollection ( collection, callback ) {
         _forEachEntityLabel( collection, callback );
     }
@@ -750,17 +745,6 @@
         _.each( labels, function ( label, index ) {
             callback( label, collectionOrModel, index, labels );
         } );
-    }
-
-    function multiSelectionToArray ( selectionsHash ) {
-        function mapper ( value, key ) {
-            selectedArr[key] = value;
-        }
-
-        var selectedArr = [];
-        _.each( selectionsHash, mapper );
-
-        return selectedArr;
     }
 
     function initOptions ( options ) {
@@ -777,12 +761,45 @@
         queueEvent( storage, context, [ eventName + ":" + label ].concat( eventArgs ) );
     }
 
+    function getActiveQueue ( storage ) {
+        // There are two properties which could store the queue:
+        //
+        // - Usually, the queue is stored in the _eventQueue property.
+        //
+        //   The queue will eventually be processed by the object which created it. The _eventQueue is created in the
+        //   initial select/deselect method call which started the whole thing. When all secondary calls are done and
+        //   the end of that method is reached, the _eventQueue is processed.
+        //
+        //   Secondary calls on other objects just add to the queue. They don't resolve it when they reach their own
+        //   processEventQueue() because its resolution is blocked by the original method. That method has created a
+        //   _processedBy entry for the calling object which is not yet marked as done. (All _processedBy entries must
+        //   be marked as done when the queue is processed.)
+        //
+        //   In the course of secondary calls, the original object is called back sometimes. These recursive, tertiary
+        //   calls also don't resolve the queue (which would be premature). They also don't have to do any real work,
+        //   except for some minor tasks. Recursive, tertiary calls return early when a _processedBy entry for the
+        //   object exists, whether it is marked done or not. Hence, they don't reach processEventQueue().
+        //
+        // - Sometimes, though, recursive calls to methods on the original object _have_ to do real work and must be
+        //   followed through. For those calls, the _processedBy entry is not passed on. They don't return early
+        //   (allowing them to do their work), add events to the queue etc, but when their end is reached,
+        //   processEventQueue() must not process the queue.
+        //
+        //   That's why they don't receive the queue in _eventQueue. Instead, the queue object is referenced in
+        //   _eventQueueAppendOnly during these calls. The _eventQueueAppendOnly property is left alone by
+        //   processEventQueue(), protecting the queue from premature resolution.
+        //
+        //   New events in these recursive calls must be added to _eventQueueAppendOnly, not _eventQueue, which just
+        //   contains an unused, empty hash. The original calling method shares the reference, and will process the
+        //   queue in the end, including the events added by the recursive call.
+        //
+        // _eventQueueAppendOnly exists only when needed, and thus takes precedence. If it exists, it is the active
+        // queue, whereas _eventQueue just contains an unused, empty hash. If not, _eventQueue is the real thing.
+        return storage._eventQueueAppendOnly || storage._eventQueue;
+    }
+
     function queueEvent ( storage, context, triggerArgs ) {
-        // Use either _eventQueue, which will eventually be processed by the calling
-        // object, or _eventQueueAppendOnly, which is another object's event queue
-        // and resolved elsewhere. _eventQueueAppendOnly exists only when needed,
-        // and thus takes precedence.
-        var queue = storage._eventQueueAppendOnly || storage._eventQueue;
+        var queue = getActiveQueue( storage );
         queue.push( {
             context: context,
             triggerArgs: triggerArgs
