@@ -28,7 +28,8 @@
                             // added to the common event queue. But the event queue must not be resolved prematurely
                             // during the deselection phase. Resolution is prevented by naming the queue differently.
                             //
-                            // See getActiveQueue() for a detailed description of the process.
+                            // See getActiveQueue() for a detailed description of the process. (Also explains why
+                            // _processedBy is omitted.)
                             _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
                             { _eventQueueAppendOnly: getActiveQueue( options ) }
                         ) );
@@ -106,7 +107,13 @@
 
                     if ( options.exclusive ) {
                         this.each( function ( iteratedModel ) {
-                            if ( iteratedModel !== model ) this.deselect( iteratedModel, _.extend( {}, options, { _silentLocally: true } ) );
+                            if ( iteratedModel !== model ) this.deselect( iteratedModel, _.extend(
+                                    // Using _eventQueueAppendOnly instead of  _eventQueue: See .select() in Select.One
+                                    // or, in more detail, getActiveQueue() (also explains why _processedBy is omitted).
+                                    _.omit( options, "_processedBy", "_eventQueue", "exclusive" ),
+                                    { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                                )
+                            );
                         }, this );
                     }
 
@@ -164,7 +171,7 @@
 
                     this.each( function ( model ) {
                         if ( this[label][model.cid] ) reselected.push( model );
-                        this.select( model, _.extend( {}, options, { _silentLocally: true } ) );
+                        this.select( model, _.extend( _.omit( options, "exclusive" ), { _silentLocally: true } ) );
                     }, this );
 
                     setSelectionSize( _.size( this[label] ), this, label );
@@ -254,10 +261,10 @@
 
                     if ( this._pickyCollections ) {
                         // Model-sharing mode: notify collections with an event
-                        this.trigger( "_selected", this, stripLocalOptions( options ) );
+                        this.trigger( "_selected", this, stripLocalOptionsExcept( options, "exclusive" ) );
                     } else if ( this.collection ) {
                         // Single collection only: no event listeners set up in collection, call it directly
-                        if ( !options._processedBy[this.collection._pickyCid] ) this.collection.select( this, stripLocalOptions( options ) );
+                        if ( !options._processedBy[this.collection._pickyCid] ) this.collection.select( this, stripLocalOptionsExcept( options, "exclusive" ) );
                     }
 
                     if ( !(options.silent || options._silentLocally) ) {
@@ -472,8 +479,14 @@
     // Helper Methods
     // --------------
 
+    /** @type {string[]}  options which are local to a method call, and not inherited by other method calls */
+    var localOptions = ["_silentLocally", "_externalEvent", "exclusive"],
+
+        /** @type {string[]}  options which are used internally for communicating across method calls, should not appear in public events */
+        internalOptions = ["_messageOnly", "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly"];
+
     // Trigger events from a multi-select collection, based on the number of selected items.
-    var triggerMultiSelectEvents = function ( collection, prevSelected, options, reselected ) {
+    function triggerMultiSelectEvents ( collection, prevSelected, options, reselected ) {
         function mapCidsToModels ( cids, collection, previousSelection ) {
             function mapper ( cid ) {
                 // Find the model in the collection. If not found, it has been removed, so get it from the array of
@@ -524,7 +537,7 @@
             queueEventSet( "select:some", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
             return;
         }
-    };
+    }
 
     function onAdd ( model, collection ) {
         registerCollectionWithModel( model, collection );
@@ -637,7 +650,22 @@
     }
 
     function stripLocalOptions ( options ) {
-        return _.omit( options, "_silentLocally", "_externalEvent" );
+        return _.omit( options, localOptions );
+    }
+
+    function stripLocalOptionsExcept ( options, exceptions ) {
+        var omit = localOptions;
+
+        if ( exceptions ) {
+            if ( _.isString( exceptions ) ) exceptions = [exceptions];
+            omit = _.without.apply( undefined, [ localOptions ].concat( exceptions ) );
+        }
+
+        return _.omit( options, omit );
+    }
+
+    function stripInternalOptions ( options ) {
+        return _.omit( options, internalOptions );
     }
 
     function toEventOptions ( options, label ) {
@@ -655,10 +683,6 @@
         _.extend( eventOptions, { label: label } );
 
         return eventOptions;
-    }
-
-    function stripInternalOptions ( options ) {
-        return _.omit( options, "_messageOnly", "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
     }
 
     function getLabel ( options, obj ) {
