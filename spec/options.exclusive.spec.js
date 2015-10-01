@@ -680,6 +680,19 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
                 expect( events.get( collection, "select:some:*" ) ).not.toHaveBeenCalled();
             } );
 
+            it( 'it does not change the state captured by these events, ie they fire at the end', function () {
+                expected[m1.cid] = m1;
+                expected[m2.cid] = m2;
+                expected[m3.cid] = m3;
+                expected[m4.cid] = m4;
+                expected[m5.cid] = m5;
+                expected[m5.cid] = m5;
+
+                expect( eventStates.getEvent( collection, "select:all" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( collection, "select:all" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( collection, "select:all" ).stateOf( collection ).selected ).toEqual( expected );
+            } );
+
         } );
 
         describe( 'When calling deselectAll() on the collection,', function () {
@@ -720,6 +733,13 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
 
                 expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
                 expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'it does not change the state captured by these events, ie they fire at the end', function () {
+                expect( eventStates.getEvent( collection, "select:none" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( collection, "select:none" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( collection, "select:none" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( collection, "select:none" ).stateOf( collection ).selected ).toEqual( {} );
             } );
 
         } );
