@@ -1,4 +1,4 @@
-// Backbone.Select, v1.3.2
+// Backbone.Select, v1.4.0
 // Copyright (c) 2015 Michael Heim
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
@@ -28,52 +28,53 @@
     ;( function ( Backbone, _ ) {
         "use strict";
     
-        var Mixins = {
+        var illegalLabelNames = [],
     
-                // Select.One
-                // ----------
-                // A single-select mixin for Backbone.Collection, allowing a single
-                // model to be selected within a collection. Selection of another
-                // model within the collection causes the previous model to be
-                // deselected.
+            Mixins = {
     
                 SelectOne: {
     
-                    // Type indicator, undocumented, but part of the API (monitored by tests).
-                    // Can be queried safely by other components. Use it read-only.
+                    // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                    // other components. Use it read-only.
                     _pickyType: "Backbone.Select.One",
     
-                    // Select a model, deselecting any previously selected model
                     select: function ( model, options ) {
-                        var reselected = model && this.selected === model ? model : undefined;
+                        var label, reselected, eventOptions;
     
                         options = initOptions( options );
                         if ( options._processedBy[this._pickyCid] ) return;
+    
+                        label = getLabel( options, this );
+                        if ( isIgnoredLabel( label, this ) ) return;
+    
+                        reselected = model && this[label] === model ? model : undefined;
     
                         if ( !reselected ) {
                             this.deselect( undefined, _.extend(
                                 // _eventQueue vs _eventQueueAppendOnly:
                                 //
-                                // When a deselect sub action is initiated from a select action, the
-                                // deselection events are added to the common event queue. But the
-                                // event queue must not be resolved prematurely during the
-                                // deselection phase. Resolution is prevented by naming the queue
-                                // differently.
+                                // When a deselect sub action is initiated from a select action, the deselection events are
+                                // added to the common event queue. But the event queue must not be resolved prematurely
+                                // during the deselection phase. Resolution is prevented by naming the queue differently.
+                                //
+                                // See getActiveQueue() for a detailed description of the process. (Also explains why
+                                // _processedBy is omitted.)
                                 _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
-                                { _eventQueueAppendOnly: options._eventQueue }
+                                { _eventQueueAppendOnly: getActiveQueue( options ) }
                             ) );
-                            this.selected = model;
+                            this[label] = model;
                         }
                         options._processedBy[this._pickyCid] = { done: false };
     
-                        if ( !options._processedBy[this.selected.cid] ) this.selected.select( stripLocalOptions( options ) );
+                        if ( !options._processedBy[this[label].cid] ) this[label].select( stripLocalOptions( options ) );
     
                         if ( !(options.silent || options._silentLocally) ) {
     
+                            eventOptions = toEventOptions( options, label, this );
                             if ( reselected ) {
-                                if ( !options._silentReselect ) queueEvent( options, this, ["reselect:one", model, this, stripInternalOptions( options )] );
+                                if ( !options._silentReselect ) queueEventSet( "reselect:one", label, [ model, this, eventOptions ], this, options );
                             } else {
-                                queueEvent( options, this, ["select:one", model, this, stripInternalOptions( options )] );
+                                queueEventSet( "select:one", label, [ model, this, eventOptions ], this, options );
                             }
     
                         }
@@ -82,22 +83,27 @@
                         processEventQueue( options );
                     },
     
-                    // Deselect a model, resulting in no model
-                    // being selected
                     deselect: function ( model, options ) {
+                        var label;
+    
                         options = initOptions( options );
                         if ( options._processedBy[this._pickyCid] ) return;
     
-                        if ( !this.selected ) return;
+                        label = getLabel( options, this );
+                        if ( isIgnoredLabel( label, this ) || !this[label] ) return;
     
-                        model = model || this.selected;
-                        if ( this.selected !== model ) return;
+                        // The _messageOnly flag is used for a noop which is supposed to convey the label name only, and
+                        // make sure it is registered. That's done, so we can bail out now.
+                        if ( options._messageOnly ) return;
+    
+                        model = model || this[label];
+                        if ( this[label] !== model ) return;
     
                         options._processedBy[this._pickyCid] = { done: false };
     
-                        delete this.selected;
+                        delete this[label];
                         if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
-                        if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, ["deselect:one", model, this, stripInternalOptions( options )] );
+                        if ( !(options.silent || options._silentLocally) ) queueEventSet( "deselect:one", label, [ model, this, toEventOptions( options, label, this ) ], this, options );
     
                         options._processedBy[this._pickyCid].done = true;
                         processEventQueue( options );
@@ -110,31 +116,39 @@
     
                 },
     
-                // Select.Many
-                // -----------
-                // A multi-select mixin for Backbone.Collection, allowing a collection to
-                // have multiple items selected, including `selectAll` and `deselectAll`
-                // capabilities.
-    
                 SelectMany: {
     
-                    // Type indicator, undocumented, but part of the API (monitored by tests).
-                    // Can be queried safely by other components. Use it read-only.
+                    // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                    // other components. Use it read-only.
                     _pickyType: "Backbone.Select.Many",
     
-                    // Select a specified model, make sure the model knows it's selected, and
-                    // hold on to the selected model.
                     select: function ( model, options ) {
-                        var prevSelected = multiSelectionToArray( this.selected ),
-                            reselected = this.selected[model.cid] ? [model] : [];
+                        var label, prevSelected, reselected;
     
                         options = initOptions( options );
+                        label = getLabel( options, this );
+                        if ( isIgnoredLabel( label, this ) ) return;
+    
+                        prevSelected = _.clone( this[label] );
+                        reselected = this[label][model.cid] ? [model] : [];
     
                         if ( reselected.length && options._processedBy[this._pickyCid] ) return;
     
+                        if ( options.exclusive ) {
+                            this.each( function ( iteratedModel ) {
+                                if ( iteratedModel !== model ) this.deselect( iteratedModel, _.extend(
+                                        // Using _eventQueueAppendOnly instead of  _eventQueue: See .select() in Select.One
+                                        // or, in more detail, getActiveQueue() (also explains why _processedBy is omitted).
+                                        _.omit( options, "_processedBy", "_eventQueue", "exclusive" ),
+                                        { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                                    )
+                                );
+                            }, this );
+                        }
+    
                         if ( !reselected.length ) {
-                            this.selected[model.cid] = model;
-                            this.selectedLength = _.size( this.selected );
+                            this[label][model.cid] = model;
+                            setSelectionSize( _.size( this[label] ), this, label );
                         }
                         options._processedBy[this._pickyCid] = { done: false };
     
@@ -145,20 +159,27 @@
                         processEventQueue( options );
                     },
     
-                    // Deselect a specified model, make sure the model knows it has been deselected,
-                    // and remove the model from the selected list.
                     deselect: function ( model, options ) {
-                        var prevSelected = multiSelectionToArray( this.selected );
+                        var label, prevSelected;
     
                         options = initOptions( options );
                         if ( options._processedBy[this._pickyCid] ) return;
     
-                        if ( !this.selected[model.cid] ) return;
+                        label = getLabel( options, this );
+                        if ( isIgnoredLabel( label, this ) ) return;
+    
+                        // The _messageOnly flag is used for a noop which is supposed to convey the label name only, and
+                        // make sure it is registered. That's done, so we can bail out now.
+                        if ( options._messageOnly ) return;
+    
+                        prevSelected = _.clone( this[label] );
+    
+                        if ( !this[label][model.cid] ) return;
     
                         options._processedBy[this._pickyCid] = { done: false };
     
-                        delete this.selected[model.cid];
-                        this.selectedLength = _.size( this.selected );
+                        delete this[label][model.cid];
+                        setSelectionSize( _.size( this[label] ), this, label );
     
                         if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
                         triggerMultiSelectEvents( this, prevSelected, options );
@@ -167,19 +188,22 @@
                         processEventQueue( options );
                     },
     
-                    // Select all models in this collection
                     selectAll: function ( options ) {
-                        var prevSelected = multiSelectionToArray( this.selected ),
+                        var label, prevSelected,
                             reselected = [];
     
-                        options || (options = {});
+                        options || ( options = {} );
+                        label = getLabel( options, this );
+                        if ( isIgnoredLabel( label, this ) ) return;
+    
+                        prevSelected = _.clone( this[label] );
     
                         this.each( function ( model ) {
-                            if ( this.selected[model.cid] ) reselected.push( model );
-                            this.select( model, _.extend( {}, options, { _silentLocally: true } ) );
+                            if ( this[label][model.cid] ) reselected.push( model );
+                            this.select( model, _.extend( _.omit( options, "exclusive" ), { _silentLocally: true } ) );
                         }, this );
     
-                        this.selectedLength = _.size( this.selected );
+                        setSelectionSize( _.size( this[label] ), this, label );
     
                         options = initOptions( options );
                         triggerMultiSelectEvents( this, prevSelected, options, reselected );
@@ -192,20 +216,22 @@
                         processEventQueue( options );
                     },
     
-                    // Deselect all models in this collection
                     deselectAll: function ( options ) {
-                        var prevSelected;
+                        var prevSelected, label;
     
-                        if ( this.selectedLength === 0 ) return;
-                        prevSelected = multiSelectionToArray( this.selected );
+                        options || ( options = {} );
+                        label = getLabel( options, this );
+                        if ( isIgnoredLabel( label, this ) ) return;
     
-                        options || (options = {});
+                        if ( getSelectionSize( this, label ) === 0 ) return;
+                        prevSelected = _.clone( this[label] );
+    
     
                         this.each( function ( model ) {
                             this.deselect( model, _.extend( {}, options, { _silentLocally: true } ) );
                         }, this );
     
-                        this.selectedLength = 0;
+                        setSelectionSize( 0, this, label );
     
                         options = initOptions( options );
                         triggerMultiSelectEvents( this, prevSelected, options );
@@ -222,10 +248,16 @@
                         this.deselectAll( options );
                     },
     
-                    // Toggle select all / none. If some are selected, it will select all. If all
-                    // are selected, it will select none. If none are selected, it will select all.
+                    // Toggle select all / none. If some are selected, it will select all. If all are selected, it will
+                    // select none. If none are selected, it will select all.
                     toggleSelectAll: function ( options ) {
-                        if ( this.selectedLength === this.length ) {
+                        var label;
+    
+                        options || ( options = {} );
+                        label = getLabel( options, this );
+                        if ( isIgnoredLabel( label, this ) ) return;
+    
+                        if ( getSelectionSize( this, label ) === this.length ) {
                             this.deselectAll( options );
                         } else {
                             this.selectAll( options );
@@ -238,42 +270,39 @@
                     }
                 },
     
-                // Select.Me
-                // ---------
-                // A selectable mixin for Backbone.Model, allowing a model to be selected,
-                // enabling it to work with Select.One or Select.Many, or on it's own.
-    
                 SelectMe: {
     
-                    // Type indicator, undocumented, but part of the API (monitored by tests).
-                    // Can be queried safely by other components. Use it read-only.
+                    // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                    // other components. Use it read-only.
                     _pickyType: "Backbone.Select.Me",
     
-                    // Select this model, and tell our
-                    // collection that we're selected
                     select: function ( options ) {
-                        var reselected = this.selected;
+                        var label, reselected, eventOptions;
     
                         options = initOptions( options );
                         if ( options._processedBy[this.cid] ) return;
     
                         options._processedBy[this.cid] = { done: false };
-                        this.selected = true;
+    
+                        label = getLabel( options, this );
+                        reselected = this[label];
+                        this[label] = true;
     
                         if ( this._pickyCollections ) {
                             // Model-sharing mode: notify collections with an event
-                            this.trigger( "_selected", this, stripLocalOptions( options ) );
+                            this.trigger( "_selected", this, stripLocalOptionsExcept( options, "exclusive" ) );
                         } else if ( this.collection ) {
-                            // Single collection only: no event listeners set up in collection, call
-                            // it directly
-                            if ( !options._processedBy[this.collection._pickyCid] ) this.collection.select( this, stripLocalOptions( options ) );
+                            // Single collection only: no event listeners set up in collection, call it directly
+                            if ( !options._processedBy[this.collection._pickyCid] ) this.collection.select( this, stripLocalOptionsExcept( options, "exclusive" ) );
                         }
     
                         if ( !(options.silent || options._silentLocally) ) {
+                            eventOptions = toEventOptions( options, label, this );
+    
                             if ( reselected ) {
-                                if ( !options._silentReselect ) queueEvent( options, this, ["reselected", this, stripInternalOptions( options )] );
+                                if ( !options._silentReselect ) queueEventSet( "reselected", label, [ this, eventOptions ], this, options );
                             } else {
-                                queueEvent( options, this, ["selected", this, stripInternalOptions( options )] );
+                                queueEventSet( "selected", label, [ this, eventOptions ], this, options );
                             }
                         }
     
@@ -281,35 +310,43 @@
                         processEventQueue( options );
                     },
     
-                    // Deselect this model, and tell our collection that we're deselected
                     deselect: function ( options ) {
+                        var label, isNoop;
+    
                         options = initOptions( options );
                         if ( options._processedBy[this.cid] ) return;
     
-                        if ( !this.selected ) return;
+                        label = getLabel( options, this );
+                        isNoop = !this[label];
     
-                        options._processedBy[this.cid] = { done: false };
-                        this.selected = false;
+                        options._processedBy[this.cid] = { done: isNoop };
+                        this[label] = false;
     
                         if ( this._pickyCollections ) {
                             // Model-sharing mode: notify collections with an event
+                            if ( isNoop ) options = _.extend( options, { _messageOnly: true } );
                             this.trigger( "_deselected", this, stripLocalOptions( options ) );
                         } else if ( this.collection ) {
-                            // Single collection only: no event listeners set up in collection, call
-                            // it directly
+                            // Single collection only: no event listeners set up in collection, call it directly
+                            if ( isNoop ) options = _.extend( options, { _messageOnly: true } );
                             this.collection.deselect( this, stripLocalOptions( options ) );
                         }
     
-                        if ( !(options.silent || options._silentLocally) ) queueEvent( options, this, ["deselected", this, stripInternalOptions( options )] );
+                        if ( isNoop ) return;
+    
+                        if ( !(options.silent || options._silentLocally) ) queueEventSet( "deselected", label, [ this, toEventOptions( options, label, this ) ], this, options );
     
                         options._processedBy[this.cid].done = true;
                         processEventQueue( options );
                     },
     
-                    // Change selected to the opposite of what
-                    // it currently is
                     toggleSelected: function ( options ) {
-                        if ( this.selected ) {
+                        var label;
+    
+                        options || ( options = {} );
+                        label = getLabel( options, this );
+    
+                        if ( this[label] ) {
                             this.deselect( options );
                         } else {
                             this.select( options );
@@ -326,10 +363,15 @@
     
                 Me: {
     
-                    applyTo: function ( hostObject ) {
+                    applyTo: function ( hostObject, options ) {
                         if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
     
                         _.extend( hostObject, Mixins.SelectMe );
+    
+                        hostObject._pickyLabels = {};
+                        hostObject._pickyDefaultLabel = options && options.defaultLabel || "selected";
+                        ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
+    
                         augmentTrigger( hostObject );
                     }
     
@@ -344,14 +386,19 @@
                         if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
                         if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
     
-                        // Store a reference to the existing select method (most likely the
-                        // default Backbone.Collection.select method). Used to overload the new
-                        // select method.
+                        // Store a reference to the existing select method (most likely the default
+                        // Backbone.Collection.select method). Used to overload the new select method.
                         oldSelect = hostObject.select;
     
                         _.extend( hostObject, Mixins.SelectOne );
     
                         hostObject._pickyCid = _.uniqueId( 'singleSelect' );
+    
+                        hostObject._pickyLabels = {};
+                        hostObject._pickyDefaultLabel = options && options.defaultLabel || "selected";
+                        registerIgnoredLabels( options && options.ignoreLabel, hostObject );
+                        ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
+    
                         augmentTrigger( hostObject );
                         overloadSelect( oldSelect, hostObject );
     
@@ -360,10 +407,14 @@
                             // model-sharing mode
                             _.each( models || [], function ( model ) {
                                 registerCollectionWithModel( model, hostObject );
-                                if ( model.selected ) {
-                                    if ( hostObject.selected ) hostObject.selected.deselect();
-                                    hostObject.selected = model;
-                                }
+    
+                                forEachLabelInModel( model, function ( label ) {
+                                    ensureLabelIsRegistered( label, hostObject );
+                                    if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
+                                        if ( hostObject[label] ) hostObject[label].deselect( { label: label } );
+                                        hostObject[label] = model;
+                                    }
+                                } );
                             } );
     
                             hostObject.listenTo( hostObject, '_selected', hostObject.select );
@@ -373,8 +424,8 @@
                             hostObject.listenTo( hostObject, 'add', onAdd );
                             hostObject.listenTo( hostObject, 'remove', onRemove );
     
-                            // Mode flag, undocumented, but part of the API (monitored by tests). Can
-                            // be queried safely by other components. Use it read-only.
+                            // Mode flag, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                            // other components. Use it read-only.
                             hostObject._modelSharingEnabled = true;
     
                         }
@@ -386,31 +437,52 @@
                 Many: {
     
                     applyTo: function ( hostObject, models, options ) {
-                        var oldSelect;
+                        var oldSelect,
+                            enableModelSharing = options && options.enableModelSharing;
     
                         if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
                         if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
                         if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
     
-                        // Store a reference to the existing select method (most likely the
-                        // default Backbone.Collection.select method). Used to overload the new
-                        // select method.
+                        // Store a reference to the existing select method (most likely the default
+                        // Backbone.Collection.select method). Used to overload the new select method.
                         oldSelect = hostObject.select;
     
                         _.extend( hostObject, Mixins.SelectMany );
     
                         hostObject._pickyCid = _.uniqueId( 'multiSelect' );
-                        hostObject.selected = {};
-                        hostObject.selectedLength = 0;
+    
+                        hostObject._pickyLabels = {};
+                        hostObject._pickyDefaultLabel = options && options.defaultLabel || "selected";
+                        registerIgnoredLabels( options && options.ignoreLabel, hostObject );
+                        ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
+    
                         augmentTrigger( hostObject );
                         overloadSelect( oldSelect, hostObject );
     
-                        if ( options && options.enableModelSharing ) {
+                        if ( !enableModelSharing ) {
+    
+                            // The default label of the models may not be the same as the default label of the collection.
+                            // So we need to make sure the default label of the models is acknowledged, and the collection
+                            // property for that label is available and initialized with an empty hash.
+                            //
+                            // To keep things fast, we just handle the first model here. We expect the default label of all
+                            // models to be the same. If not, model-sharing mode must be used instead, which scans all
+                            // models for labels.
+                            if ( models && models[0] ) ensureLabelIsRegistered( models[0]._pickyDefaultLabel, hostObject );
+    
+                        } else {
     
                             // model-sharing mode
                             _.each( models || [], function ( model ) {
                                 registerCollectionWithModel( model, hostObject );
-                                if ( model.selected ) hostObject.selected[model.cid] = model;
+    
+                                forEachLabelInModel( model, function ( label ) {
+                                    ensureLabelIsRegistered( label, hostObject );
+                                    if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
+                                        hostObject[label][model.cid] = model;
+                                    }
+                                } );
                             } );
     
                             hostObject.listenTo( hostObject, '_selected', hostObject.select );
@@ -420,8 +492,8 @@
                             hostObject.listenTo( hostObject, 'add', onAdd );
                             hostObject.listenTo( hostObject, 'remove', onRemove );
     
-                            // Mode flag, undocumented, but part of the API (monitored by tests). Can
-                            // be queried safely by other components. Use it read-only.
+                            // Mode flag, undocumented, but part of the API (monitored by tests). Can be queried safely by
+                            // other components. Use it read-only.
                             hostObject._modelSharingEnabled = true;
     
                         }
@@ -436,12 +508,18 @@
         // Helper Methods
         // --------------
     
+        /** @type {string[]}  options which are local to a method call, and not inherited by other method calls */
+        var localOptions = ["_silentLocally", "_externalEvent", "exclusive"],
+    
+            /** @type {string[]}  options which are used internally for communicating across method calls, should not appear in public events */
+            internalOptions = ["_messageOnly", "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly"];
+    
         // Trigger events from a multi-select collection, based on the number of selected items.
-        var triggerMultiSelectEvents = function ( collection, prevSelected, options, reselected ) {
+        function triggerMultiSelectEvents ( collection, prevSelected, options, reselected ) {
             function mapCidsToModels ( cids, collection, previousSelection ) {
                 function mapper ( cid ) {
-                    // Find the model in the collection. If not found, it has been removed,
-                    // so get it from the array of previously selected models.
+                    // Find the model in the collection. If not found, it has been removed, so get it from the array of
+                    // previously selected models.
                     return collection.get( cid ) || previousSelection[cid];
                 }
     
@@ -450,17 +528,21 @@
     
             if ( options.silent || options._silentLocally ) return;
     
-            var selectedLength = collection.selectedLength,
+            var diff,
+                label = getLabel( options, collection ),
+    
+                selectionSize = getSelectionSize( collection, label ),
                 length = collection.length,
+    
                 prevSelectedCids = _.keys( prevSelected ),
-                selectedCids = _.keys( collection.selected ),
+                selectedCids = _.keys( collection[label] ),
                 addedCids = _.difference( selectedCids, prevSelectedCids ),
                 removedCids = _.difference( prevSelectedCids, selectedCids ),
-                unchanged = (selectedLength === prevSelectedCids.length && addedCids.length === 0 && removedCids.length === 0),
-                diff;
+    
+                unchanged = (selectionSize === prevSelectedCids.length && addedCids.length === 0 && removedCids.length === 0);
     
             if ( reselected && reselected.length && !options._silentReselect ) {
-                queueEvent( options, collection, ["reselect:any", reselected, collection, stripInternalOptions( options )] );
+                queueEventSet( "reselect:any", label, [ reselected, collection, toEventOptions( options, label, collection ) ], collection, options );
             }
     
             if ( unchanged ) return;
@@ -470,25 +552,41 @@
                 deselected: mapCidsToModels( removedCids, collection, prevSelected )
             };
     
-            if ( selectedLength === length ) {
-                queueEvent( options, collection, ["select:all", diff, collection, stripInternalOptions( options )] );
+            if ( selectionSize === length ) {
+                queueEventSet( "select:all", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
                 return;
             }
     
-            if ( selectedLength === 0 ) {
-                queueEvent( options, collection, ["select:none", diff, collection, stripInternalOptions( options )] );
+            if ( selectionSize === 0 ) {
+                queueEventSet( "select:none", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
                 return;
             }
     
-            if ( selectedLength > 0 && selectedLength < length ) {
-                queueEvent( options, collection, ["select:some", diff, collection, stripInternalOptions( options )] );
+            if ( selectionSize > 0 && selectionSize < length ) {
+                queueEventSet( "select:some", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
                 return;
             }
-        };
+        }
     
         function onAdd ( model, collection ) {
             registerCollectionWithModel( model, collection );
-            if ( model.selected ) collection.select( model, { _silentReselect: true, _externalEvent: "add" } );
+            forEachLabelInModel( model, function ( label ) {
+                // We want to keep the list of registered labels as small as possible in the collection, in order to keep
+                // the processing overhead low.
+                //
+                // In Select.One collections, there is no need to register a label before we encounter a model which is
+                // selected with it. The collection property for the label does not have to be created before - it would be
+                // left undefined anyway. (Below, a collection.select() call handles label creation when it is required.)
+                //
+                // In Select.Many collections, however, existing labels should be registered even if no model is selected
+                // with that label at the moment. We want the collection property for the label to exist, even if it is just
+                // an empty hash. That way, we don't have to guard against the property being undefined when it is queried
+                // in client code.
+                if ( collection._pickyType === "Backbone.Select.Many" ) ensureLabelIsRegistered( label, collection );
+    
+                if ( model[label] ) collection.select( model, { _silentReselect: true, _externalEvent: "add", label: label } );
+            } );
+    
         }
     
         function onRemove ( model, collection, options ) {
@@ -497,37 +595,60 @@
     
         function releaseModel ( model, collection, options ) {
             if ( model._pickyCollections ) model._pickyCollections = _.without( model._pickyCollections, collection._pickyCid );
-            if ( model.selected ) {
-                if ( model._pickyCollections && model._pickyCollections.length === 0 ) {
-                    collection.deselect( model, options );
-                } else {
-                    collection.deselect( model, _.extend( {}, options, { _skipModelCall: true } ) );
+    
+            forEachLabelInCollection( collection, function ( label ) {
+                var deselectOptions;
+    
+                if ( model[label] ) {
+    
+                    if ( model._pickyCollections && model._pickyCollections.length === 0 ) {
+                        deselectOptions = _.extend( {}, options, { label: label } );
+                    } else {
+                        deselectOptions = _.extend( {}, options, { label: label, _skipModelCall: true } );
+                    }
+    
+                    collection.deselect( model, deselectOptions );
                 }
-            }
+    
+            } );
         }
     
         function onResetSingleSelect ( collection, options ) {
             var selected,
                 excessiveSelections,
-                deselectOnRemove = _.find( options.previousModels, function ( model ) { return model.selected; } );
+                deselectOnRemove = {};
+            
+            forEachLabelInCollection( collection, function ( label ) {
+                var removeThis = _.find( options.previousModels, function ( model ) { return model[label]; } );
+                if ( removeThis ) deselectOnRemove[removeThis.cid] = removeThis; 
+            } );
     
-            if ( deselectOnRemove ) releaseModel( deselectOnRemove, collection, { _silentLocally: true } );
+            _.each( deselectOnRemove, function ( model ) {
+                releaseModel( model, collection, { _silentLocally: true } );
+            } );
+    
             _.each( options.previousModels, function ( model ) {
                 if ( model._pickyCollections ) model._pickyCollections = _.without( model._pickyCollections, collection._pickyCid );
             } );
     
             collection.each( function ( model ) {
                 registerCollectionWithModel( model, collection );
+                ensureModelLabelsInCollection( model, collection );
             } );
-            selected = collection.filter( function ( model ) { return model.selected; } );
-            excessiveSelections = _.initial( selected );
-            if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect(); } );
-            if ( selected.length ) collection.select( _.last( selected ), { silent: true } );
+    
+            forEachLabelInCollection( collection, function ( label ) {
+    
+                selected = collection.filter( function ( model ) { return model[label]; } );
+                excessiveSelections = _.initial( selected );
+                if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect( { label: label } ); } );
+                if ( selected.length ) collection.select( _.last( selected ), { silent: true, label: label } );
+    
+            } );
         }
     
         function onResetMultiSelect ( collection, options ) {
             var select,
-                deselect = _.filter( options.previousModels, function ( model ) { return model.selected; } );
+                deselect = _.filter( options.previousModels, function ( model ) { return isModelSelectedWithAnyCollectionLabel( model, collection ); } );
     
             if ( deselect ) _.each( deselect, function ( model ) { releaseModel( model, collection, { _silentLocally: true } ); } );
     
@@ -537,9 +658,13 @@
     
             collection.each( function ( model ) {
                 registerCollectionWithModel( model, collection );
+                ensureModelLabelsInCollection( model, collection );
             } );
-            select = collection.filter( function ( model ) { return model.selected; } );
-            if ( select.length ) _.each( select, function ( model ) { collection.select( model, { silent: true } ); } );
+    
+            forEachLabelInCollection( collection, function ( label ) {
+                select = collection.filter( function ( model ) { return model[label]; } );
+                if ( select.length ) _.each( select, function ( model ) { collection.select( model, { silent: true, label: label } ); } );
+            } );
         }
     
         function registerCollectionWithModel ( model, collection ) {
@@ -554,22 +679,128 @@
         }
     
         function stripLocalOptions ( options ) {
-            return _.omit( options, "_silentLocally", "_externalEvent" );
+            return _.omit( options, localOptions );
+        }
+    
+        function stripLocalOptionsExcept ( options, exceptions ) {
+            var omit = localOptions;
+    
+            if ( exceptions ) {
+                if ( _.isString( exceptions ) ) exceptions = [exceptions];
+                omit = _.without.apply( undefined, [ localOptions ].concat( exceptions ) );
+            }
+    
+            return _.omit( options, omit );
         }
     
         function stripInternalOptions ( options ) {
-            return _.omit( options, "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly" );
+            return _.omit( options, internalOptions );
         }
     
-        function multiSelectionToArray ( selectionsHash ) {
-            function mapper ( value, key ) {
-                selectedArr[key] = value;
+        function toEventOptions ( options, label ) {
+            var eventOptions = stripInternalOptions( options );
+    
+            // The default label is used for a select/deselect action unless the label has been passed in explicitly. More
+            // precisely, what gets used is the default label of the object on which select/deselect has initially been
+            // called.
+            //
+            // But other objects may have been created with another default label. So it can happen that the default label
+            // of the ongoing operation, initiated elsewhere, is different from the default label of the object which is
+            // processed right now.
+            //
+            // Therefore, in order to avoid ambiguity, the label is always exposed in the event options.
+            _.extend( eventOptions, { label: label } );
+    
+            return eventOptions;
+        }
+    
+        function getLabel ( options, obj ) {
+            // getLabel must be called before any work gets done in a select/deselect method. Therefore, it is also tasked
+            // with a few side jobs regarding proper initialization:
+            //
+            // - It ensures that the label is explicit in the options object, from here on out
+            // - It ensures that the label is registered
+            options.label || ( options.label = obj._pickyDefaultLabel );
+            ensureLabelIsRegistered( options.label, obj );
+    
+            return options.label;
+        }
+    
+        function ensureLabelIsRegistered ( name, obj ) {
+            if ( name && !obj._pickyLabels[name] && !isIgnoredLabel( name, obj ) ) {
+                // Check if the name is safe
+                if ( _.indexOf( illegalLabelNames, name ) !== -1 ) throw new Error( 'Illegal label name "' + name + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+    
+                obj._pickyLabels[name] = true;
+    
+                if ( obj._pickyType === "Backbone.Select.Many" ) {
+                    obj[name] = {};
+                    setSelectionSize( 0, obj, name );
+                }
             }
+        }
     
-            var selectedArr = [];
-            _.each( selectionsHash, mapper );
+        function ensureModelLabelsInCollection ( model, collection ) {
+            forEachLabelInModel( model, function ( label ) {
+                ensureLabelIsRegistered( label, collection );
+            } );
+        }
     
-            return selectedArr;
+        function isModelSelectedWithAnyCollectionLabel ( model, collection ) {
+            var hasCollectionLabel = false;
+    
+            forEachLabelInCollection( collection, function ( label ) {
+                hasCollectionLabel || ( hasCollectionLabel = model[label] );
+            } );
+    
+            return hasCollectionLabel;
+        }
+    
+        function registerIgnoredLabels ( labels, collection ) {
+            labels || ( labels = [] );
+            if ( _.isString( labels ) ) labels = [ labels ];
+    
+            if ( !_.isArray( labels ) ) throw new Error( "ignoreLabel option: illegal value. Expected a string or an array of strings but got the value " + labels );
+            if ( _.contains( labels, collection._pickyDefaultLabel ) ) throw new Error( "ignoreLabel option: illegal value. Can't ignore the default label, \"" + collection._pickyDefaultLabel + "\", of a collection (_pickyCid: " + collection._pickyCid + ")" );
+    
+            collection._pickyIgnoredLabels = labels;
+        }
+    
+        function isIgnoredLabel ( label, collection ) {
+            // - The query only really makes sense for collections. Labels can be ignored in collections.
+            // - A model doesn't ignore labels and doesn't have a _pickyIgnoredLabels property, so return false for a model.
+            // - If the label is undefined, return false, too.
+            return ( label && collection._pickyIgnoredLabels ) ? _.contains( collection._pickyIgnoredLabels, label ) : false;
+        }
+    
+        function getSelectionSizeProp ( label ) {
+            // For Select.Many collections only
+            return label + "Length";
+        }
+    
+        function getSelectionSize( collection, label ) {
+            // For Select.Many collections only
+            return collection[getSelectionSizeProp( label )];
+        }
+    
+        function setSelectionSize( size, collection, label ) {
+            // For Select.Many collections only
+            collection[getSelectionSizeProp( label )] = size;
+        }
+    
+        function forEachLabelInCollection ( collection, callback ) {
+            _forEachEntityLabel( collection, callback );
+        }
+    
+        function forEachLabelInModel ( model, callback ) {
+            _forEachEntityLabel( model, callback );
+        }
+    
+        function _forEachEntityLabel ( collectionOrModel, callback ) {
+            var labels = _.keys( collectionOrModel._pickyLabels );
+            _.each( labels, function ( label, index ) {
+                callback( label, collectionOrModel, index, labels );
+            } );
         }
     
         function initOptions ( options ) {
@@ -580,14 +811,53 @@
             return options;
         }
     
-        function queueEvent ( storage, actor, triggerArgs ) {
-            // Use either _eventQueue, which will eventually be processed by the calling
-            // object, or _eventQueueAppendOnly, which is another object's event queue
-            // and resolved elsewhere. _eventQueueAppendOnly exists only when needed,
-            // and thus takes precedence.
-            var queue = storage._eventQueueAppendOnly || storage._eventQueue;
+        function queueEventSet ( eventName, label, eventArgs, context, storage ) {
+            // Queue two events which are identical, except that one is namespaced to the label.
+            queueEvent( storage, context, [ eventName ].concat( eventArgs ) );
+            queueEvent( storage, context, [ eventName + ":" + label ].concat( eventArgs ) );
+        }
+    
+        function getActiveQueue ( storage ) {
+            // There are two properties which could store the queue:
+            //
+            // - Usually, the queue is stored in the _eventQueue property.
+            //
+            //   The queue will eventually be processed by the object which created it. The _eventQueue is created in the
+            //   initial select/deselect method call which started the whole thing. When all secondary calls are done and
+            //   the end of that method is reached, the _eventQueue is processed.
+            //
+            //   Secondary calls on other objects just add to the queue. They don't resolve it when they reach their own
+            //   processEventQueue() because its resolution is blocked by the original method. That method has created a
+            //   _processedBy entry for the calling object which is not yet marked as done. (All _processedBy entries must
+            //   be marked as done when the queue is processed.)
+            //
+            //   In the course of secondary calls, the original object is called back sometimes. These recursive, tertiary
+            //   calls also don't resolve the queue (which would be premature). They also don't have to do any real work,
+            //   except for some minor tasks. Recursive, tertiary calls return early when a _processedBy entry for the
+            //   object exists, whether it is marked done or not. Hence, they don't reach processEventQueue().
+            //
+            // - Sometimes, though, recursive calls to methods on the original object _have_ to do real work and must be
+            //   followed through. For those calls, the _processedBy entry is not passed on. They don't return early
+            //   (allowing them to do their work), add events to the queue etc, but when their end is reached,
+            //   processEventQueue() must not process the queue.
+            //
+            //   That's why they don't receive the queue in _eventQueue. Instead, the queue object is referenced in
+            //   _eventQueueAppendOnly during these calls. The _eventQueueAppendOnly property is left alone by
+            //   processEventQueue(), protecting the queue from premature resolution.
+            //
+            //   New events in these recursive calls must be added to _eventQueueAppendOnly, not _eventQueue, which just
+            //   contains an unused, empty hash. The original calling method shares the reference, and will process the
+            //   queue in the end, including the events added by the recursive call.
+            //
+            // _eventQueueAppendOnly exists only when needed, and thus takes precedence. If it exists, it is the active
+            // queue, whereas _eventQueue just contains an unused, empty hash. If not, _eventQueue is the real thing.
+            return storage._eventQueueAppendOnly || storage._eventQueue;
+        }
+    
+        function queueEvent ( storage, context, triggerArgs ) {
+            var queue = getActiveQueue( storage );
             queue.push( {
-                actor: actor,
+                context: context,
                 triggerArgs: triggerArgs
             } );
         }
@@ -604,31 +874,37 @@
                     mergeMultiSelectEvents( storage._eventQueue );
                     while ( storage._eventQueue.length ) {
                         eventData = storage._eventQueue.pop();
-                        eventData.actor.trigger.apply( eventData.actor, eventData.triggerArgs );
+                        eventData.context.trigger.apply( eventData.context, eventData.triggerArgs );
                     }
                 }
             }
         }
     
-        // Merges separate (sub-)events of a Select.Many collection into a single,
-        // summary event, and cleans up the event queue.
+        // Merges separate (sub-)events of a Select.Many collection into a single, summary event, and cleans up the event
+        // queue.
         //
-        // NB "reselect:any" events stand on their own and are not merged into a joint
-        // select:some event. They only occur once per collection in the event queue.
+        // NB "reselect:any" events stand on their own and are not merged into a joint select:some event. They only occur
+        // once per collection in the event queue.
         function mergeMultiSelectEvents ( queue ) {
             var multiSelectCollections = {};
     
             // Create merged data for each multi-select collection
             _.each( queue, function ( event, index ) {
-                var extractedData, diff, opts,
-                    actor = event.actor,
+                var label, datasetId, extractedData, diff, opts,
+                    context = event.context,
                     eventName = event.triggerArgs[0];
     
-                if ( actor._pickyType === "Backbone.Select.Many" && eventName !== "reselect:any" ) {
+                // Only act on queue entries for Backbone.Select.Many, and ignore their "reselect:any" events.
+                if ( context._pickyType === "Backbone.Select.Many" && eventName.indexOf( "reselect:any" ) === -1 ) {
     
-                    extractedData = multiSelectCollections[actor._pickyCid];
-                    if ( !extractedData ) extractedData = multiSelectCollections[actor._pickyCid] = {
-                        actor: actor,
+                    // NB Label (= event namespace) is an empty string for the non-namespaced event
+                    label = eventName.replace( /^select:(all|some|none):?/, "" );
+                    datasetId = context._pickyCid + "-ns-" + label;
+    
+                    extractedData = multiSelectCollections[datasetId];
+                    if ( !extractedData ) extractedData = multiSelectCollections[datasetId] = {
+                        context: context,
+                        label: label,
                         indexes: [],
                         merged: {
                             selected: [],
@@ -648,11 +924,9 @@
                 }
             } );
     
-            // If there are multiple event entries for a collection, remove them from
-            // the queue and append a merged event.
+            // If there are multiple event entries for a collection, remove them from the queue and append a merged event.
     
-            // - Don't touch the queued events for multi-select collections which have
-            //   just one entry.
+            // - Don't touch the queued events for multi-select collections which have just one entry.
             multiSelectCollections = _.filter( multiSelectCollections, function ( entry ) {
                 return entry.indexes.length > 1;
             } );
@@ -669,15 +943,14 @@
             // - Append merged event entry.
             _.each( multiSelectCollections, function ( extractedData ) {
     
-                // NB Multiple entries only occur if a select has been accompanied by
-                // one or more deselects. By definition, that translates into a
-                // select:some event (and never into select:all, select:none).
+                // NB Multiple entries only occur if a select has been accompanied by one or more deselects. By definition,
+                // that translates into a select:some event (and never into select:all, select:none).
                 queue.push( {
-                    actor: extractedData.actor,
+                    context: extractedData.context,
                     triggerArgs: [
-                        "select:some",
+                        extractedData.label ? "select:some:" + extractedData.label : "select:some",
                         { selected: extractedData.merged.selected, deselected: extractedData.merged.deselected },
-                        extractedData.actor,
+                        extractedData.context,
                         extractedData.merged.options
                     ]
                 } );
@@ -686,12 +959,11 @@
     
         }
     
-        // Overloads the select method. Provides access to the previous, legacy
-        // implementation, based on the arguments passed to the method.
+        // Overloads the select method. Provides access to the previous, legac implementation, based on the arguments passed
+        // to the method.
         //
-        // If `select` is called with a model as first parameter, the `select`
-        // method of the mixin is used, otherwise the previous implementation is
-        // called.
+        // If `select` is called with a model as first parameter, the `select` method of the mixin is used, otherwise the
+        // previous implementation is called.
         function overloadSelect ( oldSelect, context ) {
     
             context.select = (function () {
@@ -707,8 +979,8 @@
     
         }
     
-        // Creates a new trigger method which calls the predefined event handlers
-        // (onDeselect etc) as well as triggering the event.
+        // Creates a new trigger method which calls the predefined event handlers (onDeselect etc) as well as triggering the
+        // event.
         //
         // Adapted from Marionette.triggerMethod.
         function augmentTrigger ( context ) {
@@ -717,8 +989,7 @@
     
                 var origTrigger = context.trigger;
     
-                // Return an augmented trigger method implementation, in order to replace
-                // the original trigger method
+                // Return an augmented trigger method implementation, in order to replace the original trigger method
                 return function ( event, eventArgs ) {
     
                     if ( isSelectionEvent( event ) ) {
@@ -747,14 +1018,12 @@
     
         // Helpers for augmentTrigger
     
-        // Checks if the event is generated by Backbone.Select. Excludes internal
-        // events like `_selected`.
+        // Checks if the event is generated by Backbone.Select. Excludes internal events like `_selected`.
         function isSelectionEvent ( eventName ) {
             return ( /^([rd]e)?select(ed)?($|:)/ ).test( eventName );
         }
     
-        // Take the event section ("section1:section2:section3") and turn it
-        // into an uppercase name
+        // Take the event section ("section1:section2:section3") and turn it into an uppercase name
         //noinspection JSUnusedLocalSymbols
         function getEventName ( match, prefix, eventName ) {
             return eventName.toUpperCase();
@@ -775,6 +1044,57 @@
         }
     
         Backbone.Select = Select;
+    
+        // Capture existing Backbone model and collection methods and properties, as well as the mixin methods and
+        // properties, to populate a blacklist of illegal label names.
+        (function () {
+            var key,
+    
+                modelKeys = [],
+                selectOneKeys= [],
+                selectManyKeys = [],
+    
+                Model = Backbone.Model.extend( {
+                    initialize: function () {
+                        Backbone.Select.Me.applyTo( this );
+                    }
+                } ),
+    
+                SelectOneCollection = Backbone.Collection.extend( {
+                    initialize: function ( models ) {
+                        Backbone.Select.One.applyTo( this, models );
+                    }
+                } ),
+    
+                SelectManyCollection = Backbone.Collection.extend( {
+                    initialize: function ( models ) {
+                        Backbone.Select.Many.applyTo( this, models );
+                    }
+                } ),
+    
+                model = new Model(),
+    
+                selectOneCollection = new SelectOneCollection(),
+    
+                selectManyCollection = new SelectManyCollection();
+    
+            if ( _.allKeys ) {
+                // _.allKeys is not available before Underscore 1.8. Use it if it is there.
+                modelKeys = _.allKeys( model );
+                selectOneKeys = _.allKeys( selectOneCollection );
+                selectManyKeys = _.allKeys( selectManyCollection );
+            } else {
+                // Use simple for-in iteration to get the properties. In IE8, some properties might be missed that way (see
+                // http://stackoverflow.com/a/3705407/508355). Label name conflicts would still be caught while testing in
+                // other browsers, so never mind.
+                for ( key in model ) modelKeys.push( key );
+                for ( key in selectOneCollection ) selectOneKeys.push( key );
+                for ( key in selectManyCollection ) selectManyKeys.push( key );
+            }
+    
+            illegalLabelNames = _.without( _.union( modelKeys, selectOneKeys, selectManyKeys ), "selected", "selectedLength" );
+    
+        })();
     
     } )( Backbone, _ );
     
