@@ -1,0 +1,12 @@
+@charset "utf-8";
+
+/**
+ * Font Awesome
+ */
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('https://cdn.rawgit.com/FortAwesome/Font-Awesome/v4.4.0/fonts/fontawesome-webfont.eot?v=4.4.0');
+    src: url('https://cdn.rawgit.com/FortAwesome/Font-Awesome/v4.4.0/fonts/fontawesome-webfont.eot?#iefix&v=4.4.0') format('embedded-opentype'), url('https://cdn.rawgit.com/FortAwesome/Font-Awesome/v4.4.0/fonts/fontawesome-webfont.woff2?v=4.4.0') format('woff2'), url('https://cdn.rawgit.com/FortAwesome/Font-Awesome/v4.4.0/fonts/fontawesome-webfont.woff?v=4.4.0') format('woff'), url('https://cdn.rawgit.com/FortAwesome/Font-Awesome/v4.4.0/fonts/fontawesome-webfont.ttf?v=4.4.0') format('truetype'), url('https://cdn.rawgit.com/FortAwesome/Font-Awesome/v4.4.0/fonts/fontawesome-webfont.svg?v=4.4.0#fontawesomeregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}

@@ -5,15 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)</title>
+    <title>Backbone.Select 1.4.0: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)</title>
+    <meta name="description" content="Backbone.Select 1.4.0: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)">
 
     <!-- ATTN Foundation loaded without JS - stay clear of JS-driven widgets, or add the JS setup -->
-    <link rel="stylesheet" href="../bower_demo_components/foundation/css/normalize.css">
-    <link rel="stylesheet" href="../bower_demo_components/foundation/css/foundation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.css">
 
-    <link rel="stylesheet" href="../common.css">
-    <link rel="stylesheet" href="font-awesome.css">
-    <link rel="stylesheet" href="focus.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/hashchange/backbone.select/1.4.0/demo/common.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/hashchange/backbone.select/1.4.0/demo/amd/jsbin/font-awesome.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/hashchange/backbone.select/1.4.0/demo/amd/focus.css">
 
     <script id="item-template" type="text/x-template">
         <li class="item"><div class="content"><a href="#"><%= id %></a></div></li>
@@ -28,18 +29,10 @@
     </script>
 </head>
 <body>
-    <!-- check that 'bower install' has been run in the demo dir if bower.json isn't empty -->
-    <script src="../bower-check.js"></script>
 
     <section id="header">
         <h1 class="row">Backbone.Select</h1>
         <h2 class="row">Focusing on one selected item in a Select.Many collection, using the <code>exclusive</code> option (AMD)</h2>
-
-        <p id="build-info" class="row">
-            <a href="#" id="close-build-info">×</a>
-            This page uses the AMD build in the <code>dist</code> directory, not the files in
-            <code>src</code>. In other words, run the <code>grunt</code> command first to build a current version.
-        </p>
     </section>
 
     <section>
@@ -67,14 +60,9 @@
     </section>
 
     <!-- libraries -->
-    <script src="../bower_demo_components/requirejs/require.js"></script>
-    <script src="require-config.js"></script>
-    <script>
-        // Relative to the baseUrl defined in require-config.js
-        require( ['../demo/amd/focus-exclusive'] );
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.js"></script>
+    <script src="https://cdn.rawgit.com/hashchange/backbone.select/1.4.0/demo/amd/jsbin/require-config.js"></script>
 
-    <script src="../bower_demo_components/outline.js/outline.js"></script>
-    <script src="../close-build-info.js"></script>
+    <script src="https://cdn.rawgit.com/lindsayevans/outline.js/0d16b1edc9139854d2870989962ded04a488832f/outline.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-// amd.js
+// baskets.js
 
 require( [
 
