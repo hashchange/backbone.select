@@ -200,6 +200,43 @@
                     processEventQueue( options );
                 },
 
+                invertSelection: function ( options ) {
+                    var label, prevSelected, forwardedOptions;
+
+                    options = initOptions( options );
+                    label = getLabel( options, this );
+                    if ( isIgnoredLabel( label, this ) ) return;
+
+                    prevSelected = _.clone( this[label] );
+
+                    // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select() in
+                    // Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted in the
+                    // call).
+                    forwardedOptions = _.extend(
+                        _.omit( options, "_eventQueue", "exclusive" ),
+                        { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                    );
+
+                    this.each( function ( model ) {
+                        if ( this[label][model.cid] ) {
+                            this.deselect( model, _.omit( forwardedOptions, "_processedBy" ) );
+                        } else {
+                            this.select( model, _.omit( forwardedOptions, "_processedBy" ) );
+                        }
+                    }, this );
+
+                    setSelectionSize( _.size( this[label] ), this, label );
+
+                    triggerMultiSelectEvents( this, prevSelected, options );
+
+                    if ( options._processedBy[this._pickyCid] ) {
+                        options._processedBy[this._pickyCid].done = true;
+                    } else {
+                        options._processedBy[this._pickyCid] = { done: true };
+                    }
+                    processEventQueue( options );
+                },
+
                 deselectAll: function ( options ) {
                     var prevSelected, label, forwardedOptions;
 

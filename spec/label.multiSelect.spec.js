@@ -991,6 +991,137 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
 
         } );
 
+        describe( 'invertSelection()', function () {
+            var m1, m2, m3, collection, events, expected;
+
+            beforeEach( function () {
+                m1 = new Model();
+                m2 = new Model();
+                m3 = new Model();
+
+                collection = new Collection( [m1, m2, m3] );
+                m1.select();
+                m3.select( { label: "picked" } );
+
+                expected = {};
+            } );
+
+            describe( 'when 2 out of 3 models in a collection are already selected, and inverting the selection', function () {
+
+                beforeEach( function () {
+                    m1.select( { label: "starred" } );
+                    m2.select( { label: "starred" } );
+
+                    events = getEventSpies( [collection], ["selected", "picked", "starred"] );
+
+                    collection.invertSelection( { label: "starred" } );
+                } );
+
+                it( 'should unstar the first model', function () {
+                    expect( m1.starred ).toBe( false );
+                } );
+
+                it( 'should unstar the second model', function () {
+                    expect( m2.starred ).toBe( false );
+                } );
+
+                it( 'should star the third model', function () {
+                    expect( m3.starred ).toBe( true );
+                } );
+
+                it( 'should not change the selected, picked status of the first model', function () {
+                    expect( m1.selected ).toBe( true );
+                    expect( m1.picked ).toBeFalsy();
+                } );
+
+                it( 'should not change the selected, picked status of the second model', function () {
+                    expect( m2.selected ).toBeFalsy();
+                    expect( m2.picked ).toBeFalsy();
+                } );
+
+                it( 'should not change the selected, picked status of the third model', function () {
+                    expect( m3.selected ).toBeFalsy();
+                    expect( m3.picked ).toBe( true );
+                } );
+
+                it( "should have a starred count of 1", function () {
+                    expect( collection.starredLength ).toBe( 1 );
+                } );
+
+                it( "should have the third model in the starred list", function () {
+                    expected[m3.cid] = m3;
+                    expect( collection.starred ).toEqual( expected );
+                } );
+
+                it( "should have an unchanged selected count of 1", function () {
+                    expect( collection.selectedLength ).toBe( 1 );
+                } );
+
+                it( "should have an unchanged selected list, containing the first model", function () {
+                    expected[m1.cid] = m1;
+                    expect( collection.selected ).toEqual( expected );
+                } );
+
+                it( "should have an unchanged picked count of 1", function () {
+                    expect( collection.selectedLength ).toBe( 1 );
+                } );
+
+                it( "should have an unchanged picked list, containing the third model", function () {
+                    expected[m3.cid] = m3;
+                    expect( collection.picked ).toEqual( expected );
+                } );
+
+                it( 'should trigger a select:some event, with label "starred" in the event options', function () {
+                    expect( events.get( collection, "select:some" ) ).toHaveBeenCalledWith( {
+                        selected: [m3],
+                        deselected: [m1, m2]
+                    }, collection, { label: "starred" } );
+                } );
+
+                it( 'should trigger a select:some:starred event', function () {
+                    expect( events.get( collection, "select:some:starred" ) ).toHaveBeenCalledWith( {
+                        selected: [m3],
+                        deselected: [m1, m2]
+                    }, collection, { label: "starred" } );
+                } );
+
+                it( 'should not trigger more than those two select:some events (including namespaced ones)', function () {
+                    expect( events.get( collection, "select:some:*" ) ).toHaveCallCount( 2 );
+                } );
+
+                it( "should not trigger a select:all event, including any of the namespaces", function () {
+                    expect( events.get( collection, "select:all:*" ) ).not.toHaveBeenCalled();
+                } );
+
+                it( "should not trigger a select:none event, including any of the namespaces", function () {
+                    expect( events.get( collection, "select:none:*" ) ).not.toHaveBeenCalled();
+                } );
+
+                it( "should not trigger a reselect:any event, including any of the namespaces", function () {
+                    expect( events.get( collection, "reselect:any:*" ) ).not.toHaveBeenCalled();
+                } );
+
+            } );
+
+            describe( 'when 2 out of 3 models in a collection are already selected, and inverting the selection, with options.silent enabled', function () {
+
+                beforeEach( function () {
+                    m1.select( { label: "starred" } );
+                    m2.select( { label: "starred" } );
+
+                    events = getEventSpies( [collection], ["selected", "picked", "starred"] );
+
+                    collection.invertSelection( { label: "starred", silent: true } );
+                } );
+
+                it( 'should not trigger any selection-related events', function () {
+                    expect( events.get( collection, "*" ) ).not.toHaveBeenCalled();
+                } );
+
+            } );
+
+        } );
+
     } );
 
     describe( 'A property for the custom label exists, and holds a hash', function () {

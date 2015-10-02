@@ -779,6 +779,102 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
 
         } );
 
+        describe( 'When calling invertSelection() on the collection,', function () {
+
+            beforeEach( function () {
+                collection.invertSelection( { exclusive: true } );
+            } );
+
+            it( 'it does not change the outcome', function () {
+                expect( m1.selected ).toBe( false );
+                expect( m2.selected ).toBe( true );
+                expect( m3.selected ).toBe( false );
+                expect( m4.selected ).toBe( true );
+                expect( m5.selected ).toBe( false );
+
+                expected[m2.cid] = m2;
+                expected[m4.cid] = m4;
+                expect( collection.selected ).toEqual( expected );
+            } );
+
+            it( 'it does not change the fired events', function () {
+                expect( events.get( m1, "deselected" ) ).toHaveBeenCalledWith( m1, { label: "selected" } );
+                expect( events.get( m1, "deselected:selected" ) ).toHaveBeenCalledWith( m1, { label: "selected" } );
+                expect( events.get( m1, "*" ) ).toHaveCallCount( 2 );
+
+                expect( events.get( m2, "selected" ) ).toHaveBeenCalledWith( m2, { label: "selected" } );
+                expect( events.get( m2, "selected:selected" ) ).toHaveBeenCalledWith( m2, { label: "selected" } );
+                expect( events.get( m2, "*" ) ).toHaveCallCount( 2 );
+
+                expect( events.get( m3, "deselected" ) ).toHaveBeenCalledWith( m3, { label: "selected" } );
+                expect( events.get( m3, "deselected:selected" ) ).toHaveBeenCalledWith( m3, { label: "selected" } );
+                expect( events.get( m3, "*" ) ).toHaveCallCount( 2 );
+
+                expect( events.get( m4, "selected" ) ).toHaveBeenCalledWith( m4, { label: "selected" } );
+                expect( events.get( m4, "selected:selected" ) ).toHaveBeenCalledWith( m4, { label: "selected" } );
+                expect( events.get( m4, "*" ) ).toHaveCallCount( 2 );
+
+                expect( events.get( m5, "deselected" ) ).toHaveBeenCalledWith( m5, { label: "selected" } );
+                expect( events.get( m5, "deselected:selected" ) ).toHaveBeenCalledWith( m5, { label: "selected" } );
+                expect( events.get( m5, "*" ) ).toHaveCallCount( 2 );
+
+                expect( events.get( collection, "select:some" ) ).toHaveBeenCalledWith( { selected: [m2, m4], deselected: [m1, m3, m5] }, collection, { exclusive: true, label: "selected" } );
+                expect( events.get( collection, "select:some:selected" ) ).toHaveBeenCalledWith( { selected: [m2, m4], deselected: [m1, m3, m5] }, collection, { exclusive: true, label: "selected" } );
+                expect( events.get( collection, "select:some:*" ) ).toHaveCallCount( 2 );
+                expect( events.get( collection, "select:none:*" ) ).not.toHaveBeenCalled();
+                expect( events.get( collection, "select:all:*" ) ).not.toHaveBeenCalled();
+                expect( events.get( collection, "reselect:any" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'it does not change the state captured by these events, ie they fire at the end', function () {
+                expected[m2.cid] = m2;
+                expected[m4.cid] = m4;
+
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( collection, "select:some" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( collection, "select:some" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( collection, "select:some" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( collection, "select:some" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( collection, "select:some" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( collection, "select:some" ).stateOf( collection ).selected ).toEqual( expected );
+            } );
+
+        } );
+
     } );
 
 } );
