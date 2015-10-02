@@ -88,6 +88,16 @@ m2.select();
 // prints "m2 has been selected."
 ```
 
+###### Demos
+
+There are a couple of interactive demos you can play around with. The demos are kept simple, and are a good way to explore the various features of Backbone.Select.
+
+- Basic functionality, sharing models among multiple collections: [JSBin][demo-basic-jsbin], [Codepen][demo-basic-codepen]
+- Delayed animation. Using custom labels in a Select.One collection: [JSBin][demo-label-select.one-jsbin], [Codepen][demo-label-select.one-codepen]
+- Selecting, starring, loving. Using custom labels in a Select.Many collection: [JSBin][demo-label-select.many-jsbin], [Codepen][demo-label-select.many-codepen]
+- Focusing on one selected item in a Select.Many collection, using custom labels: [JSBin][demo-focus-with-label-jsbin], [Codepen][demo-focus-with-label-codepen]
+- Focusing on one selected item in a Select.Many collection, using the `exclusive` option: [JSBin][demo-focus-with-exclusive-jsbin], [Codepen][demo-focus-with-exclusive-codepen]
+
 ## Dependencies and setup
 
 [Backbone][] is the only dependency. Include backbone.select.js after [Backbone][]. Backbone.Select requires Backbone 0.9.9 or later.
@@ -1186,8 +1196,19 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [external-event]: #events
 [custom-labels]: #custom-labels "Custom labels"
 [label-event-args]: #event-handler-arguments-label-property "Event handler arguments: `label` property"
-[default-label]: #the-defaultLabel-setup-option "The `defaultLabel` setup option"
-[ignore-label]: #the-ignoreLabel-setup-option "The `ignoreLabel` setup option"
+[default-label]: #the-defaultlabel-setup-option "The `defaultLabel` setup option"
+[ignore-label]: #the-ignorelabel-setup-option "The `ignoreLabel` setup option"
 [custom-options]: #custom-options
 [select-compatibility]: #compatibility-with-backbones-own-select-method
 [picky-compatibility]: #compatibility-with-backbonepicky
+
+[demo-basic-jsbin]: http://jsbin.com/xosepu/2/edit?js,output "Backbone.Select: Basic demo, with model sharing (AMD) – JSBin"
+[demo-basic-codepen]: http://codepen.io/hashchange/pen/yNdbgR "Backbone.Select: Basic demo, with model sharing (AMD) – Codepen"
+[demo-label-select.one-jsbin]: http://jsbin.com/xetuva/1/edit?js,output "Backbone.Select: Custom label demo for a Select.One collection"
+[demo-label-select.one-codepen]: http://codepen.io/hashchange/pen/BoWLKP "Backbone.Select: Custom label demo for a Select.One collection"
+[demo-label-select.many-jsbin]: http://jsbin.com/pobezu/2/edit?js,output "Backbone.Select: Custom label demo for a Select.Many collection (AMD)"
+[demo-label-select.many-codepen]: http://codepen.io/hashchange/pen/epvzMx "Backbone.Select: Custom label demo for a Select.Many collection (AMD)"
+[demo-focus-with-label-jsbin]: http://jsbin.com/soduyi/1/edit?html,js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using custom labels (AMD)"
+[demo-focus-with-label-codepen]: http://codepen.io/hashchange/pen/wKJzWE "Backbone.Select: Focusing on one selected item in a Select.Many collection, using custom labels (AMD)"
+[demo-focus-with-exclusive-jsbin]: http://jsbin.com/colulo/1/edit?html,js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
+[demo-focus-with-exclusive-codepen]: http://codepen.io/hashchange/pen/QjpKGo "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
