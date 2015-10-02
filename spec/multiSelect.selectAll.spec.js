@@ -20,30 +20,15 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when no models are selected, and selecting all", function () {
-        var m1, m2, collection, events, selectedEventState, selectAllEventState;
+        var m1, m2, collection, events, eventStates;
 
         beforeEach( function () {
-            selectedEventState = { model: {}, collection: {} };
-            selectAllEventState = { m1: {}, m2: {}, collection: {} };
-
             m1 = new Model();
             m2 = new Model();
 
             collection = new Collection( [m1, m2] );
             events = getEventSpies( collection );
-
-            m1.on( 'selected', function ( model ) {
-                selectedEventState.model.selected = model && model.selected;
-                selectedEventState.collection.selected = _.clone( collection.selected );
-                selectedEventState.collection.selectedLength = collection.selectedLength;
-            } );
-
-            collection.on( 'select:all', function () {
-                selectAllEventState.m1.selected = m1.selected;
-                selectAllEventState.m2.selected = m2.selected;
-                selectAllEventState.collection.selected = _.clone( collection.selected );
-                selectAllEventState.collection.selectedLength = collection.selectedLength;
-            } );
+            eventStates = getEventStateStore( [m1, m2, collection] );
 
             collection.selectAll();
         } );
@@ -74,7 +59,7 @@ describe( "multi-select collection: selectAll", function () {
         } );
 
         it( 'should trigger a model\'s selected event after the model status has been updated', function () {
-            expect( selectedEventState.model.selected ).toEqual( true );
+            expect( eventStates.getEvent( m1, "selected" ).stateOf( m1 ).selected ).toEqual( true );
         } );
 
         it( 'should trigger a model\'s selected event after the collection\'s selected models have been updated with that model', function () {
@@ -82,28 +67,28 @@ describe( "multi-select collection: selectAll", function () {
             // time. The point is that events are fired when model and collection
             // states are consistent. When m1 fires the 'selected' event, only m1 must
             // be part of the collection.
-            expect( selectedEventState.collection.selected[m1.cid] ).toBe( m1 );
+            expect( eventStates.getEvent( m1, "selected" ).stateOf( collection ).selected[m1.cid] ).toBe( m1 );
         } );
 
         it( 'should trigger a model\'s selected event after the collection\'s selected length has been updated', function () {
             // collection.selectedLength could be 1 or 2 at this time. Again, all we
             // are asking for is consistency - see comment above.
-            expect( selectedEventState.collection.selectedLength ).toBeGreaterThan( 0 );
-            expect( selectedEventState.collection.selectedLength ).toEqual( _.size( selectedEventState.collection.selected ) );
+            expect( eventStates.getEvent( m1, "selected" ).stateOf( collection ).selectedLength ).toBeGreaterThan( 0 );
+            expect( eventStates.getEvent( m1, "selected" ).stateOf( collection ).selectedLength ).toEqual( _.size( eventStates.getEvent( m1, "selected" ).stateOf( collection ).selected ) );
         } );
 
         it( 'should trigger the collection\'s select:all event after the model status has been updated', function () {
-            expect( selectAllEventState.m1.selected ).toEqual( true );
-            expect( selectAllEventState.m2.selected ).toEqual( true );
+            expect( eventStates.getEvent( collection, "select:all" ).stateOf( m1 ).selected ).toEqual( true );
+            expect( eventStates.getEvent( collection, "select:all" ).stateOf( m2 ).selected ).toEqual( true );
         } );
 
         it( 'should trigger the collection\'s select:all event after the collection\'s selected models have been updated', function () {
-            expect( selectAllEventState.collection.selected[m1.cid] ).toBe( m1 );
-            expect( selectAllEventState.collection.selected[m2.cid] ).toBe( m2 );
+            expect( eventStates.getEvent( collection, "select:all" ).stateOf( collection ).selected[m1.cid] ).toBe( m1 );
+            expect( eventStates.getEvent( collection, "select:all" ).stateOf( collection ).selected[m2.cid] ).toBe( m2 );
         } );
 
         it( 'should trigger the collection\'s select:all event after the collection\'s selected length has been updated', function () {
-            expect( selectAllEventState.collection.selectedLength ).toBe( 2 );
+            expect( eventStates.getEvent( collection, "select:all" ).stateOf( collection ).selectedLength ).toBe( 2 );
         } );
     } );
 
@@ -138,12 +123,9 @@ describe( "multi-select collection: selectAll", function () {
     } );
 
     describe( "when 1 model - the first one - is selected, and selecting all", function () {
-        var m1, m2, collection, events, reselectedEventState, reselectAnyEventState;
+        var m1, m2, collection, events, eventStates;
 
         beforeEach( function () {
-            reselectedEventState = { model: {}, collection: {} };
-            reselectAnyEventState = { m1: {}, m2: {}, collection: {} };
-
             m1 = new Model();
             m2 = new Model();
 
@@ -151,18 +133,7 @@ describe( "multi-select collection: selectAll", function () {
             m1.select();
 
             events = getEventSpies( collection );
-            m1.on( 'reselected', function ( model ) {
-                reselectedEventState.model.selected = model && model.selected;
-                reselectedEventState.collection.selected = _.clone( collection.selected );
-                reselectedEventState.collection.selectedLength = collection.selectedLength;
-            } );
-
-            collection.on( 'reselect:any', function () {
-                reselectAnyEventState.m1.selected = m1.selected;
-                reselectAnyEventState.m2.selected = m2.selected;
-                reselectAnyEventState.collection.selected = _.clone( collection.selected );
-                reselectAnyEventState.collection.selectedLength = collection.selectedLength;
-            } );
+            eventStates = getEventStateStore( [m1, m2, collection] );
 
             collection.selectAll();
         } );
@@ -198,32 +169,29 @@ describe( "multi-select collection: selectAll", function () {
             // time. The point is that events are fired when model and collection
             // states are consistent. When m1 fires the 'reselected' event, only m1
             // must be part of the collection.
-            expect( reselectedEventState.collection.selectedLength ).toBeGreaterThan( 0 );
-            expect( reselectedEventState.collection.selectedLength ).toEqual( _.size( reselectedEventState.collection.selected ) );
+            expect( eventStates.getEvent( m1, "reselected" ).stateOf( collection ).selectedLength ).toBeGreaterThan( 0 );
+            expect( eventStates.getEvent( m1, "reselected" ).stateOf( collection ).selectedLength ).toEqual( _.size( eventStates.getEvent( m1, "reselected" ).stateOf( collection ).selected ) );
         } );
 
         it( 'should trigger the collection\'s reselect:any event after the model status has been updated', function () {
-            expect( reselectAnyEventState.m1.selected ).toEqual( true );
-            expect( reselectAnyEventState.m2.selected ).toEqual( true );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( m1 ).selected ).toEqual( true );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( m2 ).selected ).toEqual( true );
         } );
 
         it( 'should trigger the collection\'s reselect:any event after the collection\'s selected models have been updated', function () {
-            expect( reselectAnyEventState.collection.selected[m1.cid] ).toBe( m1 );
-            expect( reselectAnyEventState.collection.selected[m2.cid] ).toBe( m2 );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( collection ).selected[m1.cid] ).toBe( m1 );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( collection ).selected[m2.cid] ).toBe( m2 );
         } );
 
         it( 'should trigger the collection\'s reselect:any event after the collection\'s selected length has been updated', function () {
-            expect( reselectAnyEventState.collection.selectedLength ).toBe( 2 );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( collection ).selectedLength ).toBe( 2 );
         } );
     } );
 
     describe( "when 1 model - the last one - is selected, and selecting all", function () {
-        var m1, m2, collection, events, reselectedEventState, reselectAnyEventState;
+        var m1, m2, collection, events, eventStates;
 
         beforeEach( function () {
-            reselectedEventState = { model: {}, collection: {} };
-            reselectAnyEventState = { m1: {}, m2: {}, collection: {} };
-
             m1 = new Model();
             m2 = new Model();
 
@@ -231,18 +199,7 @@ describe( "multi-select collection: selectAll", function () {
             m2.select();
 
             events = getEventSpies( collection );
-            m2.on( 'reselected', function ( model ) {
-                reselectedEventState.model.selected = model && model.selected;
-                reselectedEventState.collection.selected = _.clone( collection.selected );
-                reselectedEventState.collection.selectedLength = collection.selectedLength;
-            } );
-
-            collection.on( 'reselect:any', function () {
-                reselectAnyEventState.m1.selected = m1.selected;
-                reselectAnyEventState.m2.selected = m2.selected;
-                reselectAnyEventState.collection.selected = _.clone( collection.selected );
-                reselectAnyEventState.collection.selectedLength = collection.selectedLength;
-            } );
+            eventStates = getEventStateStore( [m1, m2, collection] );
 
             collection.selectAll();
         } );
@@ -278,22 +235,22 @@ describe( "multi-select collection: selectAll", function () {
             // time. The point is that events are fired when model and collection
             // states are consistent. When m2 fires the 'reselected' event, only m2
             // must be part of the collection.
-            expect( reselectedEventState.collection.selectedLength ).toBeGreaterThan( 0 );
-            expect( reselectedEventState.collection.selectedLength ).toEqual( _.size( reselectedEventState.collection.selected ) );
+            expect( eventStates.getEvent( m2, "reselected" ).stateOf( collection ).selectedLength ).toBeGreaterThan( 0 );
+            expect( eventStates.getEvent( m2, "reselected" ).stateOf( collection ).selectedLength ).toEqual( _.size( eventStates.getEvent( m2, "reselected" ).stateOf( collection ).selected ) );
         } );
 
         it( 'should trigger the collection\'s reselect:any event after the model status has been updated', function () {
-            expect( reselectAnyEventState.m1.selected ).toEqual( true );
-            expect( reselectAnyEventState.m2.selected ).toEqual( true );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( m1 ).selected ).toEqual( true );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( m2 ).selected ).toEqual( true );
         } );
 
         it( 'should trigger the collection\'s reselect:any event after the collection\'s selected models have been updated', function () {
-            expect( reselectAnyEventState.collection.selected[m1.cid] ).toBe( m1 );
-            expect( reselectAnyEventState.collection.selected[m2.cid] ).toBe( m2 );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( collection ).selected[m1.cid] ).toBe( m1 );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( collection ).selected[m2.cid] ).toBe( m2 );
         } );
 
         it( 'should trigger the collection\'s reselect:any event after the collection\'s selected length has been updated', function () {
-            expect( reselectAnyEventState.collection.selectedLength ).toBe( 2 );
+            expect( eventStates.getEvent( collection, "reselect:any" ).stateOf( collection ).selectedLength ).toBe( 2 );
         } );
     } );
 

@@ -52,6 +52,13 @@ _.extend( Logger.prototype, {
  *   (In other words, there is just one list of items: the items are observed for their events, and at the same time,
  *   they are also the items of which snapshots are made whenever an event occurs.)
  *
+ * - In addition to the selection state, the corresponding "*Length" properties are also recorded. So, for the
+ *   "selected" label, selectedLength is captured, and so on for all label names. This matters for Select.Many
+ *   collections.
+ *
+ *   (In fact, the "*Length" properties are recorded for any observed object, not just for Select.Many collections. But
+ *   predictably, they are always undefined for Select.Me and Select.One entities.)
+ *
  * - The base event types are hard-coded. The list must be modified when new event types are created.
  *
  * Retrieving a value:
@@ -82,6 +89,10 @@ _.extend( Logger.prototype, {
  *         expect( eventStates.getEvent( m2, "selected:starred" ).stateOf( collection ).starred ).toBe( m2 );
  *     } );
  *
+ *     it( 'when the selected:starred event of the model fires, the starredLength property of the Select.Many collection has already been updated', function () {
+ *         expect( eventStates.getEvent( m2, "selected:starred" ).stateOf( collection ).starredLength ).toBe( 2 );
+ *     } );
+ *
  *     it( 'when the select:one event of the collection fires, only model m3 is selected', function () {
  *         var event = eventStates.getEvent( collection, "select:one" );
  *         expect( event.stateOf( m1 ).selected ).toBe( false );
@@ -108,6 +119,7 @@ function getEventStateStore ( entities, labels ) {
             var entityState = {};
             _.each( labels, function ( label ) {
                 entityState[label] = captureFunc( entity, label );
+                entityState[label + "Length"] = entity ? entity[label + "Length"]: "Entity not defined at time of capture";
             } );
             states._set( entity, entityState );
         } );
