@@ -1,4 +1,4 @@
-// Backbone.Select, v1.4.0
+// Backbone.Select, v1.5.0
 // Copyright (c) 2015 Michael Heim
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
@@ -39,7 +39,7 @@
                     _pickyType: "Backbone.Select.One",
     
                     select: function ( model, options ) {
-                        var label, reselected, eventOptions;
+                        var label, reselected, eventOptions, forwardedOptions;
     
                         options = initOptions( options );
                         if ( options._processedBy[this._pickyCid] ) return;
@@ -50,18 +50,20 @@
                         reselected = model && this[label] === model ? model : undefined;
     
                         if ( !reselected ) {
-                            this.deselect( undefined, _.extend(
-                                // _eventQueue vs _eventQueueAppendOnly:
-                                //
-                                // When a deselect sub action is initiated from a select action, the deselection events are
-                                // added to the common event queue. But the event queue must not be resolved prematurely
-                                // during the deselection phase. Resolution is prevented by naming the queue differently.
-                                //
-                                // See getActiveQueue() for a detailed description of the process. (Also explains why
-                                // _processedBy is omitted.)
+                            // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options:
+                            //
+                            // When a deselect sub action is initiated from a select action, the deselection events are
+                            // added to the common event queue. But the event queue must not be resolved prematurely during
+                            // the deselection phase. Resolution is prevented by naming the queue differently.
+                            //
+                            // See getActiveQueue() for a detailed description of the process. (Also explains why
+                            // _processedBy is omitted in the call.)
+                            forwardedOptions = _.extend(
                                 _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
                                 { _eventQueueAppendOnly: getActiveQueue( options ) }
-                            ) );
+                            );
+    
+                            this.deselect( undefined, forwardedOptions );
                             this[label] = model;
                         }
                         options._processedBy[this._pickyCid] = { done: false };
@@ -123,7 +125,7 @@
                     _pickyType: "Backbone.Select.Many",
     
                     select: function ( model, options ) {
-                        var label, prevSelected, reselected;
+                        var label, prevSelected, reselected, forwardedOptions;
     
                         options = initOptions( options );
                         label = getLabel( options, this );
@@ -135,14 +137,16 @@
                         if ( reselected.length && options._processedBy[this._pickyCid] ) return;
     
                         if ( options.exclusive ) {
+                            // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select()
+                            // in Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted
+                            // in the call).
+                            forwardedOptions = _.extend(
+                                _.omit( options, "_eventQueue", "exclusive" ),
+                                { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                            );
+    
                             this.each( function ( iteratedModel ) {
-                                if ( iteratedModel !== model ) this.deselect( iteratedModel, _.extend(
-                                        // Using _eventQueueAppendOnly instead of  _eventQueue: See .select() in Select.One
-                                        // or, in more detail, getActiveQueue() (also explains why _processedBy is omitted).
-                                        _.omit( options, "_processedBy", "_eventQueue", "exclusive" ),
-                                        { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
-                                    )
-                                );
+                                if ( iteratedModel !== model ) this.deselect( iteratedModel, _.omit( forwardedOptions, "_processedBy" ) );
                             }, this );
                         }
     
@@ -189,23 +193,30 @@
                     },
     
                     selectAll: function ( options ) {
-                        var label, prevSelected,
+                        var label, prevSelected, forwardedOptions,
                             reselected = [];
     
-                        options || ( options = {} );
+                        options = initOptions( options );
                         label = getLabel( options, this );
                         if ( isIgnoredLabel( label, this ) ) return;
     
                         prevSelected = _.clone( this[label] );
     
+                        // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select() in
+                        // Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted in the
+                        // call).
+                        forwardedOptions = _.extend(
+                            _.omit( options, "_eventQueue", "exclusive" ),
+                            { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                        );
+    
                         this.each( function ( model ) {
                             if ( this[label][model.cid] ) reselected.push( model );
-                            this.select( model, _.extend( _.omit( options, "exclusive" ), { _silentLocally: true } ) );
+                            this.select( model, _.omit( forwardedOptions, "_processedBy" ) );
                         }, this );
     
                         setSelectionSize( _.size( this[label] ), this, label );
     
-                        options = initOptions( options );
                         triggerMultiSelectEvents( this, prevSelected, options, reselected );
     
                         if ( options._processedBy[this._pickyCid] ) {
@@ -216,24 +227,67 @@
                         processEventQueue( options );
                     },
     
-                    deselectAll: function ( options ) {
-                        var prevSelected, label;
+                    invertSelection: function ( options ) {
+                        var label, prevSelected, forwardedOptions;
     
-                        options || ( options = {} );
+                        options = initOptions( options );
+                        label = getLabel( options, this );
+                        if ( isIgnoredLabel( label, this ) ) return;
+    
+                        prevSelected = _.clone( this[label] );
+    
+                        // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select() in
+                        // Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted in the
+                        // call).
+                        forwardedOptions = _.extend(
+                            _.omit( options, "_eventQueue", "exclusive" ),
+                            { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                        );
+    
+                        this.each( function ( model ) {
+                            if ( this[label][model.cid] ) {
+                                this.deselect( model, _.omit( forwardedOptions, "_processedBy" ) );
+                            } else {
+                                this.select( model, _.omit( forwardedOptions, "_processedBy" ) );
+                            }
+                        }, this );
+    
+                        setSelectionSize( _.size( this[label] ), this, label );
+    
+                        triggerMultiSelectEvents( this, prevSelected, options );
+    
+                        if ( options._processedBy[this._pickyCid] ) {
+                            options._processedBy[this._pickyCid].done = true;
+                        } else {
+                            options._processedBy[this._pickyCid] = { done: true };
+                        }
+                        processEventQueue( options );
+                    },
+    
+                    deselectAll: function ( options ) {
+                        var prevSelected, label, forwardedOptions;
+    
+                        options = initOptions( options );
                         label = getLabel( options, this );
                         if ( isIgnoredLabel( label, this ) ) return;
     
                         if ( getSelectionSize( this, label ) === 0 ) return;
                         prevSelected = _.clone( this[label] );
     
+                        // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select() in
+                        // Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted in the
+                        // call).
+                        forwardedOptions = _.extend(
+                            _.omit( options, "_eventQueue" ),
+                            { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                        );
     
                         this.each( function ( model ) {
-                            this.deselect( model, _.extend( {}, options, { _silentLocally: true } ) );
+                            this.deselect( model, _.omit( forwardedOptions, "_processedBy" ) );
                         }, this );
     
                         setSelectionSize( 0, this, label );
     
-                        options = initOptions( options );
                         triggerMultiSelectEvents( this, prevSelected, options );
     
                         if ( options._processedBy[this._pickyCid] ) {
@@ -959,8 +1013,8 @@
     
         }
     
-        // Overloads the select method. Provides access to the previous, legac implementation, based on the arguments passed
-        // to the method.
+        // Overloads the select method. Provides access to the previous, legacy implementation, based on the arguments
+        // passed to the method.
         //
         // If `select` is called with a model as first parameter, the `select` method of the mixin is used, otherwise the
         // previous implementation is called.
