@@ -1,15 +1,15 @@
 describe( "multi-select collection: deselectAll", function () {
     var Model = Backbone.Model.extend( {
-        initialize: function () {
-            Backbone.Select.Me.applyTo( this );
-        }
-    } );
+            initialize: function () {
+                Backbone.Select.Me.applyTo( this );
+            }
+        } ),
 
-    var Collection = Backbone.Collection.extend( {
-        initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models );
-        }
-    } );
+        Collection = Backbone.Collection.extend( {
+            initialize: function ( models ) {
+                Backbone.Select.Many.applyTo( this, models );
+            }
+        } );
 
     beforeAll( function () {
         limitJasmineRecursiveScreenOutput();
@@ -252,21 +252,20 @@ describe( "multi-select collection: deselectAll", function () {
 
         it( "should trigger a model's deselected event after the model status has been updated", function () {
             expect( eventStates.getEvent( m1, "deselected" ).stateOf( m1 ).selected ).toEqual( false );
+            expect( eventStates.getEvent( m1, "deselected" ).stateOf( m2 ).selected ).toEqual( false );
+
+            expect( eventStates.getEvent( m2, "deselected" ).stateOf( m1 ).selected ).toEqual( false );
+            expect( eventStates.getEvent( m2, "deselected" ).stateOf( m2 ).selected ).toEqual( false );
         } );
 
-        it( "should trigger a model's deselected event after the collection's selected models have been updated with that model", function () {
-            // m2 doesn't necessarily have to be removed from collection.selected at
-            // this time. The point is that events are fired when model and collection
-            // states are consistent. When m1 fires the 'deselected' event, only m1
-            // must have been removed from the collection.
-            expect( eventStates.getEvent( m1, "deselected" ).stateOf( collection ).selected[m1.cid] ).toBeUndefined();
+        it( "should trigger a model's deselected event after the collection's selected models have been updated", function () {
+            expect( eventStates.getEvent( m1, "deselected" ).stateOf( collection ).selected ).toEqual( {} );
+            expect( eventStates.getEvent( m2, "deselected" ).stateOf( collection ).selected ).toEqual( {} );
         } );
 
         it( "should trigger a model's deselected event after the collection's selected length has been updated", function () {
-            // collection.selectedLength could be 0 or 1 at this time. Again, all we
-            // are asking for is consistency - see comment above.
-            expect( eventStates.getEvent( m1, "deselected" ).stateOf( collection ).selectedLength ).toBeLessThan( 2 );
-            expect( eventStates.getEvent( m1, "deselected" ).stateOf( collection ).selectedLength ).toEqual( _.size( eventStates.getEvent( m1, "deselected" ).stateOf( collection ).selected ) );
+            expect( eventStates.getEvent( m1, "deselected" ).stateOf( collection ).selectedLength ).toEqual( 0 );
+            expect( eventStates.getEvent( m2, "deselected" ).stateOf( collection ).selectedLength ).toEqual( 0 );
         } );
 
         it( "should trigger the collection's select:none event after the model status has been updated", function () {

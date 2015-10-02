@@ -756,6 +756,21 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
             } );
 
             it( 'it does not change the state captured by these events, ie they fire at the end', function () {
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m1, "deselected" ).stateOf( collection ).selected ).toEqual( {} );
+
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m3, "deselected" ).stateOf( collection ).selected ).toEqual( {} );
+
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( m1 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( m3 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( m5 ).selected ).toBe( false );
+                expect( eventStates.getEvent( m5, "deselected" ).stateOf( collection ).selected ).toEqual( {} );
+
                 expect( eventStates.getEvent( collection, "select:none" ).stateOf( m1 ).selected ).toBe( false );
                 expect( eventStates.getEvent( collection, "select:none" ).stateOf( m3 ).selected ).toBe( false );
                 expect( eventStates.getEvent( collection, "select:none" ).stateOf( m5 ).selected ).toBe( false );

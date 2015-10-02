@@ -196,7 +196,7 @@
                 deselectAll: function ( options ) {
                     var prevSelected, label;
 
-                    options || ( options = {} );
+                    options = initOptions( options );
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) ) return;
 
@@ -205,12 +205,16 @@
 
 
                     this.each( function ( model ) {
-                        this.deselect( model, _.extend( {}, options, { _silentLocally: true } ) );
+                        this.deselect( model, _.extend(
+                            // Using _eventQueueAppendOnly instead of  _eventQueue: See .select() in Select.One
+                            // or, in more detail, getActiveQueue() (also explains why _processedBy is omitted).
+                            _.omit( options, "_processedBy", "_eventQueue" ),
+                            { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                        ) );
                     }, this );
 
                     setSelectionSize( 0, this, label );
 
-                    options = initOptions( options );
                     triggerMultiSelectEvents( this, prevSelected, options );
 
                     if ( options._processedBy[this._pickyCid] ) {
