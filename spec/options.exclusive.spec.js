@@ -688,6 +688,26 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
                 expected[m5.cid] = m5;
                 expected[m5.cid] = m5;
 
+                expect( eventStates.getEvent( m1, "reselected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m1, "reselected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m1, "reselected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m2, "selected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( m3, "reselected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m3, "reselected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m3, "reselected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m4, "selected" ).stateOf( collection ).selected ).toEqual( expected );
+
+                expect( eventStates.getEvent( m5, "reselected" ).stateOf( m2 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m5, "reselected" ).stateOf( m4 ).selected ).toBe( true );
+                expect( eventStates.getEvent( m5, "reselected" ).stateOf( collection ).selected ).toEqual( expected );
+
                 expect( eventStates.getEvent( collection, "select:all" ).stateOf( m2 ).selected ).toBe( true );
                 expect( eventStates.getEvent( collection, "select:all" ).stateOf( m4 ).selected ).toBe( true );
                 expect( eventStates.getEvent( collection, "select:all" ).stateOf( collection ).selected ).toEqual( expected );

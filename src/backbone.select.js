@@ -165,7 +165,7 @@
                     var label, prevSelected,
                         reselected = [];
 
-                    options || ( options = {} );
+                    options = initOptions( options );
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) ) return;
 
@@ -173,12 +173,16 @@
 
                     this.each( function ( model ) {
                         if ( this[label][model.cid] ) reselected.push( model );
-                        this.select( model, _.extend( _.omit( options, "exclusive" ), { _silentLocally: true } ) );
+                        this.select( model, _.extend(
+                            // Using _eventQueueAppendOnly instead of  _eventQueue: See .select() in Select.One
+                            // or, in more detail, getActiveQueue() (also explains why _processedBy is omitted).
+                            _.omit( options, "_processedBy", "_eventQueue", "exclusive" ),
+                            { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                        ) );
                     }, this );
 
                     setSelectionSize( _.size( this[label] ), this, label );
 
-                    options = initOptions( options );
                     triggerMultiSelectEvents( this, prevSelected, options, reselected );
 
                     if ( options._processedBy[this._pickyCid] ) {
@@ -932,8 +936,8 @@
 
     }
 
-    // Overloads the select method. Provides access to the previous, legac implementation, based on the arguments passed
-    // to the method.
+    // Overloads the select method. Provides access to the previous, legacy implementation, based on the arguments
+    // passed to the method.
     //
     // If `select` is called with a model as first parameter, the `select` method of the mixin is used, otherwise the
     // previous implementation is called.
