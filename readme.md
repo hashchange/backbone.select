@@ -576,6 +576,8 @@ myCollection.selectAll();
 
 The `selectAll` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
 
+The whole batch of select actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the selections have been completed.
+
 #### collection.deselectAll( [options] )
 
 Deselects all models in the collection. Fires collection and model events indicating the change. See the [events section][select.many-events] below.
@@ -585,6 +587,8 @@ myCollection.deselectAll();
 ```
 
 The `deselectAll` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
+
+The whole batch of deselect actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the deselections have been completed.
 
 #### collection.toggleSelectAll( [options] )
 
@@ -604,6 +608,8 @@ The following rules apply when toggling:
 * If all models are selected, deselect them all.
 
 The `toggleSelectAll` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
+
+The whole batch of select and deselect actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the selections and deselections have been completed.
 
 ### Backbone.Select.Many properties
 
@@ -1034,6 +1040,10 @@ New test files in the `spec` directory are picked up automatically, no need to e
 
 ## Release notes
 
+### v1.5.0
+
+* Made events for `selectAll()`, `deselectAll()`, `toggleSelectAll()` fire only after all individual actions are complete.
+
 ### v1.4.0
 
 * Introduced support for custom labels, `label` option
@@ -1208,7 +1218,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [demo-label-select.one-codepen]: http://codepen.io/hashchange/pen/BoWLKP "Backbone.Select: Custom label demo for a Select.One collection"
 [demo-label-select.many-jsbin]: http://jsbin.com/pobezu/2/edit?js,output "Backbone.Select: Custom label demo for a Select.Many collection (AMD)"
 [demo-label-select.many-codepen]: http://codepen.io/hashchange/pen/epvzMx "Backbone.Select: Custom label demo for a Select.Many collection (AMD)"
-[demo-focus-with-label-jsbin]: http://jsbin.com/soduyi/1/edit?html,js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using custom labels (AMD)"
+[demo-focus-with-label-jsbin]: http://jsbin.com/soduyi/1/edit?js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using custom labels (AMD)"
 [demo-focus-with-label-codepen]: http://codepen.io/hashchange/pen/wKJzWE "Backbone.Select: Focusing on one selected item in a Select.Many collection, using custom labels (AMD)"
-[demo-focus-with-exclusive-jsbin]: http://jsbin.com/colulo/1/edit?html,js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
+[demo-focus-with-exclusive-jsbin]: http://jsbin.com/colulo/1/edit?js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
 [demo-focus-with-exclusive-codepen]: http://codepen.io/hashchange/pen/QjpKGo "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
