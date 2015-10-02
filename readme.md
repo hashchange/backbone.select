@@ -23,7 +23,7 @@ Backbone.Select is [compatible with Backbone.Picky][picky-compatibility]. For a 
     * [Events](#backboneselectone-events): ["select:one"](#selectone), ["deselect:one"](#deselectone), ["reselect:one"](#reselectone)
 - [Backbone.Select.Many: a multi-select collection](#backboneselectmany-a-multi-select-collection)
     * [Basic usage](#basic-usage-2)
-    * [Methods](#backboneselectmany-methods): [`select`](#collectionselect-model-options--1), [`deselect`](#collectiondeselect-model-options--1), [`selectAll`](#collectionselectall-options-), [`deselectAll`](#collectiondeselectall-options-), [`toggleSelectAll`](#collectiontoggleselectall-options-)
+    * [Methods](#backboneselectmany-methods): [`select`](#collectionselect-model-options--1), [`deselect`](#collectiondeselect-model-options--1), [`selectAll`](#collectionselectall-options-), [`deselectAll`](#collectiondeselectall-options-), [`invertSelection`](#collectioninvertselection-options-), [`toggleSelectAll`](#collectiontoggleselectall-options-)
     * [Properties](#backboneselectmany-properties): [`selected`](#collectionselected-1), [`selectedLength`](#collectionselectedlength)
     * [Events](#backboneselectmany-events): ["select:all"](#selectall), ["select:none"](#selectnone), ["select:some"](#selectsome), ["reselect:any"](#reselectany)
 - [Sharing models among collections](#sharing-models-among-collections)
@@ -590,6 +590,18 @@ The `deselectAll` method supports the following options: [`silent`][select.many-
 
 The whole batch of deselect actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the deselections have been completed.
 
+#### collection.invertSelection( [options] )
+
+Selects all models in the collection which haven't been selected, and deselects those which have been. Fires collection and model events indicating the change. See the [events section][select.many-events] below.
+
+```js
+myCollection.invertSelection();
+```
+
+The `invertSelection` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
+
+The whole batch of select and deselect actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the selections and deselections have been completed.
+
 #### collection.toggleSelectAll( [options] )
 
 Selects all models in the collection. If that is already the case and all models are selected, they are deselected instead. Fires collection and model events indicating the change, and separate events for any re-selections. See the [events section][select.many-events] below.
@@ -1042,6 +1054,7 @@ New test files in the `spec` directory are picked up automatically, no need to e
 
 ### v1.5.0
 
+* Added `invertSelection()`
 * Made events for `selectAll()`, `deselectAll()`, `toggleSelectAll()` fire only after all individual actions are complete.
 
 ### v1.4.0
