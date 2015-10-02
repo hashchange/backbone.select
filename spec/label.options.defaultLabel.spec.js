@@ -783,4 +783,125 @@ describe( 'Custom label options: defaultLabel.', function () {
 
     } );
 
+    describe( 'Preventing conflicts with existing methods and properties.', function () {
+
+        describe( 'Using an illegal default label in a call on a Backbone.Select.Me model. An error is thrown', function () {
+
+            it( 'when a label name matches an existing Backbone model method', function () {
+                var label = "save";
+                expect( function () { new Model( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'when a label name matches an existing Backbone model property', function () {
+                var label = "attributes";
+                expect( function () { new Model( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Backbone collection method', function () {
+                var label = "at";
+                expect( function () { new Model( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Backbone collection property', function () {
+                var label = "models";
+                expect( function () { new Model( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.Me method', function () {
+                var label = "toggleSelected";
+                expect( function () { new Model( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.One method', function () {
+                var label = "deselect";
+                expect( function () { new Model( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.Many method', function () {
+                var label = "toggleSelectAll";
+                expect( function () { new Model( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+        } );
+
+        describe( 'Using an illegal default label in a call on a Backbone.Select.One collection. An error is thrown', function () {
+
+            it( 'when a label name matches an existing Backbone model method', function () {
+                var label = "save";
+                expect( function () { new SelectOneCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'when a label name matches an existing Backbone model property', function () {
+                var label = "attributes";
+                expect( function () { new SelectOneCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Backbone collection method', function () {
+                var label = "at";
+                expect( function () { new SelectOneCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Backbone collection property', function () {
+                var label = "models";
+                expect( function () { new SelectOneCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.Me method', function () {
+                var label = "toggleSelected";
+                expect( function () { new SelectOneCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.One method', function () {
+                var label = "deselect";
+                expect( function () { new SelectOneCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.Many method', function () {
+                var label = "toggleSelectAll";
+                expect( function () { new SelectOneCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+        } );
+
+        describe( 'Using an illegal default label in a call on a Backbone.Select.Many collection. An error is thrown', function () {
+
+            it( 'when a label name matches an existing Backbone model method', function () {
+                var label = "save";
+                expect( function () { new SelectManyCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'when a label name matches an existing Backbone model property', function () {
+                var label = "attributes";
+                expect( function () { new SelectManyCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Backbone collection method', function () {
+                var label = "at";
+                expect( function () { new SelectManyCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Backbone collection property', function () {
+                var label = "models";
+                expect( function () { new SelectManyCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.Me method', function () {
+                var label = "toggleSelected";
+                expect( function () { new SelectManyCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.One method', function () {
+                var label = "deselect";
+                expect( function () { new SelectManyCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+            it( 'When a label name matches an existing Select.Many method', function () {
+                var label = "toggleSelectAll";
+                expect( function () { new SelectManyCollection( undefined, { defaultLabel: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+            } );
+
+        } );
+
+    } );
+
 } );

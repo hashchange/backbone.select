@@ -1,7 +1,9 @@
 ;( function ( Backbone, _ ) {
     "use strict";
 
-    var Mixins = {
+    var illegalLabelNames = [],
+
+        Mixins = {
 
             SelectOne: {
 
@@ -699,6 +701,9 @@
 
     function ensureLabelIsRegistered ( name, obj ) {
         if ( name && !obj._pickyLabels[name] && !isIgnoredLabel( name, obj ) ) {
+            // Check if the name is safe
+            if ( _.indexOf( illegalLabelNames, name ) !== -1 ) throw new Error( 'Illegal label name "' + name + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
+
             obj._pickyLabels[name] = true;
 
             if ( obj._pickyType === "Backbone.Select.Many" ) {
@@ -1012,5 +1017,56 @@
     }
 
     Backbone.Select = Select;
+
+    // Capture existing Backbone model and collection methods and properties, as well as the mixin methods and
+    // properties, to populate a blacklist of illegal label names.
+    (function () {
+        var key,
+
+            modelKeys = [],
+            selectOneKeys= [],
+            selectManyKeys = [],
+
+            Model = Backbone.Model.extend( {
+                initialize: function () {
+                    Backbone.Select.Me.applyTo( this );
+                }
+            } ),
+
+            SelectOneCollection = Backbone.Collection.extend( {
+                initialize: function ( models ) {
+                    Backbone.Select.One.applyTo( this, models );
+                }
+            } ),
+
+            SelectManyCollection = Backbone.Collection.extend( {
+                initialize: function ( models ) {
+                    Backbone.Select.Many.applyTo( this, models );
+                }
+            } ),
+
+            model = new Model(),
+
+            selectOneCollection = new SelectOneCollection(),
+
+            selectManyCollection = new SelectManyCollection();
+
+        if ( _.allKeys ) {
+            // _.allKeys is not available before Underscore 1.8. Use it if it is there.
+            modelKeys = _.allKeys( model );
+            selectOneKeys = _.allKeys( selectOneCollection );
+            selectManyKeys = _.allKeys( selectManyCollection );
+        } else {
+            // Use simple for-in iteration to get the properties. In IE8, some properties might be missed that way (see
+            // http://stackoverflow.com/a/3705407/508355). Label name conflicts would still be caught while testing in
+            // other browsers, so never mind.
+            for ( key in model ) modelKeys.push( key );
+            for ( key in selectOneCollection ) selectOneKeys.push( key );
+            for ( key in selectManyCollection ) selectManyKeys.push( key );
+        }
+
+        illegalLabelNames = _.without( _.union( modelKeys, selectOneKeys, selectManyKeys ), "selected", "selectedLength" );
+
+    })();
 
 } )( Backbone, _ );
