@@ -394,4 +394,31 @@ describe( "selectable model", function () {
         } );
     } );
 
+    describe( 'Works with nested inheritance hierarchies', function () {
+        var Model, ModelSubtype, model;
+
+        beforeEach( function () {
+            Model = Backbone.Model.extend();
+
+            ModelSubtype = Model.extend( {
+                initialize: function () {
+                    Backbone.Select.Me.applyTo( this );
+                }
+            } );
+
+            model = new ModelSubtype();
+        } );
+
+        it( 'A selection works as intended', function () {
+            model.select();
+            expect( model.selected ).toBe( true );
+        } );
+
+        it( 'A deselection works as intended', function () {
+            model.select();
+            model.deselect();
+            expect( model.selected ).toBe( false );
+        } );
+    } );
+
 } );
