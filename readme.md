@@ -1,10 +1,12 @@
 # Backbone.Select
 
+<small>[Outline][outline] – [Example][intro-example] – [Setup][setup] – [Select.Me][Backbone.Select.Me] – [Select.One][Backbone.Select.One] – [Select.Many][Backbone.Select.Many] – [Sharing models][sharing] – [Labels][custom-labels] – [Compatibility][select-compatibility]</small>
+
 Backbone.Select is a set of mixins for Backbone models and collections. Models gain the ability to be selected, and collections handle those selections.
 
 Collections either allow only a single model to be selected ([Backbone.Select.One][] mixin), or cater for multiple selections ([Backbone.Select.Many][]). Events communicate selections and deselections to other parts of your application. In [model-sharing mode][sharing], models can be part of more than one collection. Backbone.Select will keep selections of shared models in sync and guarantee consistency in even the most complex scenarios.
 
-Backbone.Select is [compatible with Backbone.Picky][picky-compatibility]. For a superset of Backbone.Select with additional features, have a look at [Backbone.Cycle][].
+For a superset of Backbone.Select with additional features, have a look at [Backbone.Cycle][].
 
 #### Outline
 
@@ -100,7 +102,7 @@ There are a couple of interactive demos you can play around with. The demos are 
 
 ## Dependencies and setup
 
-[Backbone][] is the only dependency. Include backbone.select.js after [Backbone][]. Backbone.Select requires Backbone 0.9.9 or later.
+[Backbone][] is the only dependency. Include backbone.select.js after [Backbone][]. Backbone.Select requires Backbone 1.0.0 or later.
 
 The stable version of Backbone.Select is available in the `dist` directory ([dev][dist-dev], [prod][dist-prod]), including an AMD build ([dev][dist-amd-dev], [prod][dist-amd-prod]). If you use Bower, fetch the files with `bower install backbone.select`. With npm, it is `npm install backbone.select`.
 
@@ -1187,6 +1189,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [Backbone.Picky]: https://github.com/derickbailey/backbone.picky#readme "Backbone.Picky"
 [Backbone.Cycle]: https://github.com/hashchange/backbone.cycle#readme "Backbone.Cycle"
 
+[outline]: #outline "Outline"
+[intro-example]: #an-introductory-example "An introductory example"
+[setup]: #dependencies-and-setup "Dependencies and setup"
 [Backbone.Select.Me]: #backboneselectme-making-models-selectable
 [Backbone.Select.One]: #backboneselectone-a-single-select-collection
 [Backbone.Select.Many]: #backboneselectmany-a-multi-select-collection
@@ -1224,6 +1229,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [custom-options]: #custom-options
 [select-compatibility]: #compatibility-with-backbones-own-select-method
 [picky-compatibility]: #compatibility-with-backbonepicky
+[build]: #build-process-and-tests "Build process and tests"
 
 [demo-basic-jsbin]: http://jsbin.com/xosepu/2/edit?js,output "Backbone.Select: Basic demo, with model sharing (AMD) – JSBin"
 [demo-basic-codepen]: http://codepen.io/hashchange/pen/yNdbgR "Backbone.Select: Basic demo, with model sharing (AMD) – Codepen"
