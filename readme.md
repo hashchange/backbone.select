@@ -35,7 +35,7 @@ For a superset of Backbone.Select with additional features, have a look at [Back
 - [Custom labels](#custom-labels)
     * [Using the `label` option](#using-the-label-option)
     * [`label` in events](#the-label-in-events)
-    * [`defaultLabel`](#the-defaultLabel-setup-option), [`ignoreLabel`](#the-ignoreLabel-setup-option)
+    * [`defaultLabel`](#the-defaultlabel-setup-option), [`ignoreLabel`](#the-ignorelabel-setup-option)
 - [Custom options](#custom-options)
 - [Compatibility with Backbone's own select method](#compatibility-with-backbones-own-select-method)
 - [Compatibility with Backbone.Picky](#compatibility-with-backbonepicky)
@@ -872,10 +872,10 @@ Collection = Backbone.Collection.extend({
 collection = new Collection( [myModel] );
 
 // Calling select() without specifying a label
-myCollection.select( myModel );
+collection.select( myModel );
 
-myCollection.starred;     // => myModel
-myCollection.selected;    // => undefined
+collection.starred;     // => myModel
+collection.selected;    // => undefined
 ```
 
 Unless you have a specific dislike for the `"selected"` label, you probably won't need that option most of the time. But it becomes essential when you want to ignore the `"selected"` label. Read on for that.
@@ -906,12 +906,12 @@ Collection = Backbone.Collection.extend({
 collection = new Collection( [myModel] );
 
 // Calling select() with the ignored label
-myCollection.select( myModel, { label: "starred" );
-myCollection.starred;     // => undefined
+collection.select( myModel, { label: "starred" );
+collection.starred;     // => undefined
 
 // Calling select() with other labels continues to work
-myCollection.select( myModel );
-myCollection.selected;    // => myModel
+collection.select( myModel );
+collection.selected;    // => myModel
 ```
 
 Ignoring labels only works in the context of a collection. You can't ignore labels on the level of a model. Technical considerations aside, it just wouldn't make sense. Hence, the `ignoreLabel` option does not do anything in a Select.Me model setup.
@@ -935,8 +935,8 @@ Collection = Backbone.Collection.extend({
 collection = new Collection( [myModel] );
 
 // Calling select() with the ignored label
-myCollection.select( myModel, { label: "selected" );
-myCollection.selected;    // => undefined
+collection.select( myModel, { label: "selected" );
+collection.selected;    // => undefined
 ```
 
 ## Custom options
