@@ -378,4 +378,48 @@ describe( 'Custom label options: ignoreLabel.', function () {
 
     } );
 
+    describe( '_pickyIgnoredLabels property.', function () {
+
+        // NB A model doesn't ignore labels and doesn't have a _pickyIgnoredLabels property.
+
+        describe( 'Select.One collection', function () {
+
+            it( 'By default, _pickyIgnoredLabels is an empty array', function () {
+                var collection = new SelectOneCollection();
+                expect( collection._pickyIgnoredLabels ).toEqual( [] );
+            } );
+
+            it( 'When a label is ignored, it appears in the _pickyIgnoredLabels array', function () {
+                var collection = new SelectOneCollection( undefined, { ignoreLabel: "starred" } );
+                expect( collection._pickyIgnoredLabels ).toEqual( ["starred"] );
+            } );
+
+            it( 'When multiple labels are ignored, they appear in the _pickyIgnoredLabels array', function () {
+                var collection = new SelectOneCollection( undefined, { ignoreLabel: ["starred", "picked"] } );
+                expect( collection._pickyIgnoredLabels ).toEqual( ["starred", "picked"] );
+            } );
+
+        } );
+
+        describe( 'Select.Many collection', function () {
+
+            it( 'By default, _pickyIgnoredLabels is an empty array', function () {
+                var collection = new SelectManyCollection();
+                expect( collection._pickyIgnoredLabels ).toEqual( [] );
+            } );
+
+            it( 'When a label is ignored, it appears in the _pickyIgnoredLabels array', function () {
+                var collection = new SelectManyCollection( undefined, { ignoreLabel: "starred" } );
+                expect( collection._pickyIgnoredLabels ).toEqual( ["starred"] );
+            } );
+
+            it( 'When multiple labels are ignored, they appear in the _pickyIgnoredLabels array', function () {
+                var collection = new SelectManyCollection( undefined, { ignoreLabel: ["starred", "picked"] } );
+                expect( collection._pickyIgnoredLabels ).toEqual( ["starred", "picked"] );
+            } );
+
+        } );
+
+    } );
+
 } );
