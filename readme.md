@@ -1054,6 +1054,10 @@ New test files in the `spec` directory are picked up automatically, no need to e
 
 ## Release notes
 
+### v1.5.1
+
+* Added `_pickyIgnoredLabels` property to public API
+
 ### v1.5.0
 
 * Added `invertSelection()`
