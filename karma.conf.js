@@ -1,6 +1,11 @@
 // Karma configuration
 // Generated on Mon Dec 30 2013 16:14:03 GMT+0100 (CET)
 
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// + For automated testing with Grunt, some settings in this config file  +
+// + are overridden in Gruntfile.js. Check both locations.                +
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 module.exports = function(config) {
   config.set({
 
@@ -9,6 +14,8 @@ module.exports = function(config) {
 
 
     // frameworks to use
+    //
+    // For Jasmine, use ['jasmine'] only, or ['jasmine', 'jasmine-matchers'].
     frameworks: ['jasmine'],
 
 
@@ -25,7 +32,7 @@ module.exports = function(config) {
       'spec/helpers/**/*.js',
 
       // Tests
-      'spec/**/*.+(spec|test).js'
+      'spec/**/*.+(spec|test|tests).js'
     ],
 
 
@@ -61,10 +68,11 @@ module.exports = function(config) {
     // - Chrome
     // - ChromeCanary
     // - Firefox
-    // - Opera (has to be installed with `npm install karma-opera-launcher`)
-    // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
+    // - Opera
+    // - Safari
     // - PhantomJS
-    // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
+    // - SlimerJS
+    // - IE (Windows only)
     //
     // ATTN Interactive debugging in PhpStorm/WebStorm doesn't work with PhantomJS. Use Firefox or Chrome instead.
     browsers: ['PhantomJS'],

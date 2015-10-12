@@ -11,12 +11,12 @@ module.exports = function(grunt) {
       ];
 
   // Project configuration.
-  grunt.initConfig({
+  grunt.config.init({
     pkg: grunt.file.readJSON('package.json'),
     meta: {
       version: '<%= pkg.version %>',
       banner: '// Backbone.Select, v<%= meta.version %>\n' +
-        '// Copyright (c) <%= grunt.template.today("yyyy") %> Michael Heim\n' +
+        '// Copyright (c) 2014-<%= grunt.template.today("yyyy") %> Michael Heim, Zeilenwechsel.de\n' +
         '//           (c) 2013 Derick Bailey, Muted Solutions, LLC.\n' +
         '// Distributed under MIT license\n' +
         '// http://github.com/hashchange/backbone.select\n' +
@@ -24,7 +24,6 @@ module.exports = function(grunt) {
     },
 
     preprocess: {
-      // Currently works as a copy
       build: {
         files: {
           'dist/backbone.select.js' : 'src/backbone.select.js',
@@ -56,7 +55,7 @@ module.exports = function(grunt) {
       options: {
         banner: "<%= meta.banner %>",
         mangle: {
-          except: ['jQuery', 'Backbone', '_']
+          except: ['jQuery', 'Zepto', 'Backbone', '_']
         },
         sourceMap: true
       },
@@ -87,10 +86,29 @@ module.exports = function(grunt) {
     },
 
     jshint: {
-      options: {
-        jshintrc: '.jshintrc'
+      components: {
+        // Workaround for merging .jshintrc with Gruntfile options, see http://goo.gl/Of8QoR
+        options: grunt.util._.merge({
+          globals: {
+            // Add vars which are shared between various sub-components
+            // (before concatenation makes them local)
+          }
+        }, grunt.file.readJSON('.jshintrc')),
+        files: {
+          src: ['src/**/*.js']
+        }
       },
-      components: 'src/**/*.js'
+      concatenated: {
+        options: grunt.util._.merge({
+          // Suppressing 'W034: Unnecessary directive "use strict"'.
+          // Redundant nested "use strict" is ok in concatenated file,
+          // no adverse effects.
+          '-W034': true
+        }, grunt.file.readJSON('.jshintrc')),
+        files: {
+          src: 'dist/**/__COMPONENT_NAME_LC__.js'
+        }
+      }
     },
 
     'sails-linker': {
@@ -111,8 +129,20 @@ module.exports = function(grunt) {
         },
         files: {
           // the target file is changed in place; for generating copies, run preprocess first
-          'web-mocha/index.html': ['spec/**/*.+(spec|test).js']
+          'web-mocha/index.html': ['spec/**/*.+(spec|test|tests).js']
         }
+      }
+    },
+
+    focus: {
+      demo: {
+        exclude: ['build', 'buildDirty']
+      },
+      demoCi: {
+        exclude: ['buildDirty']
+      },
+      demoCiDirty: {
+        exclude: ['build']
       }
     },
 
@@ -128,6 +158,10 @@ module.exports = function(grunt) {
       },
       build: {
         tasks: ['default'],
+        files: WATCHED_FILES
+      },
+      buildDirty: {
+        tasks: ['build-dirty'],
         files: WATCHED_FILES
       }
     },
@@ -147,6 +181,12 @@ module.exports = function(grunt) {
         options: {
           open: 'http://localhost:<%= connect.options.port %>/web-mocha/',
           livereload: LIVERELOAD_PORT
+        }
+      },
+      testNoReload: {
+        options: {
+          open: 'http://localhost:<%= connect.options.port %>/web-mocha/',
+          keepalive: true
         }
       },
       demo: {
@@ -190,12 +230,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-sails-linker');
   grunt.loadNpmTasks('grunt-text-replace');
+  grunt.loadNpmTasks('grunt-focus');
 
-  grunt.registerTask('test', ['jshint', 'karma:test']);
+  grunt.registerTask('lint', ['jshint:components']);
+  grunt.registerTask('hint', ['jshint:components']);        // alias
+  grunt.registerTask('test', ['jshint:components', 'karma:test']);
+  grunt.registerTask('webtest', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:testNoReload']);
   grunt.registerTask('interactive', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:test', 'watch:livereload']);
-  grunt.registerTask('demo', ['connect:demo', 'watch:livereload']);
-  grunt.registerTask('build', ['jshint', 'karma:build', 'preprocess:build', 'concat', 'uglify']);
-  grunt.registerTask('ci', ['watch:build']);
+  grunt.registerTask('demo', ['connect:demo', 'focus:demo']);
+  grunt.registerTask('build', ['jshint:components', 'karma:build', 'preprocess:build', 'concat', 'uglify', 'jshint:concatenated']);
+  grunt.registerTask('ci', ['build', 'watch:build']);
   grunt.registerTask('setver', ['replace:version']);
   grunt.registerTask('getver', function () {
     grunt.config.get('getver.files').forEach(function (file) {
@@ -203,6 +247,19 @@ module.exports = function(grunt) {
       grunt.log.writeln('Version number in ' + file + ': ' + config.version);
     });
   });
+
+  // Special tasks, not mentioned in Readme documentation:
+  //
+  // - build-dirty:
+  //   builds the project without running checks (no linter, no tests)
+  // - demo-ci:
+  //   Runs the demo (= "demo" task), and also rebuilds the project on every source change (= "ci" task)
+  // - demo-ci-dirty:
+  //   Runs the demo (= "demo" task), and also rebuilds the project "dirty", without tests or linter, on every source
+  //   change (= "build-dirty"/"ci" cross-over task)
+  grunt.registerTask('build-dirty', ['preprocess:build', 'concat', 'uglify']);
+  grunt.registerTask('demo-ci', ['build', 'connect:demo', 'focus:demoCi']);
+  grunt.registerTask('demo-ci-dirty', ['build-dirty', 'connect:demo', 'focus:demoCiDirty']);
 
   // Make 'build' the default task.
   grunt.registerTask('default', ['build']);
