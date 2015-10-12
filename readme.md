@@ -39,6 +39,7 @@ For a superset of Backbone.Select with additional features, have a look at [Back
 - [Custom options](#custom-options)
 - [Compatibility with Backbone's own select method](#compatibility-with-backbones-own-select-method)
 - [Compatibility with Backbone.Picky](#compatibility-with-backbonepicky)
+- [Internal properties](#internal-properties)
 - [Build process and tests](#build-process-and-tests), [release notes](#release-notes), [credits, copyright, MIT license](#credits-copyright-mit-license)
 
 ## An introductory example
@@ -1009,6 +1010,36 @@ initialize: function ( models ) {
 Picky.MultiSelect is treated the same way. Use `Backbone.Select.Many.applyTo( this, models )`.
 
 If you want to [enable model sharing][sharing] in a Select.One or Select.Many collection, you need to pass in an options hash as the third argument: `{ enableModelSharing: true }`. [See above][sharing].
+
+## Internal properties
+
+There are a number of internal properties which nevertheless are part of the public API of Backbone.Select. You should not need to even know about them when you apply the mixins to your own objects. But they can come in handy if you build a component on top of Backbone.Select. (An example of such a component is [Backbone.Cycle][].)
+
+**Use them read-only.**
+
+The behaviour of these properties, as described below, is safeguarded by tests. Introducing a breaking change would entail moving to a new major version of Backbone.Select. In other words, they are safe to use – never mind they are internal.
+
+Internal properties are prefixed with `_picky`. (The first such property was introduced when Backbone.Select was still a bunch of PRs for Backbone.Picky, hence the name.) 
+
+Not all of the `_picky` properties are part of the public API, though. If you encounter one and don't see it in the list below, it might change or be removed at any time, so don't rely on it (or monitor it closely).
+
+##### `_pickyType`
+
+Present in all Backbone.Select entities. Signals if a Backbone.Select mixin has been applied to a Backbone model or collection, and tells its type. Values: `"Backbone.Select.Me"`, `"Backbone.Select.One"`, `"Backbone.Select.Many"`.
+
+##### `_pickyDefaultLabel`
+
+Used in all Backbone.Select entities. Contains the name of the [default label][default-label]. Always present, is set to `"selected"` unless the label has been changed with the `defaultLabel` setup option.
+
+##### `_pickyIgnoredLabels`
+
+Used in Select.One and Select.Many collections. Contains an array of [ignored labels][ignore-label]. Always present, contains an empty array if no label has been ignored.
+
+##### `_modelSharingEnabled`
+
+Used in Select.One and Select.Many collections. Present and set to `true` when [model sharing][sharing] is enabled, otherwise absent.
+
+(Yes, the name is inconsistent with the `_picky` prefix convention. But it sneaked in long ago, along with a comment in the source saying it is a reliable part of the API, so it stays.)
 
 ## Build process and tests
 

@@ -7,8 +7,8 @@
 
             SelectOne: {
 
-                // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                // other components. Use it read-only.
+                // Type indicator, part of the API (monitored by tests). Can be queried safely by other components. Use
+                // it read-only.
                 _pickyType: "Backbone.Select.One",
 
                 select: function ( model, options ) {
@@ -93,8 +93,8 @@
 
             SelectMany: {
 
-                // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                // other components. Use it read-only.
+                // Type indicator, part of the API (monitored by tests). Can be queried safely by other components. Use
+                // it read-only.
                 _pickyType: "Backbone.Select.Many",
 
                 select: function ( model, options ) {
@@ -299,8 +299,8 @@
 
             SelectMe: {
 
-                // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                // other components. Use it read-only.
+                // Type indicator, part of the API (monitored by tests). Can be queried safely by other components. Use
+                // it read-only.
                 _pickyType: "Backbone.Select.Me",
 
                 select: function ( options ) {
@@ -451,8 +451,8 @@
                         hostObject.listenTo( hostObject, 'add', onAdd );
                         hostObject.listenTo( hostObject, 'remove', onRemove );
 
-                        // Mode flag, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                        // other components. Use it read-only.
+                        // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
+                        // Use it read-only.
                         hostObject._modelSharingEnabled = true;
 
                     }
@@ -519,8 +519,8 @@
                         hostObject.listenTo( hostObject, 'add', onAdd );
                         hostObject.listenTo( hostObject, 'remove', onRemove );
 
-                        // Mode flag, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                        // other components. Use it read-only.
+                        // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
+                        // Use it read-only.
                         hostObject._modelSharingEnabled = true;
 
                     }
