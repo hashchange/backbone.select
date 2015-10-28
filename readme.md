@@ -42,7 +42,7 @@ If you are a happy user of this project already, you can support its development
 - [Compatibility with Backbone's own select method](#compatibility-with-backbones-own-select-method)
 - [Compatibility with Backbone.Picky](#compatibility-with-backbonepicky)
 - [Internal properties](#internal-properties)
-- [Build process and tests](#build-process-and-tests), [Donations](#donations), [release notes](#release-notes), [credits, copyright, MIT license](#credits-copyright-mit-license)
+- [Build process and tests](#build-process-and-tests), [donations](#facilitating-development), [release notes](#release-notes), [credits, copyright, MIT license](#credits-copyright-mit-license)
 
 ## An introductory example
 
@@ -1087,13 +1087,15 @@ In case anything about the test and build process needs to be changed, have a lo
 
 New test files in the `spec` directory are picked up automatically, no need to edit the configuration for that.
 
-## Donations
+## Facilitating development
 
 To my own surprise, [a kind soul][donations-idea] wanted to donate to one of my projects, but there hadn't been a link. [Now there is.][donations-paypal-link]
 
-Please don't feel obliged in the slightest. It's [MIT][license], and so it's free. That said, if you do want to support the maintenance and development of this component, or any of my [other open-source projects][hashchange-projects-overview], I _am_ thankful for your contribution.
+Please don't feel obliged in the slightest. The license here is [MIT][license], and so it's free. That said, if you do want to support the maintenance and development of this component, or any of my [other open-source projects][hashchange-projects-overview], I _am_ thankful for your contribution.
 
-Naturally, these things don't pay for themselves – not even remotely. The components I write aim to be well tested, performant, and reliable. That may not sound terribly fascinating, but at the end of the day, these attributes make all the difference in production. And maintaining that standard is rather costly, time-wise. That's why donations are welcome, no matter how small, and be it as nod of appreciation to keep spirits up. [Thank you!][donations-paypal-link]
+Naturally, these things don't pay for themselves – not even remotely. The components I write aim to be well tested, performant, and reliable. These qualities may not seem particularly fascinating, but I put a lot of emphasis on them because they make all the difference in production. They are also rather costly to maintain, time-wise.
+
+That's why donations are welcome, and be it as nod of appreciation to keep spirits up. [Thank you!][donations-paypal-link]
 
 [![Donate with Paypal][donations-paypal-button]][donations-paypal-link]
 
@@ -1291,7 +1293,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [demo-focus-with-exclusive-jsbin]: http://jsbin.com/colulo/1/edit?js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
 [demo-focus-with-exclusive-codepen]: http://codepen.io/hashchange/pen/QjpKGo "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
 
-[donations]: #donations "Donations"
+[donations]: #facilitating-development "Facilitating development"
 [donations-idea]: https://github.com/hashchange/jquery.documentsize/issues/1 "jQuery.documentSize, issue #1: Thank you!"
 [donations-paypal-link]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HQPX3WBXNRUCN "Donate with Paypal"
 [donations-paypal-button]: https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif "Donate with Paypal"
