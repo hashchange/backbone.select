@@ -574,7 +574,7 @@ The method returns the collection, and allows chaining.
 
 Backbone collections have a `select` method out of the box, an alias of `filter`. It continues to be accessible, based on its different signature. [See below][select-compatibility].
 
-#### collection.deselect( model, [options] )
+#### collection.deselect( [model], [options] )
 
 Deselects a model if it had been selected. It removes the model from the `selected` list of the collection, and sets the `selected` property of the model to false as well. Both collection and model fire their respective events for a deselection.
 
@@ -586,6 +586,8 @@ myCollection.deselect( myModel );
 ```
 
 If the model is not currently selected, this action is a no-op.
+
+You can call `deselect` without a model argument. All currently selected models, if any, will be deselected in that case. The method acts exactly like `deselectAll()` then.
 
 The `deselect` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
 

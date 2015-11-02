@@ -147,6 +147,8 @@
                 deselect: function ( model, options ) {
                     var label, prevSelected;
 
+                    if ( !model ) return this.deselectAll( options );
+
                     options = initOptions( options );
                     if ( options._processedBy[this._pickyCid] ) return this;
 

@@ -158,6 +158,15 @@ describe( "multi-select collection: general", function () {
                     expect( collection.deselect( model ) ).toBe( collection );
                 } );
 
+                it( 'without a model argument, while no model in the collection is selected', function () {
+                    expect( collection.deselect() ).toBe( collection );
+                } );
+
+                it( 'without a model argument, while a model in the collection is selected', function () {
+                    model.select();
+                    expect( collection.deselect() ).toBe( collection );
+                } );
+
                 it( 'with a custom label which is ignored in the collection', function () {
                     collection = new Collection( [model], { ignoreLabel: "starred" } );
                     model.select( { label: "starred" } );

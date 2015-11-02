@@ -49,6 +49,34 @@ describe( "multi-select collection: deselectAll", function () {
         } );
     } );
 
+    describe( "when no models are selected, and deselecting all (deselect() without model argument)", function () {
+        var m1, m2, collection, events;
+
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
+
+            collection = new Collection( [m1, m2] );
+            events = getEventSpies( collection );
+
+            collection.deselect();
+        } );
+
+        it( "should not trigger a select:none event", function () {
+            expect( events["select:none:*"] ).not.toHaveBeenCalled();
+        } );
+
+        it( "should have a selected count of 0", function () {
+            expect( collection.selectedLength ).toBe( 0 );
+        } );
+
+        it( "should not have any models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 0 );
+        } );
+
+    } );
+
     describe( "when no models are selected, and deselecting all, with options.silent enabled", function () {
         var m1, m2, collection, events;
 
@@ -211,6 +239,40 @@ describe( "multi-select collection: deselectAll", function () {
         } );
     } );
 
+    describe( "when 1 model is selected, and deselecting all (deselect() without model argument)", function () {
+        var m1, m2, collection, events;
+
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
+
+            collection = new Collection( [m1, m2] );
+            m1.select();
+
+            events = getEventSpies( collection );
+            collection.deselect();
+        } );
+
+        it( "should trigger a select:none event", function () {
+            expect( events["select:none"] ).toHaveBeenCalledOnce();
+            expect( events["select:none"] ).toHaveBeenCalledWith( { selected: [], deselected: [m1] }, collection, { label: "selected" } );
+        } );
+
+        it( "should not trigger a reselect:any event", function () {
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
+        } );
+
+        it( "should have a selected count of 0", function () {
+            expect( collection.selectedLength ).toBe( 0 );
+        } );
+
+        it( "should not have any models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 0 );
+        } );
+
+    } );
+
     describe( "when all models are selected, and deselecting all", function () {
         var m1, m2, collection, events, eventStates;
 
@@ -314,6 +376,41 @@ describe( "multi-select collection: deselectAll", function () {
             var size = _.size( collection.selected );
             expect( size ).toBe( 0 );
         } );
+    } );
+
+    describe( "when all models are selected, and deselecting all (deselect() without model argument)", function () {
+        var m1, m2, collection, events;
+
+        beforeEach( function () {
+            m1 = new Model();
+            m2 = new Model();
+
+            collection = new Collection( [m1, m2] );
+            m1.select();
+            m2.select();
+
+            events = getEventSpies( collection );
+            collection.deselect();
+        } );
+
+        it( "should trigger a select:none event", function () {
+            expect( events["select:none"] ).toHaveBeenCalledOnce();
+            expect( events["select:none"] ).toHaveBeenCalledWith( { selected: [], deselected: [m1, m2] }, collection, { label: "selected" } );
+        } );
+
+        it( "should not trigger a reselect:any event", function () {
+            expect( events["reselect:any:*"] ).not.toHaveBeenCalled();
+        } );
+
+        it( "should have a selected count of 0", function () {
+            expect( collection.selectedLength ).toBe( 0 );
+        } );
+
+        it( "should not have any models in the selected list", function () {
+            var size = _.size( collection.selected );
+            expect( size ).toBe( 0 );
+        } );
+
     } );
 
     describe( "when all models are selected, and deselecting all, with options.silent enabled", function () {
