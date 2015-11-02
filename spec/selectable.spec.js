@@ -1,7 +1,7 @@
 describe( "selectable model", function () {
     var Model = Backbone.Model.extend( {
-        initialize: function () {
-            Backbone.Select.Me.applyTo( this );
+        initialize: function ( attributes, options ) {
+            Backbone.Select.Me.applyTo( this, options );
         }
     } );
 
@@ -377,6 +377,46 @@ describe( "selectable model", function () {
             expect( model.onChange ).not.toHaveBeenCalled();
             expect( model.onAll ).not.toHaveBeenCalled();
         } );
+    } );
+
+    describe( 'Chaining', function () {
+        var model;
+
+        beforeEach( function () {
+            model = new Model();
+        } );
+
+        describe( 'The model is returned', function () {
+
+            it( 'when calling select() on an unselected model', function () {
+                expect( model.select() ).toBe( model );
+            } );
+
+            it( 'when calling select() on a selected model', function () {
+                model.select();
+                expect( model.select() ).toBe( model );
+            } );
+
+            it( 'when calling deselect() on an unselected model', function () {
+                expect( model.deselect() ).toBe( model );
+            } );
+
+            it( 'when calling deselect() on a selected model', function () {
+                model.select();
+                expect( model.deselect() ).toBe( model );
+            } );
+
+            it( 'when calling toggleSelected() on an unselected model', function () {
+                expect( model.toggleSelected() ).toBe( model );
+            } );
+
+            it( 'when calling toggleSelect() on a selected model', function () {
+                model.select();
+                expect( model.toggleSelected() ).toBe( model );
+            } );
+
+        } );
+
     } );
 
     describe( 'Mixin is protected from modification', function () {

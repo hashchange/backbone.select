@@ -1,14 +1,14 @@
 describe( "single-select collection", function () {
 
     var Model = Backbone.Model.extend( {
-        initialize: function () {
-            Backbone.Select.Me.applyTo( this );
+        initialize: function ( attributes, options ) {
+            Backbone.Select.Me.applyTo( this, options );
         }
     } );
 
     var Collection = Backbone.Collection.extend( {
-        initialize: function ( models ) {
-            Backbone.Select.One.applyTo( this, models );
+        initialize: function ( models, options ) {
+            Backbone.Select.One.applyTo( this, models, options );
         }
     } );
 
@@ -839,6 +839,66 @@ describe( "single-select collection", function () {
             expect( collection.onReset ).not.toHaveBeenCalled();
             expect( collection.onAll ).not.toHaveBeenCalled();
         } );
+    } );
+
+    describe( 'Chaining', function () {
+        var model, collection;
+
+        beforeEach( function () {
+            model = new Model();
+            collection = new Collection( [model] );
+        } );
+
+        describe( 'The collection is returned', function () {
+
+            describe( 'when calling select()', function () {
+
+                it( 'with an unselected model as argument', function () {
+                    expect( collection.select( model ) ).toBe( collection );
+                } );
+
+                it( 'with a selected model as argument', function () {
+                    model.select();
+                    expect( collection.select( model ) ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    expect( collection.select( model, { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+            describe( 'when calling deselect()', function () {
+
+                it( 'with an unselected model as argument', function () {
+                    expect( collection.deselect( model ) ).toBe( collection );
+                } );
+
+                it( 'with a selected model as argument', function () {
+                    model.select();
+                    expect( collection.deselect( model ) ).toBe( collection );
+                } );
+
+                it( 'without a model argument, while no model in the collection is selected', function () {
+                    expect( collection.deselect() ).toBe( collection );
+                } );
+
+                it( 'without a model argument, while a model in the collection is selected', function () {
+                    model.select();
+                    expect( collection.deselect() ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    model.select( { label: "starred" } );
+                    expect( collection.deselect( model, { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+        } );
+
     } );
 
     describe( 'Model-sharing status flag', function () {

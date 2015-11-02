@@ -1,13 +1,13 @@
 describe( "multi-select collection: general", function () {
     var Model = Backbone.Model.extend( {
-        initialize: function () {
-            Backbone.Select.Me.applyTo( this );
+        initialize: function ( attributes, options ) {
+            Backbone.Select.Me.applyTo( this, options );
         }
     } );
 
     var Collection = Backbone.Collection.extend( {
-        initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models );
+        initialize: function ( models, options ) {
+            Backbone.Select.Many.applyTo( this, models, options );
         }
     } );
 
@@ -117,6 +117,149 @@ describe( "multi-select collection: general", function () {
             expect( collection.onReset ).not.toHaveBeenCalled();
             expect( collection.onAll ).not.toHaveBeenCalled();
         } );
+    } );
+
+    describe( 'Chaining', function () {
+        var model, collection;
+
+        beforeEach( function () {
+            model = new Model();
+            collection = new Collection( [model] );
+        } );
+
+        describe( 'The collection is returned', function () {
+
+            describe( 'when calling select()', function () {
+
+                it( 'with an unselected model as argument', function () {
+                    expect( collection.select( model ) ).toBe( collection );
+                } );
+
+                it( 'with a selected model as argument', function () {
+                    model.select();
+                    expect( collection.select( model ) ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    expect( collection.select( model, { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+            describe( 'when calling deselect()', function () {
+
+                it( 'with an unselected model as argument', function () {
+                    expect( collection.deselect( model ) ).toBe( collection );
+                } );
+
+                it( 'with a selected model as argument', function () {
+                    model.select();
+                    expect( collection.deselect( model ) ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    model.select( { label: "starred" } );
+                    expect( collection.deselect( model, { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+            describe( 'when calling selectAll()', function () {
+
+                it( 'when no models in the collection are selected', function () {
+                    expect( collection.selectAll() ).toBe( collection );
+                } );
+
+                it( 'when all models in the collection are selected', function () {
+                    collection.selectAll();
+                    expect( collection.selectAll() ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    expect( collection.selectAll( { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+            describe( 'when calling deselectAll()', function () {
+
+                it( 'when no models in the collection are selected', function () {
+                    expect( collection.deselectAll() ).toBe( collection );
+                } );
+
+                it( 'when all models in the collection are selected', function () {
+                    collection.selectAll();
+                    expect( collection.deselectAll() ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    model.select( { label: "starred" } );
+                    expect( collection.deselectAll( { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+            describe( 'when calling invertSelection()', function () {
+
+                it( 'when no models in the collection are selected', function () {
+                    expect( collection.invertSelection() ).toBe( collection );
+                } );
+
+                it( 'when all models in the collection are selected', function () {
+                    collection.selectAll();
+                    expect( collection.invertSelection() ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    expect( collection.invertSelection( { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+            describe( 'when calling toggleSelectAll()', function () {
+
+                it( 'when no models in the collection are selected', function () {
+                    expect( collection.toggleSelectAll() ).toBe( collection );
+                } );
+
+                it( 'when all models in the collection are selected', function () {
+                    collection.selectAll();
+                    expect( collection.toggleSelectAll() ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    expect( collection.toggleSelectAll( { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+            describe( 'when calling selectNone()', function () {
+
+                it( 'when no models in the collection are selected', function () {
+                    expect( collection.selectNone() ).toBe( collection );
+                } );
+
+                it( 'when all models in the collection are selected', function () {
+                    collection.selectAll();
+                    expect( collection.selectNone() ).toBe( collection );
+                } );
+
+                it( 'with a custom label which is ignored in the collection', function () {
+                    collection = new Collection( [model], { ignoreLabel: "starred" } );
+                    model.select( { label: "starred" } );
+                    expect( collection.selectNone( { label: "starred" } ) ).toBe( collection );
+                } );
+
+            } );
+
+        } );
+
     } );
 
     describe( 'Model-sharing status flag', function () {

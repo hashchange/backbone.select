@@ -172,6 +172,10 @@ If the model has already been selected, selecting it again does not affect its s
 
 The `select` method supports the following options: [`silent`][select.me-silent], [`label`][custom-labels] and [`exclusive`][option-exclusive]. The `exclusive` option only affects [Select.Many][Backbone.Select.Many] collections – [see there][option-exclusive] for more.
 
+###### Chaining
+
+The method returns the model, and allows chaining.
+
 #### model.deselect( [options] )
 
 Deselects a model. It sets the model's `selected` property to false and triggers a [`"deselected"`][deselected-event] event.
@@ -194,6 +198,8 @@ If a model is not selected, deselecting it is a no-op and does not trigger a `"d
 
 The `deselect` method supports the following options: [`silent`][select.me-silent], [`label`][custom-labels].
 
+The method returns the model, and allows chaining.
+
 #### model.toggleSelected( [options] )
 
 Toggles the selection state between selected and deselected. Calls either the `select` or `deselect` method, which does the actual work.
@@ -214,6 +220,8 @@ myModel.toggleSelected(); // => prints "I am no longer selected."
 ```
 
 The `toggleSelected` method supports the following options: [`silent`][select.me-silent], [`label`][custom-labels].
+
+The method returns the model, and allows chaining.
 
 ### Backbone.Select.Me properties
 
@@ -344,6 +352,10 @@ Instead, a [`"reselect:one"`][reselect:one-event] event (collection) and a [`"re
 
 The `select` method supports the following options: [`silent`][select.one-silent], [`label`][custom-labels].
 
+###### Chaining
+
+The method returns the collection, and allows chaining.
+
 ###### Compatibility
 
 Backbone collections have a `select` method out of the box, an alias of `filter`. It continues to be accessible, based on its different signature. [See below][select-compatibility].
@@ -366,6 +378,8 @@ If the model is not currently selected, this action is a no-op. If you try to de
 You can call `deselect` without a model argument. The currently selected model, if any, will be deselected in that case.
 
 The `deselect` method supports the following options: [`silent`][select.one-silent], [`label`][custom-labels].
+
+The method returns the collection, and allows chaining.
 
 ### Backbone.Select.One properties
 
@@ -552,6 +566,10 @@ collectionB.selected;    // stores only m2; `exclusive` also at work here
 
 Finally, combined select-deselect actions are treated as atomic, so all related events – for the selection as well as the deselections – are fired only after the selection and the deselections have already taken place.
 
+###### Chaining
+
+The method returns the collection, and allows chaining.
+
 ###### Compatibility 
 
 Backbone collections have a `select` method out of the box, an alias of `filter`. It continues to be accessible, based on its different signature. [See below][select-compatibility].
@@ -571,6 +589,8 @@ If the model is not currently selected, this action is a no-op.
 
 The `deselect` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
 
+The method returns the collection, and allows chaining.
+
 #### collection.selectAll( [options] )
 
 Selects all models in the collection. Fires collection and model events indicating the change, and separate events for any re-selections. See the [events section][select.many-events] below.
@@ -582,6 +602,8 @@ myCollection.selectAll();
 The `selectAll` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
 
 The whole batch of select actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the selections have been completed.
+
+The method returns the collection, and allows chaining.
 
 #### collection.deselectAll( [options] )
 
@@ -595,6 +617,8 @@ The `deselectAll` method supports the following options: [`silent`][select.many-
 
 The whole batch of deselect actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the deselections have been completed.
 
+The method returns the collection, and allows chaining.
+
 #### collection.invertSelection( [options] )
 
 Selects all models in the collection which haven't been selected, and deselects those which have been. Fires collection and model events indicating the change. See the [events section][select.many-events] below.
@@ -606,6 +630,8 @@ myCollection.invertSelection();
 The `invertSelection` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
 
 The whole batch of select and deselect actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the selections and deselections have been completed.
+
+The method returns the collection, and allows chaining.
 
 #### collection.toggleSelectAll( [options] )
 
@@ -627,6 +653,8 @@ The following rules apply when toggling:
 The `toggleSelectAll` method supports the following options: [`silent`][select.many-silent], [`label`][custom-labels].
 
 The whole batch of select and deselect actions is treated as atomic. All related events – those of the collection as well as those of individual models – are fired only after the selections and deselections have been completed.
+
+The method returns the collection, and allows chaining.
 
 ### Backbone.Select.Many properties
 
