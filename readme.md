@@ -1131,6 +1131,11 @@ That's why donations are welcome, and be it as nod of appreciation to keep spiri
 
 ## Release notes
 
+### v1.5.2
+
+* Made all methods support chaining.
+* Allowed `deselect()` to be called without a model argument in a Select.Many collection (acts like `deselectAll()`).
+
 ### v1.5.1
 
 * Added `_pickyIgnoredLabels` property to public API

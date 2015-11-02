@@ -1,5 +1,5 @@
-// Backbone.Select, v1.5.1
-// Copyright (c) 2015 Michael Heim
+// Backbone.Select, v1.5.2
+// Copyright (c) 2014-2015 Michael Heim, Zeilenwechsel.de
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
 // http://github.com/hashchange/backbone.select
@@ -34,18 +34,18 @@
     
                 SelectOne: {
     
-                    // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                    // other components. Use it read-only.
+                    // Type indicator, part of the API (monitored by tests). Can be queried safely by other components. Use
+                    // it read-only.
                     _pickyType: "Backbone.Select.One",
     
                     select: function ( model, options ) {
                         var label, reselected, eventOptions, forwardedOptions;
     
                         options = initOptions( options );
-                        if ( options._processedBy[this._pickyCid] ) return;
+                        if ( options._processedBy[this._pickyCid] ) return this;
     
                         label = getLabel( options, this );
-                        if ( isIgnoredLabel( label, this ) ) return;
+                        if ( isIgnoredLabel( label, this ) ) return this;
     
                         reselected = model && this[label] === model ? model : undefined;
     
@@ -83,23 +83,25 @@
     
                         options._processedBy[this._pickyCid].done = true;
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     deselect: function ( model, options ) {
                         var label;
     
                         options = initOptions( options );
-                        if ( options._processedBy[this._pickyCid] ) return;
+                        if ( options._processedBy[this._pickyCid] ) return this;
     
                         label = getLabel( options, this );
-                        if ( isIgnoredLabel( label, this ) || !this[label] ) return;
+                        if ( isIgnoredLabel( label, this ) || !this[label] ) return this;
     
                         // The _messageOnly flag is used for a noop which is supposed to convey the label name only, and
                         // make sure it is registered. That's done, so we can bail out now.
-                        if ( options._messageOnly ) return;
+                        if ( options._messageOnly ) return this;
     
                         model = model || this[label];
-                        if ( this[label] !== model ) return;
+                        if ( this[label] !== model ) return this;
     
                         options._processedBy[this._pickyCid] = { done: false };
     
@@ -109,19 +111,23 @@
     
                         options._processedBy[this._pickyCid].done = true;
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     close: function () {
                         unregisterCollectionWithModels( this );
                         this.stopListening();
+    
+                        return this;
                     }
     
                 },
     
                 SelectMany: {
     
-                    // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                    // other components. Use it read-only.
+                    // Type indicator, part of the API (monitored by tests). Can be queried safely by other components. Use
+                    // it read-only.
                     _pickyType: "Backbone.Select.Many",
     
                     select: function ( model, options ) {
@@ -129,12 +135,12 @@
     
                         options = initOptions( options );
                         label = getLabel( options, this );
-                        if ( isIgnoredLabel( label, this ) ) return;
+                        if ( isIgnoredLabel( label, this ) ) return this;
     
                         prevSelected = _.clone( this[label] );
                         reselected = this[label][model.cid] ? [model] : [];
     
-                        if ( reselected.length && options._processedBy[this._pickyCid] ) return;
+                        if ( reselected.length && options._processedBy[this._pickyCid] ) return this;
     
                         if ( options.exclusive ) {
                             // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select()
@@ -161,24 +167,28 @@
     
                         options._processedBy[this._pickyCid].done = true;
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     deselect: function ( model, options ) {
                         var label, prevSelected;
     
+                        if ( !model ) return this.deselectAll( options );
+    
                         options = initOptions( options );
-                        if ( options._processedBy[this._pickyCid] ) return;
+                        if ( options._processedBy[this._pickyCid] ) return this;
     
                         label = getLabel( options, this );
-                        if ( isIgnoredLabel( label, this ) ) return;
+                        if ( isIgnoredLabel( label, this ) ) return this;
     
                         // The _messageOnly flag is used for a noop which is supposed to convey the label name only, and
                         // make sure it is registered. That's done, so we can bail out now.
-                        if ( options._messageOnly ) return;
+                        if ( options._messageOnly ) return this;
     
                         prevSelected = _.clone( this[label] );
     
-                        if ( !this[label][model.cid] ) return;
+                        if ( !this[label][model.cid] ) return this;
     
                         options._processedBy[this._pickyCid] = { done: false };
     
@@ -190,6 +200,8 @@
     
                         options._processedBy[this._pickyCid].done = true;
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     selectAll: function ( options ) {
@@ -198,7 +210,7 @@
     
                         options = initOptions( options );
                         label = getLabel( options, this );
-                        if ( isIgnoredLabel( label, this ) ) return;
+                        if ( isIgnoredLabel( label, this ) ) return this;
     
                         prevSelected = _.clone( this[label] );
     
@@ -225,6 +237,8 @@
                             options._processedBy[this._pickyCid] = { done: true };
                         }
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     invertSelection: function ( options ) {
@@ -232,7 +246,7 @@
     
                         options = initOptions( options );
                         label = getLabel( options, this );
-                        if ( isIgnoredLabel( label, this ) ) return;
+                        if ( isIgnoredLabel( label, this ) ) return this;
     
                         prevSelected = _.clone( this[label] );
     
@@ -262,6 +276,8 @@
                             options._processedBy[this._pickyCid] = { done: true };
                         }
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     deselectAll: function ( options ) {
@@ -269,9 +285,9 @@
     
                         options = initOptions( options );
                         label = getLabel( options, this );
-                        if ( isIgnoredLabel( label, this ) ) return;
+                        if ( isIgnoredLabel( label, this ) ) return this;
     
-                        if ( getSelectionSize( this, label ) === 0 ) return;
+                        if ( getSelectionSize( this, label ) === 0 ) return this;
                         prevSelected = _.clone( this[label] );
     
                         // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select() in
@@ -296,10 +312,12 @@
                             options._processedBy[this._pickyCid] = { done: true };
                         }
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     selectNone: function ( options ) {
-                        this.deselectAll( options );
+                        return this.deselectAll( options );
                     },
     
                     // Toggle select all / none. If some are selected, it will select all. If all are selected, it will
@@ -309,32 +327,36 @@
     
                         options || ( options = {} );
                         label = getLabel( options, this );
-                        if ( isIgnoredLabel( label, this ) ) return;
+                        if ( isIgnoredLabel( label, this ) ) return this;
     
                         if ( getSelectionSize( this, label ) === this.length ) {
                             this.deselectAll( options );
                         } else {
                             this.selectAll( options );
                         }
+    
+                        return this;
                     },
     
                     close: function () {
                         unregisterCollectionWithModels( this );
                         this.stopListening();
+    
+                        return this;
                     }
                 },
     
                 SelectMe: {
     
-                    // Type indicator, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                    // other components. Use it read-only.
+                    // Type indicator, part of the API (monitored by tests). Can be queried safely by other components. Use
+                    // it read-only.
                     _pickyType: "Backbone.Select.Me",
     
                     select: function ( options ) {
                         var label, reselected, eventOptions;
     
                         options = initOptions( options );
-                        if ( options._processedBy[this.cid] ) return;
+                        if ( options._processedBy[this.cid] ) return this;
     
                         options._processedBy[this.cid] = { done: false };
     
@@ -362,13 +384,15 @@
     
                         options._processedBy[this.cid].done = true;
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     deselect: function ( options ) {
                         var label, isNoop;
     
                         options = initOptions( options );
-                        if ( options._processedBy[this.cid] ) return;
+                        if ( options._processedBy[this.cid] ) return this;
     
                         label = getLabel( options, this );
                         isNoop = !this[label];
@@ -386,12 +410,14 @@
                             this.collection.deselect( this, stripLocalOptions( options ) );
                         }
     
-                        if ( isNoop ) return;
+                        if ( isNoop ) return this;
     
                         if ( !(options.silent || options._silentLocally) ) queueEventSet( "deselected", label, [ this, toEventOptions( options, label, this ) ], this, options );
     
                         options._processedBy[this.cid].done = true;
                         processEventQueue( options );
+    
+                        return this;
                     },
     
                     toggleSelected: function ( options ) {
@@ -405,6 +431,8 @@
                         } else {
                             this.select( options );
                         }
+    
+                        return this;
                     }
                 }
     
@@ -478,8 +506,8 @@
                             hostObject.listenTo( hostObject, 'add', onAdd );
                             hostObject.listenTo( hostObject, 'remove', onRemove );
     
-                            // Mode flag, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                            // other components. Use it read-only.
+                            // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
+                            // Use it read-only.
                             hostObject._modelSharingEnabled = true;
     
                         }
@@ -546,8 +574,8 @@
                             hostObject.listenTo( hostObject, 'add', onAdd );
                             hostObject.listenTo( hostObject, 'remove', onRemove );
     
-                            // Mode flag, undocumented, but part of the API (monitored by tests). Can be queried safely by
-                            // other components. Use it read-only.
+                            // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
+                            // Use it read-only.
                             hostObject._modelSharingEnabled = true;
     
                         }
