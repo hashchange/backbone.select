@@ -1,4 +1,4 @@
-describe( "models shared between multiple collections", function () {
+describe( "models shared between multiple collections: adding and removing models with add(), remove(), reset(), and while instantiating", function () {
 
     var Model = Backbone.Model.extend( {
         initialize: function () {

@@ -804,11 +804,13 @@ If you are working with events a lot, there are a few details which may help.
 
 - As stated earlier, selections and deselections involving a number of collections and models are treated as atomic. Events are delayed until all collections and models have been updated, without select or deselect actions pending.
 
-- When selected models are added or removed, the collection is updated and the corresponding `select:*` event is fired. In its options, the name of the initial Backbone `"add"` or `"remove"` event is available as `options._externalEvent`, e.g. `{ _externalEvent: "add" }`.
+- When selected models are added or removed, the collection is updated and the corresponding `"select:*"` event is fired. In its options, the name of the initial Backbone `"add"` or `"remove"` event is available as `options._externalEvent`, e.g. `{ _externalEvent: "add" }`.
 
   The `_externalEvent` only appears in the event of the collection which is being added to, or removed from. It does not show up in events of other collections sharing the model, nor in events of the model itself. The `"select:*"` options also contain the event options of the initial Backbone event.
 
-- By contrast, a `reset` does not trigger a `"select:*"` or `"deselect:one"` event on the collection which is reset. The command is meant to suppress individual notifications, just like it does for `"add"` and `"remove"` events, and only fires a `"reset"` event in the end.
+- By contrast, a `reset` does not trigger a `"select:*"` or `"deselect:one"` event on the collection which is reset. The command is meant to suppress individual notifications. It does so for Backbone's own collection events as well, and keeps `"add"` and `"remove"` events from firing. So for the collection being reset, only a `"reset"` event is fired in the end.
+
+  That silence only affects the collection which is reset, however. And it is limited to collection events. Model events go ahead: the `"selected"` and `"deselected"` events of a model fire as usual, and they bubble up to the collection, too. And in other collections sharing the models, the `"select:*"` and `"deselect:one"` events proceed as ever. 
 
 ## Custom labels
 
@@ -1047,7 +1049,7 @@ If you want to [enable model sharing][sharing] in a Select.One or Select.Many co
 
 There are a number of internal properties which nevertheless are part of the public API of Backbone.Select. You should not need to even know about them when you apply the mixins to your own objects. But they can come in handy if you build a component on top of Backbone.Select. (An example of such a component is [Backbone.Cycle][].)
 
-**Use them read-only.**
+But beware: **Use them read-only.**
 
 The behaviour of these properties, as described below, is safeguarded by tests. Introducing a breaking change would entail moving to a new major version of Backbone.Select. In other words, they are safe to use – never mind they are internal.
 
