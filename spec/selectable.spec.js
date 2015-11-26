@@ -303,6 +303,101 @@ describe( "selectable model", function () {
 
     } );
 
+    describe( '_silentLocally option', function () {
+        var m1, m2, collection, events;
+
+        beforeEach( function () {
+            var SelectOneCollection = Backbone.Collection.extend( {
+                initialize: function ( models ) {
+                    Backbone.Select.One.applyTo( this, models );
+                }
+            } );
+
+            m1 = new Model();
+            m2 = new Model();
+            collection = new SelectOneCollection( [m1,m2] );
+        } );
+
+        describe( 'When a model is selected with the _silentLocally option', function () {
+
+            beforeEach( function () {
+                m2.select();
+                events = getEventSpies( [m1, m2, collection] );
+                m1.select( { _silentLocally: true } );
+            } );
+
+            it( 'should not trigger a "selected" event on the model', function () {
+                expect( events.get( m1, "selected" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'should not trigger a "selected" event on the collection, bubbling up from the model', function () {
+                expect( events.get( collection, "selected" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'should trigger a select:one event on the collection', function () {
+                expect( events.get( collection, "select:one" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a "deselected" event on another model which has been deselected in the process', function () {
+                expect( events.get( m2, "deselected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a deselect:one event on the collection, for another model which has been deselected in the process', function () {
+                expect( events.get( collection, "deselect:one" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a "deselected" event on the collection, bubbling up from the model which had been deselected in the process', function () {
+                expect( events.get( collection, "deselected" ) ).toHaveBeenCalledOnce();
+            } );
+
+        } );
+
+        describe( 'When a model is deselected with the _silentLocally option', function () {
+
+            beforeEach( function () {
+                m1.select();
+                events = getEventSpies( [m1, collection] );
+                m1.deselect( { _silentLocally: true } );
+            } );
+
+            it( 'should not trigger a "deselected" event on the model', function () {
+                expect( events.get( m1, "deselected" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'should not trigger a "deselected" event on the collection, bubbling up from the model', function () {
+                expect( events.get( collection, "deselected" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'should trigger a deselect:one event on the collection', function () {
+                expect( events.get( collection, "deselect:one" ) ).toHaveBeenCalledOnce();
+            } );
+
+        } );
+
+        describe( 'When a model is reselected with the _silentLocally option', function () {
+
+            beforeEach( function () {
+                m1.select();
+                events = getEventSpies( [m1, collection] );
+                m1.select( { _silentLocally: true } );
+            } );
+
+            it( 'should not trigger a "reselected" event on the model', function () {
+                expect( events.get( m1, "reselected" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'should not trigger a "reselected" event on the collection, bubbling up from the model', function () {
+                expect( events.get( collection, "reselected" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'should trigger a reselect:one event on the collection', function () {
+                expect( events.get( collection, "reselect:one" ) ).toHaveBeenCalledOnce();
+            } );
+
+        } );
+
+    } );
+
     describe( 'automatic invocation of onSelect, onDeselect, onReselect handlers', function () {
         var EventHandlingModel, model;
 

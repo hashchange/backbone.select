@@ -764,6 +764,117 @@ describe( "single-select collection", function () {
 
     } );
 
+    describe( '_silentLocally option', function () {
+        var m1, m2, collection, otherCollection, events;
+
+        beforeEach( function () {
+            var SelectManyCollection = Backbone.Collection.extend( {
+                initialize: function ( models ) {
+                    Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+                }
+            } );
+
+            m1 = new Model();
+            m2 = new Model();
+            collection = new Collection( [m1,m2], { enableModelSharing: true } );
+            otherCollection = new SelectManyCollection( [m1,m2] );
+        } );
+
+        describe( 'When a model is selected with the _silentLocally option', function () {
+
+            beforeEach( function () {
+                m2.select();
+                events = getEventSpies( [m1, m2, collection, otherCollection] );
+                collection.select( m1, { _silentLocally: true } );
+            } );
+
+            it( 'should not trigger a select:one event on the collection', function () {
+                expect( events.get( collection, "select:one" ) ).not.toHaveBeenCalled();
+                expect( events.get( collection, "reselect:one" ) ).not.toHaveBeenCalled();
+            } );
+
+           it( 'should trigger a deselect:one event on the collection, for another model which has been deselected in the process', function () {
+                expect( events.get( collection, "deselect:one" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a "selected" event on the collection, bubbling up from the model', function () {
+                expect( events.get( collection, "selected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a "deselected" event on the collection, bubbling up from the model which had been deselected in the process', function () {
+                expect( events.get( collection, "deselected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a "selected" event on the model', function () {
+                expect( events.get( m1, "selected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a "deselected" event on the other model', function () {
+                expect( events.get( m2, "deselected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a select:some event in a Select.Many collection sharing the model', function () {
+                expect( events.get( otherCollection, "select:some" ) ).toHaveBeenCalledOnce();
+            } );
+
+        } );
+
+        describe( 'When a model is deselected with the _silentLocally option', function () {
+
+            beforeEach( function () {
+                m1.select();
+                events = getEventSpies( [m1, collection, otherCollection] );
+                collection.deselect( m1, { _silentLocally: true } );
+            } );
+
+            it( 'should not trigger a deselect:one event on the collection', function () {
+                expect( events.get( collection, "deselect:one" ) ).not.toHaveBeenCalled();
+                expect( events.get( collection, "reselect:one" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'should trigger a "deselected" event on the collection, bubbling up from the model', function () {
+                expect( events.get( collection, "deselected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a "deselected" event on the model', function () {
+                expect( events.get( m1, "deselected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a select:* event in a Select.Many collection sharing the model', function () {
+                expect( events.get( otherCollection, "select:none" ) ).toHaveBeenCalledOnce();
+            } );
+
+        } );
+
+        describe( 'When a model is reselected with the _silentLocally option', function () {
+
+            beforeEach( function () {
+                m1.select();
+                events = getEventSpies( [m1, collection, otherCollection] );
+                collection.select( m1, { _silentLocally: true } );
+            } );
+
+            it( 'should not trigger a reselect:one or select:one event on the collection', function () {
+                expect( events.get( collection, "select:one" ) ).not.toHaveBeenCalled();
+                expect( events.get( collection, "reselect:one" ) ).not.toHaveBeenCalled();
+            } );
+
+            it( 'should trigger a "reselected" event on the collection, bubbling up from the model', function () {
+                expect( events.get( collection, "reselected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a "reselected" event on the model', function () {
+                expect( events.get( m1, "reselected" ) ).toHaveBeenCalledOnce();
+            } );
+
+            it( 'should trigger a reselect:any event in a Select.Many collection sharing the model', function () {
+                expect( events.get( otherCollection, "reselect:any" ) ).toHaveBeenCalledOnce();
+            } );
+
+        } );
+
+    } );
+
     describe( 'automatic invocation of onSelect, onDeselect, onReselect handlers', function () {
         var EventHandlingCollection, model, collection;
 
