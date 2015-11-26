@@ -1075,6 +1075,21 @@ Used in Select.One and Select.Many collections. Present and set to `true` when [
 
 (Yes, the name is inconsistent with the `_picky` prefix convention. But it sneaked in long ago, along with a comment in the source saying it is a reliable part of the API, so it stays.)
 
+
+#### Internal flags
+
+##### `_silentLocally`
+
+You can pass the flag `_silentLocally: true` in the options of a `select()` or `deselect()` call. It acts like `silent`, except that events are silenced only for the model or collection on which `select()` or `deselect()` has been called. In addition, events are silenced only for the call itself, not secondary ones.
+
+Let's clarify the effect of the `_silentLocally` flag in practical terms:
+
+- If you use the flag for a call on a collection, it doesn't silence the events fired by the model. It also doesn't silence the events fired by other collections sharing the model.
+- If the flag is used on a model, collection events go ahead unsilenced.
+- If you select a model in a Select.One collection and it leads to another model being deselected, only the `select:one` event is silenced, but not the (secondary) `deselect:one` event.
+- If you use the flag on a collection, only the collection events themselves are silenced (e.g. `select:one`, `deselect:one` for a Select.One collection). The model events `selected`, `deselected` continue to bubble up to the collection and can be observed on it.
+- However, if you use the flag on a model, the `selected` and `deselected` events aren't just silenced the on the model itself, but also on the collection. They aren't fired on the model, so they don't bubble up.
+
 ## Build process and tests
 
 If you'd like to fix, customize or otherwise improve the project: here are your tools.
@@ -1132,6 +1147,10 @@ That's why donations are welcome, and be it as nod of appreciation to keep spiri
 [![Donate with Paypal][donations-paypal-button]][donations-paypal-link]
 
 ## Release notes
+
+### v1.5.3
+
+* Added `_silentLocally` flag to public API
 
 ### v1.5.2
 
