@@ -1266,7 +1266,7 @@ That's why donations are welcome, and be it as nod of appreciation to keep spiri
 
 Special credits go to [Derick Bailey][muted-solutions], who created the original version of this component, [Backbone.Picky][]. I have forked it at version 0.2.0. Backbone.Picky is no longer developed; see the [Backbone.Picky Compatibility section][picky-compatibility] if you want to migrate.
 
-Copyright (c) 2014, 2015 Michael Heim<br>
+Copyright (c) 2014-2016 Michael Heim<br>
 Copyright (c) 2013 Derick Bailey, Muted Solutions, LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
