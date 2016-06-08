@@ -1148,6 +1148,10 @@ That's why donations are welcome, and be it as nod of appreciation to keep spiri
 
 ## Release notes
 
+### v1.5.4
+
+* Updated bower.json, package.json for Backbone 1.3.x ([#14][issue-14])
+
 ### v1.5.3
 
 * Added `_silentLocally` flag to public API
@@ -1291,6 +1295,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [issue-6]: https://github.com/hashchange/backbone.select/pull/6 "Backbone.Select, Pull Request #6: select:all not being triggered when expected"
 [issue-7]: https://github.com/hashchange/backbone.select/pull/7 "Backbone.Select, Pull Request #7: Update Backbone dependency for compatibility with 1.2.x"
+[issue-14]: https://github.com/hashchange/backbone.select/issues/14 "Backbone.Select, Issue #14: Upgrade to BB 1.3.*"
 
 [muted-solutions]: http://mutedsolutions.com/ "Muted Solutions, LLC"
 [Backbone.Picky]: https://github.com/derickbailey/backbone.picky#readme "Backbone.Picky"

@@ -1,5 +1,5 @@
-// Backbone.Select, v1.5.3
-// Copyright (c) 2014-2015 Michael Heim, Zeilenwechsel.de
+// Backbone.Select, v1.5.4
+// Copyright (c) 2014-2016 Michael Heim, Zeilenwechsel.de
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
 // http://github.com/hashchange/backbone.select
