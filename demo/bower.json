@@ -23,9 +23,9 @@
   "dependencies": {
     "backbone.cycle": "^2.0.2",
     "backbone.picky": "~0.2.0",
-    "foundation": "~5.5.2",
-    "jquery": "~2.1.4",
+    "foundation": "~5.5.3",
+    "jquery": "~3.1.0",
     "outline.js": "https://github.com/lindsayevans/outline.js.git#0d16b1edc9139854d2870989962ded04a488832f",
-    "requirejs": "~2.1.20"
+    "requirejs": "~2.3.1"
   }
 }
