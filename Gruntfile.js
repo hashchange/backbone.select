@@ -4,11 +4,71 @@ module.exports = function(grunt) {
   var LIVERELOAD_PORT = 35731,
       HTTP_PORT = 9400,
       KARMA_PORT = 9877,
-      WATCHED_FILES = [
-        'demo/**/*',
-        'spec/**/*',
+      WATCHED_FILES_SRC = [
         'src/**/*'
-      ];
+      ],
+      WATCHED_FILES_SPEC = [
+        'spec/**/*'
+      ],
+      WATCHED_FILES_DIST = [
+        'dist/**/*'
+      ],
+      WATCHED_FILES_DEMO = [
+        'demo/**/*'
+      ],
+
+      path = require( "path" ),
+      requireFromString = require( "require-from-string" ),
+
+      /**
+       * Receives an object and the name of a path property on that object. Translates the path property to a new path,
+       * based on a directory prefix. Does not return anything, modifies the object itself.
+       *
+       * The directory prefix can be relative (e.g. "../../"). It may or may not end in a slash.
+       *
+       * @param {string}  dirPrefix
+       * @param {Object}  object
+       * @param {string}  propertyName
+       * @param {boolean} [verbose=false]
+       */
+      translatePathProperty = function ( dirPrefix, object, propertyName, verbose ) {
+        var originalPath = object[propertyName];
+
+        if ( originalPath ) {
+          object[propertyName] = path.normalize( dirPrefix + path.sep + originalPath );
+          if ( verbose ) grunt.log.writeln( 'Translating path property "' + propertyName + '": ' + originalPath + " => " + object[propertyName] );
+        }
+      },
+
+      /**
+       * Reads an r.js build profile and returns it as an options set for a grunt-contrib-requirejs task.
+       *
+       * For a discussion, see https://github.com/gruntjs/grunt-contrib-requirejs/issues/13
+       *
+       * Paths in the build profile are relative to the profile location. In the returned options object, they are
+       * transformed to be relative to the Gruntfile. (The list is nowhere near complete. More properties need to be
+       * transformed as build profiles become more complex.)
+       *
+       * @param   {string}  profilePath      relative to the Gruntfile
+       * @param   {boolean} [verbose=false]
+       * @returns {Object}
+       */
+      getRequirejsBuildProfile = function ( profilePath, verbose ) {
+        var profileContent = grunt.file.read( profilePath ),
+            profile = requireFromString( "module.exports = " + profileContent ),
+
+            dirPrefix = path.dirname( profilePath );
+
+        if ( verbose ) grunt.log.writeln( "Loading r.js build profile " + profilePath );
+
+        // Add more paths here as needed.
+        translatePathProperty( dirPrefix, profile, "mainConfigFile", verbose );
+        translatePathProperty( dirPrefix, profile, "out", verbose );
+
+        if ( verbose ) grunt.log.writeln();
+
+        return profile;
+      };
 
   // Project configuration.
   grunt.config.init({
@@ -39,7 +99,16 @@ module.exports = function(grunt) {
 
     concat: {
       options: {
-        banner: "<%= meta.banner %>"
+        banner: "<%= meta.banner %>",
+        process: function( src, filepath ) {
+          var bowerVersion = grunt.file.readJSON( "bower.json" ).version,
+              npmVersion = grunt.file.readJSON( "package.json" ).version;
+
+          if ( npmVersion === undefined || npmVersion === "" ) grunt.fail.fatal( "Version number not specified in package.json. Specify it in bower.json and package.json" );
+          if ( npmVersion !== bowerVersion ) grunt.fail.fatal( "Version numbers in package.json and bower.json are not identical. Make them match." + " " + npmVersion );
+          if ( ! /^\d+\.\d+.\d+$/.test( npmVersion ) ) grunt.fail.fatal( 'Version numbers in package.json and bower.json are not semantic. Provide a version number in the format n.n.n, e.g "1.2.3"' );
+          return src.replace( "__COMPONENT_VERSION_PLACEHOLDER__", npmVersion );
+        }
       },
       build: {
         src: 'dist/backbone.select.js',
@@ -134,38 +203,53 @@ module.exports = function(grunt) {
       }
     },
 
+    // Use focus to run Grunt watch with a hand-picked set of simultaneous watch targets.
     focus: {
       demo: {
-        exclude: ['build', 'buildDirty']
+        include: ['livereloadDemo']
       },
       demoCi: {
-        exclude: ['buildDirty']
+        include: ['build', 'livereloadDemo']
       },
       demoCiDirty: {
-        exclude: ['build']
+        include: ['buildDirty', 'livereloadDemo']
       }
     },
 
+    // Use watch to monitor files for changes, and to kick off a task then.
     watch: {
       options: {
         nospawn: false
       },
-      livereload: {
+      // Live-reloads the web page when the source files or the spec files change. Meant for test pages.
+      livereloadTest: {
         options: {
           livereload: LIVERELOAD_PORT
         },
-        files: WATCHED_FILES
+        files: WATCHED_FILES_SRC.concat( WATCHED_FILES_SPEC )
       },
+      // Live-reloads the web page when the dist files or the demo files change. Meant for demo pages.
+      livereloadDemo: {
+        options: {
+          livereload: LIVERELOAD_PORT
+        },
+        files: WATCHED_FILES_DEMO.concat( WATCHED_FILES_DIST )
+      },
+      // Runs the "build" task (ie, runs linter and tests, then compiles the dist files) when the source files or the
+      // spec files change. Meant for continuous integration tasks ("ci", "demo-ci").
       build: {
-        tasks: ['default'],
-        files: WATCHED_FILES
+        tasks: ['build'],
+        files: WATCHED_FILES_SRC.concat( WATCHED_FILES_SPEC )
       },
+      // Runs the "build-dirty" task (ie, compiles the dist files without running linter and tests) when the source
+      // files change. Meant for "dirty" continuous integration tasks ("ci-dirty", "demo-ci-dirty").
       buildDirty: {
         tasks: ['build-dirty'],
-        files: WATCHED_FILES
+        files: WATCHED_FILES_SRC
       }
     },
 
+    // Spins up a web server.
     connect: {
       options: {
         port: HTTP_PORT,
@@ -230,13 +314,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-sails-linker');
   grunt.loadNpmTasks('grunt-text-replace');
+  grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-focus');
 
   grunt.registerTask('lint', ['jshint:components']);
   grunt.registerTask('hint', ['jshint:components']);        // alias
   grunt.registerTask('test', ['jshint:components', 'karma:test']);
   grunt.registerTask('webtest', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:testNoReload']);
-  grunt.registerTask('interactive', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:test', 'watch:livereload']);
+  grunt.registerTask('interactive', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:test', 'watch:livereloadTest']);
   grunt.registerTask('demo', ['connect:demo', 'focus:demo']);
   grunt.registerTask('build', ['jshint:components', 'karma:build', 'preprocess:build', 'concat', 'uglify', 'jshint:concatenated']);
   grunt.registerTask('ci', ['build', 'watch:build']);
@@ -252,12 +337,15 @@ module.exports = function(grunt) {
   //
   // - build-dirty:
   //   builds the project without running checks (no linter, no tests)
+  // - ci-dirty:
+  //   builds the project without running checks (no linter, no tests) on every source change
   // - demo-ci:
   //   Runs the demo (= "demo" task), and also rebuilds the project on every source change (= "ci" task)
   // - demo-ci-dirty:
   //   Runs the demo (= "demo" task), and also rebuilds the project "dirty", without tests or linter, on every source
-  //   change (= "build-dirty"/"ci" cross-over task)
+  //   change (= "ci-dirty" task)
   grunt.registerTask('build-dirty', ['preprocess:build', 'concat', 'uglify']);
+  grunt.registerTask('ci-dirty', ['build-dirty', 'watch:buildDirty']);
   grunt.registerTask('demo-ci', ['build', 'connect:demo', 'focus:demoCi']);
   grunt.registerTask('demo-ci-dirty', ['build-dirty', 'connect:demo', 'focus:demoCiDirty']);
 
