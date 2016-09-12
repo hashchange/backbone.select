@@ -1,4 +1,4 @@
-// Backbone.Select, v1.5.4
+// Backbone.Select, v1.5.5
 // Copyright (c) 2014-2016 Michael Heim, Zeilenwechsel.de
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
@@ -1105,6 +1105,7 @@
     }
 
     Backbone.Select = Select;
+    Backbone.Select.version = "1.5.5";
 
     // Capture existing Backbone model and collection methods and properties, as well as the mixin methods and
     // properties, to populate a blacklist of illegal label names.
