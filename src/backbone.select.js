@@ -1099,6 +1099,7 @@
     }
 
     Backbone.Select = Select;
+    Backbone.Select.version = "__COMPONENT_VERSION_PLACEHOLDER__";
 
     // Capture existing Backbone model and collection methods and properties, as well as the mixin methods and
     // properties, to populate a blacklist of illegal label names.
