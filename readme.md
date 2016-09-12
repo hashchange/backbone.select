@@ -1350,15 +1350,15 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [picky-compatibility]: #compatibility-with-backbonepicky
 [build]: #build-process-and-tests "Build process and tests"
 
-[demo-basic-jsbin]: http://jsbin.com/xosepu/2/edit?js,output "Backbone.Select: Basic demo, with model sharing (AMD) – JSBin"
+[demo-basic-jsbin]: http://jsbin.com/xosepu/4/edit?js,output "Backbone.Select: Basic demo, with model sharing (AMD) – JSBin"
 [demo-basic-codepen]: http://codepen.io/hashchange/pen/yNdbgR "Backbone.Select: Basic demo, with model sharing (AMD) – Codepen"
-[demo-label-select.one-jsbin]: http://jsbin.com/xetuva/1/edit?js,output "Backbone.Select: Custom label demo for a Select.One collection"
+[demo-label-select.one-jsbin]: http://jsbin.com/xetuva/2/edit?js,output "Backbone.Select: Custom label demo for a Select.One collection"
 [demo-label-select.one-codepen]: http://codepen.io/hashchange/pen/BoWLKP "Backbone.Select: Custom label demo for a Select.One collection"
-[demo-label-select.many-jsbin]: http://jsbin.com/pobezu/2/edit?js,output "Backbone.Select: Custom label demo for a Select.Many collection (AMD)"
+[demo-label-select.many-jsbin]: http://jsbin.com/pobezu/3/edit?js,output "Backbone.Select: Custom label demo for a Select.Many collection (AMD)"
 [demo-label-select.many-codepen]: http://codepen.io/hashchange/pen/epvzMx "Backbone.Select: Custom label demo for a Select.Many collection (AMD)"
-[demo-focus-with-label-jsbin]: http://jsbin.com/soduyi/1/edit?js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using custom labels (AMD)"
+[demo-focus-with-label-jsbin]: http://jsbin.com/soduyi/2/edit?js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using custom labels (AMD)"
 [demo-focus-with-label-codepen]: http://codepen.io/hashchange/pen/wKJzWE "Backbone.Select: Focusing on one selected item in a Select.Many collection, using custom labels (AMD)"
-[demo-focus-with-exclusive-jsbin]: http://jsbin.com/colulo/1/edit?js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
+[demo-focus-with-exclusive-jsbin]: http://jsbin.com/colulo/3/edit?js,output "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
 [demo-focus-with-exclusive-codepen]: http://codepen.io/hashchange/pen/QjpKGo "Backbone.Select: Focusing on one selected item in a Select.Many collection, using the `exclusive` option (AMD)"
 
 [donations]: #facilitating-development "Facilitating development"
