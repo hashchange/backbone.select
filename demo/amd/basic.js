@@ -1,4 +1,4 @@
-// amd.js
+// basic.js
 
 require( [
 

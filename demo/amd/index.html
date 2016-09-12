@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="../bower_demo_components/foundation/css/foundation.css">
 
     <link rel="stylesheet" href="../common.css">
-    <link rel="stylesheet" href="amd.css">
+    <link rel="stylesheet" href="basic.css">
 </head>
 <body>
     <!-- check that 'bower install' has been run in the demo dir if bower.json isn't empty -->
@@ -73,11 +73,31 @@
 
     <!-- libraries --><!-- edit and replace with your project libraries as needed -->
     <script src="../bower_demo_components/requirejs/require.js"></script>
+
+    <!-- Runtime async script loading -->
     <script src="require-config.js"></script>
     <script>
-        // Relative to the baseUrl defined in require-config.js
-        require( ['../demo/amd/amd'] );
+        // Main file, set to the name of the main module. The name is defined in the paths config, in require-config.js.
+        // If a path were used here, it would be relative to the baseUrl defined in require-config.js (which is set to
+        // project root):
+        // require( ['demo/amd/basic'] );
+        require( ['local.basic'] );
     </script>
+
+    <!--
+        For testing the output of r.js:
+
+        - Generate an optimized r.js build (basic-build.js) with `grunt requirejs`. For more info, see rjs/build-commands.md
+        - Comment out the runtime async script loading, above
+        - Uncomment the script tag below
+    -->
+    <!--<script src="rjs/output/unified/basic-build.js"></script>-->
+
+    <!--
+        Alternatively, also for testing r.js, use the multi-part build
+    -->
+    <!--<script src="rjs/output/parts/vendor.js"></script>-->
+    <!--<script src="rjs/output/parts/basic-app.js"></script>-->
 
     <script src="../close-build-info.js"></script>
 </body>

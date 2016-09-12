@@ -68,11 +68,31 @@
 
     <!-- libraries -->
     <script src="../bower_demo_components/requirejs/require.js"></script>
+
+    <!-- Runtime async script loading -->
     <script src="require-config.js"></script>
     <script>
-        // Relative to the baseUrl defined in require-config.js
-        require( ['../demo/amd/focus-label'] );
+        // Main file, set to the name of the main module. The name is defined in the paths config, in require-config.js.
+        // If a path were used here, it would be relative to the baseUrl defined in require-config.js (which is set to
+        // project root):
+        // require( ['demo/amd/focus-label'] );
+        require( ['local.focus-label'] );
     </script>
+
+    <!--
+        For testing the output of r.js:
+
+        - Generate an optimized r.js build (focus-label-build.js) with `grunt requirejs`. For more info, see rjs/build-commands.md
+        - Comment out the runtime async script loading, above
+        - Uncomment the script tag below
+    -->
+    <!--<script src="rjs/output/unified/focus-label-build.js"></script>-->
+
+    <!--
+        Alternatively, also for testing r.js, use the multi-part build
+    -->
+    <!--<script src="rjs/output/parts/vendor.js"></script>-->
+    <!--<script src="rjs/output/parts/focus-label-app.js"></script>-->
 
     <script src="../bower_demo_components/outline.js/outline.js"></script>
     <script src="../close-build-info.js"></script>

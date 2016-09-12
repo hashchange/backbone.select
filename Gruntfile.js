@@ -203,6 +203,44 @@ module.exports = function(grunt) {
       }
     },
 
+    requirejs : {
+      unifiedBasicBuild : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/unified/basic-build-config.js', false )
+      },
+      unifiedBasketsBuild : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/unified/baskets-build-config.js', false )
+      },
+      unifiedFocusExclusiveBuild : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/unified/focus-exclusive-build-config.js', false )
+      },
+      unifiedFocusLabelBuild : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/unified/focus-label-build-config.js', false )
+      },
+      unifiedTrailingBuild : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/unified/trailing-build-config.js', false )
+      },
+
+      splitBuildBasicApp : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/jsbin-parts/basic-app-config.js', false )
+      },
+      splitBuildBasketsApp : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/jsbin-parts/baskets-app-config.js', false )
+      },
+      splitBuildFocusExclusiveApp : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/jsbin-parts/focus-exclusive-app-config.js', false )
+      },
+      splitBuildFocusLabelApp : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/jsbin-parts/focus-label-app-config.js', false )
+      },
+      splitBuildTrailingApp : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/jsbin-parts/trailing-app-config.js', false )
+      },
+
+      splitBuildVendor : {
+        options : getRequirejsBuildProfile( 'demo/amd/rjs/config/jsbin-parts/vendor-config.js', false )
+      }
+    },
+
     // Use focus to run Grunt watch with a hand-picked set of simultaneous watch targets.
     focus: {
       demo: {
@@ -323,7 +361,7 @@ module.exports = function(grunt) {
   grunt.registerTask('webtest', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:testNoReload']);
   grunt.registerTask('interactive', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:test', 'watch:livereloadTest']);
   grunt.registerTask('demo', ['connect:demo', 'focus:demo']);
-  grunt.registerTask('build', ['jshint:components', 'karma:build', 'preprocess:build', 'concat', 'uglify', 'jshint:concatenated']);
+  grunt.registerTask('build', ['jshint:components', 'karma:build', 'preprocess:build', 'concat', 'uglify', 'jshint:concatenated', 'requirejs']);
   grunt.registerTask('ci', ['build', 'watch:build']);
   grunt.registerTask('setver', ['replace:version']);
   grunt.registerTask('getver', function () {
@@ -335,6 +373,8 @@ module.exports = function(grunt) {
 
   // Special tasks, not mentioned in Readme documentation:
   //
+  // - requirejs:
+  //   creates build files for the AMD demo with r.js
   // - build-dirty:
   //   builds the project without running checks (no linter, no tests)
   // - ci-dirty:
@@ -344,7 +384,7 @@ module.exports = function(grunt) {
   // - demo-ci-dirty:
   //   Runs the demo (= "demo" task), and also rebuilds the project "dirty", without tests or linter, on every source
   //   change (= "ci-dirty" task)
-  grunt.registerTask('build-dirty', ['preprocess:build', 'concat', 'uglify']);
+  grunt.registerTask('build-dirty', ['preprocess:build', 'concat', 'uglify', 'requirejs']);
   grunt.registerTask('ci-dirty', ['build-dirty', 'watch:buildDirty']);
   grunt.registerTask('demo-ci', ['build', 'connect:demo', 'focus:demoCi']);
   grunt.registerTask('demo-ci-dirty', ['build-dirty', 'connect:demo', 'focus:demoCiDirty']);
