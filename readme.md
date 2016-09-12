@@ -286,7 +286,7 @@ Models in a Backbone.Select.One collection must have the `Backbone.Select.Me` mi
 To create a single-select collection type, apply the mixin in the `initialize` method. Assuming your base type is `Backbone.Collection`, augment it with
 
 ```js
-SingleCollection = Backbone.Collection.extend({
+SelectOneCollection = Backbone.Collection.extend({
   initialize: function ( models ) {
     Backbone.Select.One.applyTo( this, models );
   }
@@ -300,7 +300,7 @@ Replace `Backbone.Collection` in the example above with whatever base type you w
 If you share models among multiple collections, Backbone.Select will handle the interaction for you. You must turn on model-sharing mode explicitly, with the `enableModelSharing` option:
 
 ```js
-SingleCollection = Backbone.Collection.extend({
+SelectOneCollection = Backbone.Collection.extend({
   initialize: function ( models ) {
     Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
   }
@@ -329,7 +329,7 @@ Selects a model. It stores the selected model in the `selected` property of the 
 
 ```js
 myModel = new SelectableModel();
-myCollection = new SingleCollection( [myModel] );
+myCollection = new SelectOneCollection( [myModel] );
 
 myCollection.select( myModel );
 ```
@@ -366,7 +366,7 @@ Deselects a model if it had been selected. It removes the model from the `select
 
 ```js
 myModel = new SelectableModel();
-myCollection = new SingleCollection( [myModel] );
+myCollection = new SelectOneCollection( [myModel] );
 
 myCollection.deselect( myModel );
 ```
@@ -390,7 +390,7 @@ The following property is managed by the Select.One mixin.
 Returns the model which is currently selected in the collection, or `undefined` if no model is selected.
 
 ```js
-myCollection = new SingleCollection();
+myCollection = new SelectOneCollection();
 myCollection.select( myModel );
 
 myCollection.selected; // => myModel
@@ -455,7 +455,7 @@ Models in a Backbone.Select.Many collection must have the `Backbone.Select.Me` m
 To create a multi-select collection type, apply the mixin in the `initialize` method. Assuming your base type is `Backbone.Collection`, augment it with
 
 ```js
-MultiCollection = Backbone.Collection.extend({
+SelectManyCollection = Backbone.Collection.extend({
   initialize: function ( models ) {
     Backbone.Select.Many.applyTo( this, models );
   }
@@ -469,7 +469,7 @@ Replace `Backbone.Collection` in the example above with whatever base type you w
 If you share models among multiple collections, Backbone.Select will handle the interaction for you. You must turn on model-sharing mode explicitly, with the `enableModelSharing` option:
 
 ```js
-MultiCollection = Backbone.Collection.extend({
+SelectManyCollection = Backbone.Collection.extend({
   initialize: function ( models ) {
     Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
   }
@@ -498,7 +498,7 @@ Selects a model. It stores the selected model in the `selected` list of the coll
 
 ```js
 myModel = new SelectableModel();
-myCollection = new MultiCollection( [myModel] );
+myCollection = new SelectManyCollection( [myModel] );
 
 myCollection.select( myModel );
 ```
@@ -520,7 +520,7 @@ The `select` method supports the following options: [`silent`][select.many-silen
 The `exclusive` option makes a Select.Many collection work like a Select.One collection for just one action. By passing the option `{ exclusive: true }` to a `.select()` call, only the specified model is selected, and all others are deselected.
 
 ```js
-collection = new MultiCollection( [m1, m2, m3] );
+collection = new SelectManyCollection( [m1, m2, m3] );
 m1.select();
 m2.select();
 
@@ -538,11 +538,11 @@ m3.select( { exclusive: true } );
 
 When [models are shared][sharing] among multiple collections, it makes a difference whether you call `.select()` with the `exclusive` option directly on a model, or on a collection. 
 
-In the context of a collection, the effect of the `exclusive` option is limited the collection where the selection took place. Other Select.Many collections don't inherit the "exclusivity" of the model, and don't deselect models unless they, too, are shared with the collection where the call was made. Consider this:
+In the context of a collection, the effect of the `exclusive` option is limited to the collection where the selection took place. Other Select.Many collections don't inherit the "exclusivity" of the model, and don't deselect models unless they, too, are shared with the collection where the call was made. Consider this:
 
 ```js
-collectionA = new MultiCollection( [m1, m2] );
-collectionB = new MultiCollection( [mA, m2] );
+collectionA = new SelectManyCollection( [m1, m2] );
+collectionB = new SelectManyCollection( [mA, m2] );
 m1.select();
 mA.select();
 
@@ -554,8 +554,8 @@ collectionB.selected;    // stores mA, m2; `exclusive` not inherited
 When you use the `exclusive` option for a `.select()` call on a model, however, its effect spreads to any collection sharing that particular model.
 
 ```js
-collectionA = new MultiCollection( [m1, m2] );
-collectionB = new MultiCollection( [mA, m2] );
+collectionA = new SelectManyCollection( [m1, m2] );
+collectionB = new SelectManyCollection( [mA, m2] );
 m1.select();
 mA.select();
 
@@ -580,7 +580,7 @@ Deselects a model if it had been selected. It removes the model from the `select
 
 ```js
 myModel = new SelectableModel();
-myCollection = new MultiCollection( [myModel] );
+myCollection = new SelectManyCollection( [myModel] );
 
 myCollection.deselect( myModel );
 ```
@@ -640,7 +640,7 @@ The method returns the collection, and allows chaining.
 Selects all models in the collection. If that is already the case and all models are selected, they are deselected instead. Fires collection and model events indicating the change, and separate events for any re-selections. See the [events section][select.many-events] below.
 
 ```js
-myCollection = new MultiCollection( models );
+myCollection = new SelectManyCollection( models );
 
 myCollection.toggleSelectAll(); // selects all models in the collection
 myCollection.toggleSelectAll(); // deselects all models in the collection
@@ -667,7 +667,7 @@ The following properties are managed by the Select.Many mixin.
 Returns a hash of the selected models. The `cid` of the models serve as the keys. Returns an empty object, `{}`, if no models are selected.
 
 ```js
-myCollection = new MultiCollection( [model1, model2] );
+myCollection = new SelectManyCollection( [model1, model2] );
 myCollection.select( model1 );
 
 myCollection.selected; // => { "c1": model1 }
@@ -683,7 +683,7 @@ myCollection.selected; // => { "c1": model1, "c2": model2 }
 Stores the number of selected items in the collection. Equivalent to calling `_.size( myCollection.selected )`.
 
 ```js
-myCollection = new MultiCollection();
+myCollection = new SelectManyCollection();
 myCollection.select( model );
 
 myCollection.selectedLength; // => 1
@@ -775,7 +775,9 @@ and likewise for Backbone.Select.Many. See the Basic Usage sections of [Backbone
 
 There are a few things you must and mustn't do in order to make sharing work, and keep yourself out of trouble.
 
-- Don't use the `silent` option when adding models, removing them, or resetting a collection. If you change the contents of a collection silently, the `selected`/`deselected` status of the shared models won't be synced across collections reliably.
+- Don't use the `silent` option when adding models, removing them, or resetting a collection. 
+
+  If you change the contents of a collection silently, selections are not updated as models are added or removed from it. And if you share models among collections, the `selected`/`deselected` status of these models won't be synced across collections reliably.
 
 - When a collection is no longer in use, call `close()` on it to avoid memory leaks.
 
@@ -979,7 +981,7 @@ collection.selected;    // => undefined
 With custom options, you can send additional information to event handlers. Just pass an arbitrary, custom option (or a whole bunch of them) to any method. Custom options don't affect the operation of Backbone.Select, but they are passed on to the event handlers as the last argument.
 
 ```js
-myCollection = new SingleCollection( [myModel] );
+myCollection = new SelectOneCollection( [myModel] );
 myCollection.on( "select:one", function ( model, collection, options ) {
   if ( options ) console.log( "Selected while foo=" + options.foo );
 });
@@ -1147,6 +1149,11 @@ That's why donations are welcome, and be it as nod of appreciation to keep spiri
 [![Donate with Paypal][donations-paypal-button]][donations-paypal-link]
 
 ## Release notes
+
+### v1.5.5
+
+- Version is exposed in `Backbone.Select.version`
+- AMD demo allows testing r.js output
 
 ### v1.5.4
 
