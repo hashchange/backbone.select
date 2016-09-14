@@ -107,7 +107,9 @@ There are a couple of interactive demos you can play around with. The demos are 
 
 [Backbone][] is the only dependency. Include backbone.select.js after [Backbone][]. Backbone.Select requires Backbone 1.0.0 or later.
 
-The stable version of Backbone.Select is available in the `dist` directory ([dev][dist-dev], [prod][dist-prod]), including an AMD build ([dev][dist-amd-dev], [prod][dist-amd-prod]). If you use Bower, fetch the files with `bower install backbone.select`. With npm, it is `npm install backbone.select`.
+When loaded as a module (e.g. AMD, Node), Backbone.Select does not export a meaningful value. It solely lives in the Backbone namespace.
+
+The stable version of Backbone.Select is available in the `dist` directory ([dev][dist-dev], [prod][dist-prod]). If you use Bower, fetch the files with `bower install backbone.select`. With npm, it is `npm install backbone.select`.
 
 ## Basic model and collection interaction
 
@@ -1157,121 +1159,121 @@ That's why donations are welcome, and be it as nod of appreciation to keep spiri
 
 ### v1.5.4
 
-* Updated bower.json, package.json for Backbone 1.3.x ([#14][issue-14])
+- Updated bower.json, package.json for Backbone 1.3.x ([#14][issue-14])
 
 ### v1.5.3
 
-* Added `_silentLocally` flag to public API
+- Added `_silentLocally` flag to public API
 
 ### v1.5.2
 
-* Made all methods support chaining.
-* Allowed `deselect()` to be called without a model argument in a Select.Many collection (acts like `deselectAll()`).
+- Made all methods support chaining.
+- Allowed `deselect()` to be called without a model argument in a Select.Many collection (acts like `deselectAll()`).
 
 ### v1.5.1
 
-* Added `_pickyIgnoredLabels` property to public API
+- Added `_pickyIgnoredLabels` property to public API
 
 ### v1.5.0
 
-* Added `invertSelection()`
-* Made events for `selectAll()`, `deselectAll()`, `toggleSelectAll()` fire only after all individual actions are complete.
+- Added `invertSelection()`
+- Made events for `selectAll()`, `deselectAll()`, `toggleSelectAll()` fire only after all individual actions are complete.
 
 ### v1.4.0
 
-* Introduced support for custom labels, `label` option
-* Added event variants which are namespaced according to label
-* Added `defaultLabel` setup option, `_pickyDefaultLabel` property
-* Added `ignoreLabel` setup option
-* Added `exclusive` option to `select()` in Select.Many, Select.Me
+- Introduced support for custom labels, `label` option
+- Added event variants which are namespaced according to label
+- Added `defaultLabel` setup option, `_pickyDefaultLabel` property
+- Added `ignoreLabel` setup option
+- Added `exclusive` option to `select()` in Select.Many, Select.Me
 
 ### v1.3.1
 
-* Fixed miscalculation of selectedLength in Backbone.Select.Many ([#6][issue-6])
-* Updated bower.json, package.json for Backbone 1.2.x ([#7][issue-7])
+- Fixed miscalculation of selectedLength in Backbone.Select.Many ([#6][issue-6])
+- Updated bower.json, package.json for Backbone 1.2.x ([#7][issue-7])
 
 ### v1.3.0
 
-* Fixed compatibility with Underscore 1.7.0
-* Switched to plain objects as mixins internally
+- Fixed compatibility with Underscore 1.7.0
+- Switched to plain objects as mixins internally
 
 ### v1.2.8
 
-* Enforced strict mode 
+- Enforced strict mode 
 
 ### v1.2.7
 
-* Fleshed out package.json for npm installs
+- Fleshed out package.json for npm installs
 
 ### v1.2.5
 
-* Restored access to the `select` method of Backbone.Collection by overloading the `select` method.
+- Restored access to the `select` method of Backbone.Collection by overloading the `select` method.
 
 ### v1.2.4
 
-* Added arguments validation to `applyTo` factory methods.
-* Various minor bugs fixed.
+- Added arguments validation to `applyTo` factory methods.
+- Various minor bugs fixed.
 
 ### v1.2.0
 
-* Related selections and deselections are treated as a single, atomic transaction. Firing of events is delayed until select and deselect actions have spread across all affected models and collections, without any actions still pending.
+- Related selections and deselections are treated as a single, atomic transaction. Firing of events is delayed until select and deselect actions have spread across all affected models and collections, without any actions still pending.
 
 ### v1.1.2
 
-* Fixed bug when models were added or removed with `reset` (collection was not correctly registered with models)
+- Fixed bug when models were added or removed with `reset` (collection was not correctly registered with models)
 
 ### v1.1.1
 
-* Relaxed dependency requirements in `bower.json`
+- Relaxed dependency requirements in `bower.json`
 
 ### v1.1.0
 
-* Moved build to `dist` directory
-* Added `_pickyType` property to identify mixins in a model or collection
-* Switched development stack to Bower, Karma, Node web server
-* Added demo app, memory-leak test environment in `demo` directory
+- Moved build to `dist` directory
+- Added `_pickyType` property to identify mixins in a model or collection
+- Switched development stack to Bower, Karma, Node web server
+- Added demo app, memory-leak test environment in `demo` directory
 
 ### v1.0.1
 
-* Removed obsolete Backbone.Picky files from build
+- Removed obsolete Backbone.Picky files from build
 
 ### v1.0.0
 
-* Forked Backbone.Picky, renaming the project to Backbone.Select
-* Renamed components to Select.Me (former Selectable), Select.One (former SingleSelect), Select.Many (former MultiSelect)
-* Added `options._externalEvent`, available when the selection in a collection is altered during an `add` or `remove` action
-* Added `applyTo` class methods for setup
-* Removed support for creating new Backbone.Select objects solely with the constructor
-* Event handlers with standard names are invoked automatically if they exist (`onSelect`, `onDeselect`, `onReselect`, `onSelectNone`, `onSelectSome`, `onSelectAll`)
-* Options – including arbitrary, custom ones – are passed on to event handlers
-* The collection is also passed to event handlers (single-select collection)
-* A "diff" hash is passed to select:* event handlers (multi-select collection)
-* New events capture when models are re-selected: `reselected` (model), `reselect:one` (single-select collection), `reselect:any` (multi-select collection)
-* Multi-select events no longer fire when `selectAll`, `deselectAll` actions are a no-op (change in spec)
-* Added support for sharing models among collections
-* Added a `silent` option
-* Improved events, now firing when model and collection are in a consistent state (Picky issue #18)
-* Added `deselectAll`, while keeping `selectNone` around as an alias
-* More comprehensive testing
-* Added config file for the Karma test runner
+- Forked Backbone.Picky, renaming the project to Backbone.Select
+- Renamed components to Select.Me (former Selectable), Select.One (former SingleSelect), Select.Many (former MultiSelect)
+- Added `options._externalEvent`, available when the selection in a collection is altered during an `add` or `remove` action
+- Added `applyTo` class methods for setup
+- Removed support for creating new Backbone.Select objects solely with the constructor
+- Event handlers with standard names are invoked automatically if they exist (`onSelect`, `onDeselect`, `onReselect`, `onSelectNone`, `onSelectSome`, `onSelectAll`)
+- Options – including arbitrary, custom ones – are passed on to event handlers
+- The collection is also passed to event handlers (single-select collection)
+- A "diff" hash is passed to select:- event handlers (multi-select collection)
+- New events capture when models are re-selected: `reselected` (model), `reselect:one` (single-select collection), `reselect:any` (multi-select collection)
+- Multi-select events no longer fire when `selectAll`, `deselectAll` actions are a no-op (change in spec)
+- Added support for sharing models among collections
+- Added a `silent` option
+- Improved events, now firing when model and collection are in a consistent state (Picky issue #18)
+- Added `deselectAll`, while keeping `selectNone` around as an alias
+- More comprehensive testing
+- Added config file for the Karma test runner
 
 ### v0.2.0
 
-* Renamed `SingleSelect` events from "select" and "deselect" to "select:one" and "deselect:one"
-* Pass model as argument in select:one / deselect:one events
-* Updated the build to use latest grunt and related tools
-* Removed reliance on ruby for any part of this project
+- Renamed `SingleSelect` events from "select" and "deselect" to "select:one" and "deselect:one"
+- Pass model as argument in select:one / deselect:one events
+- Updated the build to use latest grunt and related tools
+- Removed reliance on ruby for any part of this project
 
 ### v0.1.0
 
-* Added Picky.SingleSelect
-* Fleshed out the specs more
+- Added Picky.SingleSelect
+- Fleshed out the specs more
 
 ### v0.0.1
 
-* Initial release of untested code
-* Basic "Selectable" mixin for models
-* Basic "MultiSelect" mixin for collections
+- Initial release of untested code
+- Basic "Selectable" mixin for models
+- Basic "MultiSelect" mixin for collections
 
 ## Credits, copyright, MIT license
 
@@ -1297,8 +1299,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 [dist-dev]: https://raw.github.com/hashchange/backbone.select/master/dist/backbone.select.js "backbone.select.js"
 [dist-prod]: https://raw.github.com/hashchange/backbone.select/master/dist/backbone.select.min.js "backbone.select.min.js"
-[dist-amd-dev]: https://raw.github.com/hashchange/backbone.select/master/dist/amd/backbone.select.js "backbone.select.js, AMD build"
-[dist-amd-prod]: https://raw.github.com/hashchange/backbone.select/master/dist/amd/backbone.select.min.js "backbone.select.min.js, AMD build"
 
 [issue-6]: https://github.com/hashchange/backbone.select/pull/6 "Backbone.Select, Pull Request #6: select:all not being triggered when expected"
 [issue-7]: https://github.com/hashchange/backbone.select/pull/7 "Backbone.Select, Pull Request #7: Update Backbone dependency for compatibility with 1.2.x"
