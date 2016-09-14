@@ -26,8 +26,10 @@
     "_": true,
     "$": true,
 
+    "JSON": false,
     "require": false,
     "define": false,
-    "module": false
+    "module": false,
+    "exports": true
   }
 }

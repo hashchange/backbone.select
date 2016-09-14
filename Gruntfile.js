@@ -86,8 +86,7 @@ module.exports = function(grunt) {
     preprocess: {
       build: {
         files: {
-          'dist/backbone.select.js' : 'src/backbone.select.js',
-          'dist/amd/backbone.select.js' : 'src/amd.js'
+          'dist/backbone.select.js' : 'src/backbone.select.js'
         }
       },
       interactive: {
@@ -113,10 +112,6 @@ module.exports = function(grunt) {
       build: {
         src: 'dist/backbone.select.js',
         dest: 'dist/backbone.select.js'
-      },
-      amd_banner: {
-        src: 'dist/amd/backbone.select.js',
-        dest: 'dist/amd/backbone.select.js'
       }
     },
 
@@ -127,10 +122,6 @@ module.exports = function(grunt) {
           except: ['jQuery', 'Zepto', 'Backbone', '_']
         },
         sourceMap: true
-      },
-      amd: {
-        src : 'dist/amd/backbone.select.js',
-        dest : 'dist/amd/backbone.select.min.js'
       },
       core: {
         src: 'dist/backbone.select.js',

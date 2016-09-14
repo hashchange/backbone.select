@@ -19,7 +19,7 @@
     "Marc Delagrammatikas (https://github.com/marcdel)"
   ],
   "description": "Selecting Backbone models; handling selections in Backbone collections.",
-  "main": "dist/amd/backbone.select.js",
+  "main": "dist/backbone.select.js",
   "keywords": [
     "backbone",
     "picky",

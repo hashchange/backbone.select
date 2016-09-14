@@ -1,4 +1,37 @@
-;( function ( Backbone, _ ) {
+;( function ( root, factory ) {
+    "use strict";
+
+    // UMD for a Backbone plugin. Supports AMD, Node.js, CommonJS and globals.
+    //
+    // - Code lives in the Backbone namespace.
+    // - The module does not export a meaningful value.
+    // - The module does not create a global.
+
+    var supportsExports = typeof exports === "object" && exports && !exports.nodeType && typeof module === "object" && module && !module.nodeType;
+
+    // AMD:
+    // - Some AMD build optimizers like r.js check for condition patterns like the AMD check below, so keep it as is.
+    // - Check for `exports` after `define` in case a build optimizer adds an `exports` object.
+    // - The AMD spec requires the dependencies to be an array **literal** of module IDs. Don't use a variable there,
+    //   or optimizers may fail.
+    if ( typeof define === "function" && typeof define.amd === "object" && define.amd ) {
+
+        // AMD module
+        define( [ "exports", "underscore", "backbone" ], factory );
+
+    } else if ( supportsExports ) {
+
+        // Node module, CommonJS module
+        factory( exports, require( "underscore" ), require( "backbone" ) );
+
+    } else  {
+
+        // Global (browser or Rhino)
+        factory( {}, _, Backbone );
+
+    }
+
+}( this, function ( exports, _, Backbone ) {
     "use strict";
 
     var illegalLabelNames = [],
@@ -672,10 +705,10 @@
         var selected,
             excessiveSelections,
             deselectOnRemove = {};
-        
+
         forEachLabelInCollection( collection, function ( label ) {
             var removeThis = _.find( options.previousModels, function ( model ) { return model[label]; } );
-            if ( removeThis ) deselectOnRemove[removeThis.cid] = removeThis; 
+            if ( removeThis ) deselectOnRemove[removeThis.cid] = removeThis;
         } );
 
         _.each( deselectOnRemove, function ( model ) {
@@ -1051,7 +1084,7 @@
                     // get the method name from the event name
                     var unifiedEvent = unifyEventNames( event ),
 
-                    // Split the event name on the ":" (regex), capitalize, add "on" prefix
+                        // Split the event name on the ":" (regex), capitalize, add "on" prefix
                         methodName = 'on' + unifiedEvent.replace( /(^|:)(\w)/gi, getEventName ),
                         method = this[methodName];
 
@@ -1152,4 +1185,13 @@
 
     })();
 
-} )( Backbone, _ );
+
+    // Module return value
+    // -------------------
+    //
+    // A return value may be necessary for AMD to detect that the module is loaded. It ony exists for that reason and is
+    // purely symbolic. Don't use it in client code. The functionality of this module lives in the Backbone namespace.
+    exports.info = "Backbone.Select has loaded. Don't use the exported value of the module. Its functionality is available inside the Backbone namespace.";
+
+} ) );
+
