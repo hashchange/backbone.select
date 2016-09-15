@@ -510,10 +510,6 @@
                     hostObject.listenTo( hostObject, 'add', onAdd );
                     hostObject.listenTo( hostObject, 'remove', onRemove );
 
-                    // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
-                    // Use it read-only.
-                    hostObject._modelSharingEnabled = true;
-
                 }
 
             },
@@ -561,10 +557,6 @@
                     hostObject.listenTo( hostObject, 'reset', onResetMultiSelect );
                     hostObject.listenTo( hostObject, 'add', onAdd );
                     hostObject.listenTo( hostObject, 'remove', onRemove );
-
-                    // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
-                    // Use it read-only.
-                    hostObject._modelSharingEnabled = true;
 
                 }
 
