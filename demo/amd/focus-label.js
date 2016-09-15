@@ -47,7 +47,6 @@ require( [
                             this.tracked = options.tracked;
 
                             Backbone.Select.One.applyTo( this, models, {
-                                enableModelSharing: true,
                                 defaultLabel: "inFocus",
                                 ignoreLabel: "selected"
                             } );
@@ -71,7 +70,7 @@ require( [
 
                     } );
 
-                Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+                Backbone.Select.Many.applyTo( this, models );
 
                 trackingCollection = new TrackingCollection( _.toArray( this.selected ), { tracked: this } );
 

@@ -17,13 +17,13 @@ require( [
 
         SelectOneCollection = Backbone.Collection.extend( {
             initialize: function ( models ) {
-                Backbone.Select.One.applyTo( this, models, {enableModelSharing: true} );
+                Backbone.Select.One.applyTo( this, models );
             }
         } ),
 
         SelectManyCollection = Backbone.Collection.extend( {
             initialize: function ( models ) {
-                Backbone.Select.Many.applyTo( this, models, {enableModelSharing: true} );
+                Backbone.Select.Many.applyTo( this, models );
             }
         } ),
 

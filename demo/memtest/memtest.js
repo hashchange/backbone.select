@@ -12,7 +12,6 @@
         $collectionLoop = $memtest.find( "#collectionLoop" ),
 
         $collectionBehavior = $memtest.find( "#collectionBehavior" ),
-        $optModelSharing = $collectionBehavior.find( "#optModelSharingMode" ),
         $optInitialSelection = $collectionBehavior.find( "#optInitialSelection" ),
         $closeCollection = $collectionBehavior.find( "#closeCollection" ),
 
@@ -59,7 +58,7 @@
 
     $testTypes.find( 'input[name="testType"]' ).change( function () {
 
-        var optsSelect = [ 'optModelSharingMode', 'closeCollection' ],
+        var optsSelect = [ 'closeCollection' ],
             optsCycleOnly = [ 'optInitialSelection' ],
             optsAll = optsSelect.concat( optsCycleOnly ),
 
@@ -102,7 +101,6 @@
             collectionLoop = Number( $collectionLoop.val() ),
             options = {
                 initialSelection: $optInitialSelection.val(),
-                enableModelSharing: $optModelSharing.is( ':checked' ),
                 closeCollection: $closeCollection.is( ':checked' )
             };
 
