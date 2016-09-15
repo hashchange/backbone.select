@@ -1155,6 +1155,9 @@
 
         illegalLabelNames = _.without( _.union( modelKeys, selectOneKeys, selectManyKeys ), "selected", "selectedLength" );
 
+        selectOneCollection.close();
+        selectManyCollection.close();
+
     })();
 
 
