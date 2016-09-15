@@ -8,13 +8,13 @@ describe( "models shared between multiple collections", function () {
 
     var SingleSelectCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.One.applyTo( this, models );
         }
     } );
 
     var MultiSelectCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.Many.applyTo( this, models );
         }
     } );
 
@@ -41,6 +41,12 @@ describe( "models shared between multiple collections", function () {
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.select( model );
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
         } );
 
         it( "should be selected in the originating collection", function () {
@@ -109,6 +115,12 @@ describe( "models shared between multiple collections", function () {
             singleCollectionA.select( model, {silent: true} );
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
+        } );
+
         it( "should be selected in another single-select collection", function () {
             expect( singleCollectionB.selected ).toBe( model );
         } );
@@ -150,6 +162,12 @@ describe( "models shared between multiple collections", function () {
             spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
             multiCollectionA.select( model );
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
+            multiCollectionB.close();
         } );
 
         it( "should be selected in the originating collection", function () {
@@ -218,6 +236,12 @@ describe( "models shared between multiple collections", function () {
             multiCollectionA.select( model, {silent: true} );
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
+            multiCollectionB.close();
+        } );
+
         it( "should be selected in another single-select collection", function () {
             expect( singleCollectionA.selected ).toBe( model );
         } );
@@ -258,6 +282,11 @@ describe( "models shared between multiple collections", function () {
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             model.select();
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
         } );
 
         it( "should be selected in a single-select collection", function () {
@@ -312,6 +341,11 @@ describe( "models shared between multiple collections", function () {
             model.select( {silent: true} );
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
+        } );
+
         it( "should be selected in a single-select collection", function () {
             expect( singleCollectionA.selected ).toBe( model );
         } );
@@ -354,6 +388,12 @@ describe( "models shared between multiple collections", function () {
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.select( model1 );
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
         } );
 
         it( "should not deselect other selected models in a multi-select collection", function () {
@@ -414,6 +454,12 @@ describe( "models shared between multiple collections", function () {
             singleCollectionA.select( model1, {silent: true} );
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
+        } );
+
         it( 'should not trigger a selected event on the model', function () {
             expect( model1.trigger ).not.toHaveBeenCalledWithInitial( "selected" );
         } );
@@ -466,6 +512,12 @@ describe( "models shared between multiple collections", function () {
             spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
             multiCollectionA.select( model1 );
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
+            multiCollectionB.close();
         } );
 
         it( 'should not trigger a selected event on the model', function () {
@@ -523,6 +575,12 @@ describe( "models shared between multiple collections", function () {
             multiCollectionA.select( model1, {silent: true} );
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
+            multiCollectionB.close();
+        } );
+
         it( 'should not trigger a selected event on the model', function () {
             expect( model1.trigger ).not.toHaveBeenCalledWithInitial( "selected" );
         } );
@@ -574,6 +632,11 @@ describe( "models shared between multiple collections", function () {
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             model1.select();
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
         } );
 
         it( "should remain selected in a single-select collection", function () {
@@ -632,6 +695,11 @@ describe( "models shared between multiple collections", function () {
             model1.select( {silent: true} );
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
+        } );
+
         it( 'should not trigger a selected event on the model', function () {
             expect( model1.trigger ).not.toHaveBeenCalledWithInitial( "selected" );
         } );
@@ -678,6 +746,12 @@ describe( "models shared between multiple collections", function () {
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
             singleCollectionA.select( model2 );
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
         } );
 
         it( "should be selected in the originating collection", function () {
@@ -774,6 +848,11 @@ describe( "models shared between multiple collections", function () {
                 model2.select();
             } );
 
+            afterEach( function () {
+                multiCollectionA.close();
+                multiCollectionB.close();
+            } );
+
             it( "should be selected in all collections", function () {
                 expect( multiCollectionA.selected[model2.cid] ).not.toBeUndefined();
                 expect( multiCollectionB.selected[model2.cid] ).not.toBeUndefined();
@@ -833,6 +912,11 @@ describe( "models shared between multiple collections", function () {
                 spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 model2.select();
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
             } );
 
             it( "should be selected in the single-select collection", function () {
@@ -914,6 +998,11 @@ describe( "models shared between multiple collections", function () {
                 spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 model2.select();
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
             } );
 
             it( "should be selected itself", function () {
@@ -998,6 +1087,11 @@ describe( "models shared between multiple collections", function () {
                 model2.select();
             } );
 
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
+            } );
+
             it( "should be selected itself", function () {
                 expect( model2.selected ).toBe( true );
             } );
@@ -1079,6 +1173,12 @@ describe( "models shared between multiple collections", function () {
             singleCollectionA.deselect();
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
+        } );
+
         it( "should be deselected in the originating collection", function () {
             expect( singleCollectionA.selected ).toBeUndefined();
         } );
@@ -1141,6 +1241,13 @@ describe( "models shared between multiple collections", function () {
             spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
             multiCollectionA.deselect( model1 );
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
+            multiCollectionB.close();
         } );
 
         it( "should be deselected in the originating collection", function () {
@@ -1207,6 +1314,12 @@ describe( "models shared between multiple collections", function () {
                 singleCollectionA.select( model, {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                singleCollectionA.close();
+                singleCollectionB.close();
+                multiCollectionA.close();
+            } );
+
             it( 'should trigger a selected event on the model and pass the custom option along in the options object (the last parameter)', function () {
                 expect( model.trigger ).toHaveBeenCalledWith( "selected", model, { foo: "bar", label: "selected" } );
             } );
@@ -1241,6 +1354,12 @@ describe( "models shared between multiple collections", function () {
                 spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 singleCollectionA.select( model, {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                singleCollectionB.close();
+                multiCollectionA.close();
             } );
 
             it( 'should trigger a reselected event on the model and pass the custom option along in the options object (the last parameter)', function () {
@@ -1280,6 +1399,12 @@ describe( "models shared between multiple collections", function () {
                 spyOn( multiCollectionA, "trigger" ).and.callThrough();
 
                 singleCollectionA.select( model2, {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                singleCollectionB.close();
+                multiCollectionA.close();
             } );
 
             it( 'should trigger a selected event on the selected model and pass the custom option along in the options object (the last parameter)', function () {
@@ -1334,6 +1459,12 @@ describe( "models shared between multiple collections", function () {
                 multiCollectionA.select( model, {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
+                multiCollectionB.close();
+            } );
+
             it( 'should trigger a selected event on the model and pass the custom option along in the options object (the last parameter)', function () {
                 expect( model.trigger ).toHaveBeenCalledWith( "selected", model, { foo: "bar", label: "selected" } );
             } );
@@ -1369,6 +1500,12 @@ describe( "models shared between multiple collections", function () {
                 spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
                 multiCollectionA.select( model1, {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
+                multiCollectionB.close();
             } );
 
             it( 'should trigger a reselected event on the model and pass the custom option along in the options object (the last parameter)', function () {
@@ -1409,6 +1546,13 @@ describe( "models shared between multiple collections", function () {
                 spyOn( multiCollectionB, "trigger" ).and.callThrough();
 
                 multiCollectionA.deselect( model1, {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                singleCollectionB.close();
+                multiCollectionA.close();
+                multiCollectionB.close();
             } );
 
             it( 'should trigger a deselected event on the model and pass the custom option along in the options object (the last parameter)', function () {
@@ -1453,6 +1597,13 @@ describe( "models shared between multiple collections", function () {
                 singleSelectCollection, otherSingleSelectCollection, thirdSingleSelectCollection,
                 multiSelectCollection
             ];
+        } );
+
+        afterEach( function () {
+            singleSelectCollection.close();
+            otherSingleSelectCollection.close();
+            thirdSingleSelectCollection.close();
+            multiSelectCollection.close();
         } );
 
         describe( 'when a deselect action is initiated in a model', function () {
@@ -1901,6 +2052,13 @@ describe( "models shared between multiple collections", function () {
 
             events = getEventSpies( entities );
             eventStates = getEventStateStore( entities );
+        } );
+
+        afterEach( function () {
+            singleSelectCollectionA.close();
+            singleSelectCollectionB.close();
+            multiSelectCollectionA.close();
+            multiSelectCollectionB.close();
         } );
 
         describe( 'when a select action goes along with a deselect sub action, the deselection being triggered in another collection', function () {

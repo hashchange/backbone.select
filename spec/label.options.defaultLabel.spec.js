@@ -1,6 +1,8 @@
 describe( 'Custom label options: defaultLabel.', function () {
 
-    var Model = Backbone.Model.extend( {
+    var  m1, m2,
+
+        Model = Backbone.Model.extend( {
             initialize: function ( attributes, options ) {
                 Backbone.Select.Me.applyTo( this, options );
             }
@@ -25,8 +27,6 @@ describe( 'Custom label options: defaultLabel.', function () {
     afterAll( function () {
         restoreJasmineRecursiveScreenOutput();
     } );
-
-    var m1, m2;
 
     beforeEach( function () {
         m1 = new Model();
@@ -83,6 +83,10 @@ describe( 'Custom label options: defaultLabel.', function () {
 
             beforeEach( function () {
                 collection = new SelectOneCollection( [m1, m2], { defaultLabel: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             describe( 'Calling select() without a label option', function () {
@@ -154,6 +158,10 @@ describe( 'Custom label options: defaultLabel.', function () {
             beforeEach( function () {
                 collection = new SelectManyCollection( [m1, m2], { defaultLabel: "starred" } );
                 expected = {};
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             describe( 'Calling select() without a label option', function () {
@@ -318,6 +326,10 @@ describe( 'Custom label options: defaultLabel.', function () {
                     collection = new SelectOneCollection( [model, otherModel], { defaultLabel: "starred" } );
                 } );
 
+                afterEach( function () {
+                    collection.close();
+                } );
+
                 describe( 'When select() is called on the collection,', function () {
 
                     beforeEach( function () {
@@ -395,6 +407,10 @@ describe( 'Custom label options: defaultLabel.', function () {
                     model = new Model( undefined, { defaultLabel: "starred" } );
                     otherModel = new Model();
                     collection = new SelectOneCollection( [model, otherModel] );
+                } );
+
+                afterEach( function () {
+                    collection.close();
                 } );
 
                 describe( 'When select() is called on the collection,', function () {
@@ -485,6 +501,10 @@ describe( 'Custom label options: defaultLabel.', function () {
                     collection = new SelectManyCollection( [model, otherModel], { defaultLabel: "starred" } );
                 } );
 
+                afterEach( function () {
+                    collection.close();
+                } );
+
                 describe( 'When select() is called on the collection,', function () {
 
                     beforeEach( function () {
@@ -567,6 +587,10 @@ describe( 'Custom label options: defaultLabel.', function () {
                     model = new Model( undefined, { defaultLabel: "starred" } );
                     otherModel = new Model();
                     collection = new SelectManyCollection( [model, otherModel] );
+                } );
+
+                afterEach( function () {
+                    collection.close();
                 } );
 
                 describe( 'When select() is called on the collection,', function () {
@@ -655,12 +679,18 @@ describe( 'Custom label options: defaultLabel.', function () {
         describe( 'Select.One collection with custom default label', function () {
 
             beforeEach( function () {
-                collection = new SelectOneCollection( [m1, m2], { defaultLabel: "starred", enableModelSharing: true } );
+                collection = new SelectOneCollection( [m1, m2], { defaultLabel: "starred" } );
 
-                otherSelectOneCollection = new SelectOneCollection( [m1, m2], { defaultLabel: "picked", enableModelSharing: true } );
-                otherSelectManyCollection = new SelectManyCollection( [m1, m2], { defaultLabel: "picked", enableModelSharing: true } );
+                otherSelectOneCollection = new SelectOneCollection( [m1, m2], { defaultLabel: "picked" } );
+                otherSelectManyCollection = new SelectManyCollection( [m1, m2], { defaultLabel: "picked" } );
 
                 events = getEventSpies( [otherSelectOneCollection, otherSelectManyCollection], ["selected", "starred", "picked"] );
+            } );
+
+            afterEach( function () {
+                collection.close();
+                otherSelectOneCollection.close();
+                otherSelectManyCollection.close();
             } );
 
             describe( 'When select() is called on the collection,', function () {
@@ -686,12 +716,18 @@ describe( 'Custom label options: defaultLabel.', function () {
         describe( 'Select.Many collection with custom default label', function () {
 
             beforeEach( function () {
-                collection = new SelectManyCollection( [m1, m2], { defaultLabel: "starred", enableModelSharing: true } );
+                collection = new SelectManyCollection( [m1, m2], { defaultLabel: "starred" } );
 
-                otherSelectOneCollection = new SelectOneCollection( [m1, m2], { defaultLabel: "picked", enableModelSharing: true } );
-                otherSelectManyCollection = new SelectManyCollection( [m1, m2], { defaultLabel: "picked", enableModelSharing: true } );
+                otherSelectOneCollection = new SelectOneCollection( [m1, m2], { defaultLabel: "picked" } );
+                otherSelectManyCollection = new SelectManyCollection( [m1, m2], { defaultLabel: "picked" } );
 
                 events = getEventSpies( [otherSelectOneCollection, otherSelectManyCollection], ["selected", "starred", "picked"] );
+            } );
+
+            afterEach( function () {
+                collection.close();
+                otherSelectOneCollection.close();
+                otherSelectManyCollection.close();
             } );
 
             describe( 'When select() is called on the collection,', function () {
@@ -724,9 +760,13 @@ describe( 'Custom label options: defaultLabel.', function () {
             expect( collection.starred ).toEqual( {} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( 'for a default label defined in a model, even if the label has not actually been used (model sharing enabled)', function () {
             model = new Model( undefined, { defaultLabel: "starred" } );
-            collection = new SelectManyCollection( [model], { enableModelSharing: true } );
+            collection = new SelectManyCollection( [model] );
             expect( collection.starred ).toEqual( {} );
         } );
 
@@ -754,28 +794,38 @@ describe( 'Custom label options: defaultLabel.', function () {
         } );
 
         describe( 'Select.One collection', function () {
+            var collection;
+
+            afterEach( function () {
+                collection.close();
+            } );
 
             it( 'By default, _pickyDefaultLabel is set to "selected"', function () {
-                var collection = new SelectOneCollection();
+                collection = new SelectOneCollection();
                 expect( collection._pickyDefaultLabel ).toEqual( "selected" );
             } );
 
             it( 'When the default label is changed, _pickyDefaultLabel is set to the new label', function () {
-                var collection = new SelectOneCollection( undefined, { defaultLabel: "starred" } );
+                collection = new SelectOneCollection( undefined, { defaultLabel: "starred" } );
                 expect( collection._pickyDefaultLabel ).toEqual( "starred" );
             } );
 
         } );
 
         describe( 'Select.Many collection', function () {
+            var collection;
+
+            afterEach( function () {
+                collection.close();
+            } );
 
             it( 'By default, _pickyDefaultLabel is set to "selected"', function () {
-                var collection = new SelectManyCollection();
+                collection = new SelectManyCollection();
                 expect( collection._pickyDefaultLabel ).toEqual( "selected" );
             } );
 
             it( 'When the default label is changed, _pickyDefaultLabel is set to the new label', function () {
-                var collection = new SelectManyCollection( undefined, { defaultLabel: "starred" } );
+                collection = new SelectManyCollection( undefined, { defaultLabel: "starred" } );
                 expect( collection._pickyDefaultLabel ).toEqual( "starred" );
             } );
 

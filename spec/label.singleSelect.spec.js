@@ -35,6 +35,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select( { label: "starred" } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should store the currently selected model in the "starred" property of the collection', function () {
                 expect( collection.starred ).toBe( model );
             } );
@@ -129,6 +133,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select( { label: "starred", silent: true } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should store the currently selected model in the "starred" property of the collection', function () {
                 expect( collection.starred ).toBe( model );
             } );
@@ -167,6 +175,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 spyOn( model, "select" ).and.callThrough();
 
                 collection.select( model, { label: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'should store the currently selected model in the "starred" property', function () {
@@ -244,6 +256,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 collection.select( model, { label: "starred", silent: true } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should store the currently selected model in the "starred" property', function () {
                 expect( collection.starred ).toBe( model );
             } );
@@ -278,6 +294,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 events = getEventSpies( [model, collection], ["selected", "starred"] );
 
                 model.select( { label: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'should store the currently selected model in the "starred" property of the collection', function () {
@@ -344,6 +364,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 model.select( { label: "starred" } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should store the currently selected model in the "starred" property of the collection', function () {
                 expect( collection.starred ).toBe( model );
             } );
@@ -408,6 +432,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 collection.select( model, { label: "starred" } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:one event, including any of the namespaces", function () {
                 expect( events.get( collection, "select:one:*" ) ).not.toHaveBeenCalled();
             } );
@@ -452,6 +480,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 collection.select( model, { silent: true, label: "starred" } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should not trigger any selection-related events on the model', function () {
                 expect( events.get( model, "*" ) ).not.toHaveBeenCalled();
             } );
@@ -475,6 +507,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 spyOn( m1, "deselect" ).and.callThrough();
 
                 m2.select( { label: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'should store the newly selected model in the "starred" property of the collection', function () {
@@ -534,6 +570,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 m2.select( { silent: true, label: "starred" } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should store the newly selected model in the "starred" property of the collection', function () {
                 expect( collection.starred ).toBe( m2 );
             } );
@@ -572,6 +612,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 collection.deselect( { label: "starred" } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should not trigger any selection-related events on the model', function () {
                 expect( events.get( model, "*" ) ).not.toHaveBeenCalled();
             } );
@@ -594,6 +638,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 eventStates = getEventStateStore( [model, collection], ["selected", "starred"] );
 
                 model.deselect( { label: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'should set the "starred" property of the collection to undefined', function () {
@@ -664,6 +712,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 collection.deselect( model, { label: "starred" } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should set the "starred" property of the collection to undefined', function () {
                 expect( collection.starred ).toBeUndefined();
             } );
@@ -731,6 +783,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 collection.deselect( undefined, { silent: true, label: "starred" } );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'should set the "starred" property of the collection to undefined', function () {
                 expect( collection.starred ).toBeUndefined();
             } );
@@ -762,6 +818,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 events = getEventSpies( [model, collection], ["selected", "starred"] );
 
                 model.deselect( { label: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'should set the "starred" property of the collection to undefined', function () {
@@ -827,6 +887,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
                 events = getEventSpies( [model, collection], ["selected", "picked", "starred"] );
 
                 model.deselect( { label: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'should set the "starred" property of the collection to undefined', function () {
@@ -919,6 +983,10 @@ describe( "Custom labels: Select.Me model in Select.One collection", function ()
             spyOn( collection, "onRemove" ).and.callThrough();
             spyOn( collection, "onReset" ).and.callThrough();
             spyOn( collection, "onAll" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( 'calls the onSelect handler when triggering a select:one event with a custom label', function () {

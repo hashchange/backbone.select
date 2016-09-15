@@ -80,6 +80,10 @@ describe( "Custom labels: basic tests.", function () {
                 collection = new SelectOneCollection( [model] );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( 'when a label name matches an existing Backbone model method', function () {
                 var label = "save";
                 expect( function () { collection.select( model, { label: label } ); } ).toThrowError( 'Illegal label name "' + label + '", is in conflict with an existing Backbone or Backbone.Select property or method' );
@@ -123,6 +127,10 @@ describe( "Custom labels: basic tests.", function () {
             beforeEach( function () {
                 model = new Model();
                 collection = new SelectManyCollection( [model] );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'when a label name matches an existing Backbone model method', function () {

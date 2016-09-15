@@ -49,6 +49,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select();
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a select:some event", function () {
                 expect( collection.trigger ).toHaveBeenCalledWith( "select:some", { selected: [m1], deselected: [] }, collection, { label: "selected" } );
             } );
@@ -107,6 +111,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select( {silent: true} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
             } );
@@ -137,6 +145,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.select();
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a select:all event", function () {
@@ -172,6 +184,10 @@ describe( "multi-select collection: interaction with selectable models", functio
 
                 m1.select( {silent: true} );
                 m2.select( {silent: true} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should not trigger a select:all event", function () {
@@ -218,6 +234,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 } );
 
                 m1.deselect();
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a select:none event", function () {
@@ -278,6 +298,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.deselect( {silent: true} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:none event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:none" );
             } );
@@ -312,6 +336,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.select();
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a select:all event", function () {
@@ -350,6 +378,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m2.select( {silent: true} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:all event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
             } );
@@ -381,6 +413,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.deselect();
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a select:some event", function () {
@@ -420,6 +456,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.deselect( {silent: true} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
             } );
@@ -452,6 +492,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.deselect();
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a select:none event", function () {
                 expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
             } );
@@ -479,6 +523,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.deselect( {silent: true} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should not trigger a select:none event", function () {
@@ -510,6 +558,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select();
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some or select:all event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
@@ -533,6 +585,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 m1.select( {silent: true} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should not trigger a select:some or select:all event", function () {
@@ -561,6 +617,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select();
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some or select:all event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
@@ -587,6 +647,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select( {silent: true} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some or select:all event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
@@ -610,6 +674,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.deselect();
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should not trigger a select:some or select:none event", function () {
@@ -652,6 +720,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 } );
 
                 collection.select( m1 );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should select the model", function () {
@@ -715,6 +787,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.deselect( m1 );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should deselect the model", function () {
                 expect( m1.deselect ).toHaveBeenCalled();
             } );
@@ -759,6 +835,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m2 );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a select:all event", function () {
                 expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m2], deselected: [] }, collection, { label: "selected" } );
             } );
@@ -789,6 +869,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m2, {silent: true} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should not trigger a select:all event", function () {
@@ -822,6 +906,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m1 );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a select:some event", function () {
@@ -861,6 +949,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.deselect( m1, {silent: true} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
             } );
@@ -893,6 +985,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.deselect( m1 );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a select:none event", function () {
                 expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1] }, collection, { label: "selected" } );
             } );
@@ -920,6 +1016,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m1, {silent: true} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should not trigger a select:none event", function () {
@@ -951,6 +1051,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1 );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some or select:all event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
@@ -974,6 +1078,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1, {silent: true} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should not trigger a select:some or select:all event", function () {
@@ -1002,6 +1110,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1 );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some or select:all event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
@@ -1028,6 +1140,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.select( m1, {silent: true} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should not trigger a select:some or select:all event", function () {
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
                 expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
@@ -1051,6 +1167,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.deselect( m2 );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should not trigger a select:some or select:none event", function () {
@@ -1082,6 +1202,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a selected event and pass the custom option along in the options object (the last parameter)", function () {
                 expect( m1.trigger ).toHaveBeenCalledWith( "selected", m1, { foo: "bar", label: "selected" } );
             } );
@@ -1104,6 +1228,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1, {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a selected event and pass the custom option along in the options object (the last parameter)", function () {
@@ -1131,6 +1259,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.select( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a reselected event and pass the custom option along in the options object (the last parameter)", function () {
                 expect( m1.trigger ).toHaveBeenCalledWith( "reselected", m1, { foo: "bar", label: "selected" } );
             } );
@@ -1154,6 +1286,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( m1, {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a reselected event and pass the custom option along in the options object (the last parameter)", function () {
@@ -1182,6 +1318,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 m1.deselect( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a deselected event and pass the custom option along in the options object (the last parameter)", function () {
                 expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, { foo: "bar", label: "selected" } );
             } );
@@ -1208,6 +1348,10 @@ describe( "multi-select collection: interaction with selectable models", functio
                 collection.deselect( m1, {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a deselected event and pass the custom option along in the options object (the last parameter)", function () {
                 expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, { foo: "bar", label: "selected" } );
             } );
@@ -1225,13 +1369,18 @@ describe( "multi-select collection: interaction with selectable models", functio
         beforeEach( function () {
             var SelectOneCollection = Backbone.Collection.extend( {
                 initialize: function ( models ) {
-                    Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+                    Backbone.Select.One.applyTo( this, models );
                 }
             } );
 
             model = new Model();
-            collection = new Collection( [model], { enableModelSharing: true } );
+            collection = new Collection( [model] );
             otherCollection = new SelectOneCollection( [model] );
+        } );
+
+        afterEach( function () {
+            collection.close();
+            otherCollection.close();
         } );
 
         describe( 'When a model is selected with the _silentLocally option', function () {

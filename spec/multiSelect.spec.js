@@ -26,6 +26,10 @@ describe( "multi-select collection: general", function () {
             collection = new Collection();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "as an instance of Backbone.Collection", function () {
             expect( collection instanceof Backbone.Collection ).toBe( true );
         } );
@@ -77,6 +81,10 @@ describe( "multi-select collection: general", function () {
             spyOn( collection, "onAll" ).and.callThrough();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( 'calls the onSelectNone handler when triggering a select:none event', function () {
             collection.trigger( "select:none", { selected: [], deselected: [model] }, collection, {foo: "bar"} );
             expect( collection.onSelectNone ).toHaveBeenCalledWith( { selected: [], deselected: [model] }, collection, {foo: "bar"} );
@@ -125,6 +133,10 @@ describe( "multi-select collection: general", function () {
         beforeEach( function () {
             model = new Model();
             collection = new Collection( [model] );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         describe( 'The collection is returned', function () {
@@ -276,6 +288,10 @@ describe( "multi-select collection: general", function () {
         describe( 'when model sharing is disabled', function () {
             var collection;
 
+            afterEach( function () {
+                if ( collection ) collection.close();
+            } );
+
             it( 'with no models being passed in during construction, the _modelSharingEnabled property is not set to true', function () {
                 // Ie, the property must not exist, or be false.
                 collection = new Collection();
@@ -295,9 +311,13 @@ describe( "multi-select collection: general", function () {
             beforeEach( function () {
                 SharingCollection = Backbone.Collection.extend( {
                     initialize: function ( models ) {
-                        Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+                        Backbone.Select.Many.applyTo( this, models );
                     }
                 } );
+            } );
+
+            afterEach( function () {
+                if ( collection ) collection.close();
             } );
 
             it( 'with no models being passed in during construction, the _modelSharingEnabled property is true', function () {
@@ -343,6 +363,10 @@ describe( "multi-select collection: general", function () {
                     collection = new Collection( models );
                 } );
 
+                afterEach( function () {
+                    collection.close();
+                } );
+
                 it( 'returns the same array of models as Backbone.Collection.filter', function () {
                     var result = collection.select( filter );
                     expect( result ).toEqual( [ model0, model2 ] );
@@ -358,7 +382,8 @@ describe( "multi-select collection: general", function () {
 
             describe( 'when Backbone.Collection.select has been overridden in the prototype chain', function () {
 
-                var model, CollectionWithCustomSelectFoo, CollectionWithCustomSelectBar;
+                var CollectionWithCustomSelectFoo, CollectionWithCustomSelectBar,
+                    model, collectionFoo, collectionBar;
 
                 beforeEach( function () {
 
@@ -380,8 +405,13 @@ describe( "multi-select collection: general", function () {
                     model = new Model();
                 } );
 
+                afterEach( function () {
+                    if ( collectionFoo ) collectionFoo.close();
+                    if ( collectionBar ) collectionBar.close();
+                } );
+
                 it( 'returns the result of the modified select method', function () {
-                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    collectionFoo = new CollectionWithCustomSelectFoo( [model] );
                     expect( collectionFoo.select( "arg1", "arg2" ) ).toEqual( "foo:arg1:arg2" );
                 } );
 
@@ -390,15 +420,15 @@ describe( "multi-select collection: general", function () {
 
                 it( 'returns the result of a another select method, which has been modified in different way, when that collection is instantiated after the original one', function () {
                     //noinspection JSUnusedLocalSymbols
-                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
-                    var collectionBar = new CollectionWithCustomSelectBar( [model] );
+                    collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    collectionBar = new CollectionWithCustomSelectBar( [model] );
                     expect( collectionBar.select( "arg1", "arg2" ) ).toEqual( "bar:arg1:arg2" );
                 } );
 
                 it( 'returns the result of a another select method, which has been modified in different way, when that collection is instantiated before the original one', function () {
-                    var collectionBar = new CollectionWithCustomSelectBar( [model] );
+                    collectionBar = new CollectionWithCustomSelectBar( [model] );
                     //noinspection JSUnusedLocalSymbols
-                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    collectionFoo = new CollectionWithCustomSelectFoo( [model] );
                     expect( collectionBar.select( "arg1", "arg2" ) ).toEqual( "bar:arg1:arg2" );
                 } );
             } );
@@ -409,46 +439,7 @@ describe( "multi-select collection: general", function () {
 
     describe( 'Checking for memory leaks', function () {
 
-        describe( 'when a collection is replaced by another one and is not referenced by a variable any more, with model sharing disabled', function () {
-            var logger, LoggedCollection, m1, m2, collection;
-
-            beforeEach( function () {
-                logger = new Logger();
-
-                LoggedCollection = Collection.extend( {
-                    initialize: function ( models ) {
-                        this.on( "select:none", function () {
-                            logger.log( "select:none event fired in selected in collection " + this._pickyCid );
-                        } );
-                        this.on( "select:some", function () {
-                            logger.log( "select:some event fired in selected in collection " + this._pickyCid );
-                        } );
-                        this.on( "select:all", function () {
-                            logger.log( "select:all event fired in selected in collection " + this._pickyCid );
-                        } );
-
-                        Collection.prototype.initialize.call( this, models );
-                    }
-                } );
-
-                m1 = new Model();
-                m2 = new Model();
-            } );
-
-            it( 'should no longer respond to model events', function () {
-                // With only variable holding a collection, only one 'select:*' event
-                // should be logged.
-
-                //noinspection JSUnusedAssignment
-                collection = new LoggedCollection( [m1, m2] );
-                collection = new LoggedCollection( [m1, m2] );
-
-                m2.select();
-                expect( logger.entries.length ).toBe( 1 );
-            } );
-        } );
-
-        describe( 'when a collection is replaced by another one and is not referenced by a variable any more, with model sharing enabled', function () {
+        describe( 'when a collection is replaced by another one and is not referenced by a variable any more', function () {
             var logger, Collection, LoggedCollection, m1, m2, collection;
 
             beforeEach( function () {
@@ -458,7 +449,7 @@ describe( "multi-select collection: general", function () {
                     model: Model,
 
                     initialize: function ( models ) {
-                        Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+                        Backbone.Select.Many.applyTo( this, models );
                     }
                 } );
 
@@ -480,6 +471,10 @@ describe( "multi-select collection: general", function () {
 
                 m1 = new Model();
                 m2 = new Model();
+            } );
+
+            afterEach( function () {
+                if ( collection ) collection.close();
             } );
 
             it( 'should no longer respond to model events after calling close on it', function () {
@@ -504,6 +499,11 @@ describe( "multi-select collection: general", function () {
             m2 = new Model();
             c1 = new Collection( [ m1 ] );
             c2 = new Collection( [ m2 ] );
+        } );
+
+        afterEach( function () {
+            c1.close();
+            c2.close();
         } );
 
         it( 'when overwriting the select() method on one collection, the select method of another collection stays intact', function () {

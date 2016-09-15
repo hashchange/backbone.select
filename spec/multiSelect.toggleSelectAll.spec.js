@@ -32,6 +32,10 @@ describe( "multi-select collection: toggleSelectAll", function () {
             collection.toggleSelectAll();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should trigger a select:all event", function () {
             expect( collection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [m1, m2], deselected: [] }, collection, { label: "selected" } );
         } );
@@ -57,6 +61,10 @@ describe( "multi-select collection: toggleSelectAll", function () {
             spyOn( collection, "trigger" ).and.callThrough();
 
             collection.toggleSelectAll( {silent: true} );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should not trigger a select:all event", function () {
@@ -86,6 +94,10 @@ describe( "multi-select collection: toggleSelectAll", function () {
             spyOn( collection, "trigger" ).and.callThrough();
 
             collection.toggleSelectAll();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should trigger a select:all event", function () {
@@ -122,6 +134,10 @@ describe( "multi-select collection: toggleSelectAll", function () {
             collection.toggleSelectAll();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should trigger a select:none event", function () {
             expect( collection.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [m1, m2] }, collection, { label: "selected" } );
         } );
@@ -150,6 +166,10 @@ describe( "multi-select collection: toggleSelectAll", function () {
             spyOn( collection, "trigger" ).and.callThrough();
 
             collection.toggleSelectAll( {silent: true} );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should not trigger a select:none event", function () {
@@ -184,6 +204,10 @@ describe( "multi-select collection: toggleSelectAll", function () {
                 collection.toggleSelectAll( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a selected event on the first model and pass the custom option along in the options object (the last parameter)", function () {
                 expect( m1.trigger ).toHaveBeenCalledWith( "selected", m1, { foo: "bar", label: "selected" } );
             } );
@@ -212,6 +236,10 @@ describe( "multi-select collection: toggleSelectAll", function () {
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.toggleSelectAll( {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a deselected event on the first model and pass the custom option along in the options object (the last parameter)", function () {

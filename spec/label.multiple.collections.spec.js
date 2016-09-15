@@ -8,13 +8,13 @@ describe( 'Custom labels: Interaction. Select.Me models shared between Select.On
 
     var SelectOneCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.One.applyTo( this, models );
         }
     } );
 
     var SelectManyCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.Many.applyTo( this, models );
         }
     } );
 
@@ -41,6 +41,11 @@ describe( 'Custom labels: Interaction. Select.Me models shared between Select.On
                 m2.select( { label: "picked" } );
 
                 expected = {};
+            } );
+
+            afterEach( function () {
+                selectOneCollection.close();
+                selectManyCollection.close();
             } );
 
             describe( "when 1 out of 2 models in a collection is already selected, and selecting the second one via the model's select", function () {

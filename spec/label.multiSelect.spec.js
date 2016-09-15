@@ -36,6 +36,10 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 expected = {};
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             describe( "when 1 out of 2 models in a collection is already selected, and selecting the second one via the model's select", function () {
 
                 beforeEach( function () {
@@ -323,6 +327,10 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 m2.select( { label: "picked" } );
 
                 expected = {};
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             describe( "when all of 2 models are selected and deselecting the second one via the model's deselect", function () {
@@ -614,6 +622,10 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 expected = {};
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             describe( 'when 1 out of 3 models in a collection is already selected, and selecting all', function () {
 
                 beforeEach( function () {
@@ -747,6 +759,10 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 expected = {};
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             describe( 'when 2 out of 3 models in a collection are already selected, and deselecting all', function () {
 
                 beforeEach( function () {
@@ -872,6 +888,10 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 m3.select( { label: "picked" } );
 
                 expected = {};
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             describe( 'when 2 out of 3 models in a collection are already selected, and selecting all with toggleSelectAll()', function () {
@@ -1006,6 +1026,10 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 expected = {};
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             describe( 'when 2 out of 3 models in a collection are already selected, and inverting the selection', function () {
 
                 beforeEach( function () {
@@ -1136,6 +1160,10 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 model = new Model();
             } );
 
+            afterEach( function () {
+                if ( collection ) collection.close();
+            } );
+
             it( 'for a selection', function () {
                 collection = new Collection( [model] );
                 model.select( { label: "starred" } );
@@ -1151,7 +1179,7 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
             } );
 
             it( 'for a deselection, even if that deselection is a no-op (model sharing enabled)', function () {
-                collection = new Collection( [model], { enableModelSharing: true } );
+                collection = new Collection( [model] );
                 model.deselect( { label: "starred" } );
                 expect( collection.starred ).toEqual( {} );
             } );
@@ -1160,7 +1188,7 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 // NB We need to enable model sharing to account for the manipulation of models before they are part of
                 // the collection.
                 model.deselect( { label: "starred" } );
-                collection = new Collection( undefined, { enableModelSharing: true } );
+                collection = new Collection( undefined );
                 collection.add( [model] );
 
                 expect( collection.starred ).toEqual( {} );
@@ -1170,7 +1198,7 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 // NB We need to enable model sharing to account for the manipulation of models before they are part of
                 // the collection.
                 model.deselect( { label: "starred" } );
-                collection = new Collection( [model], { enableModelSharing: true } );
+                collection = new Collection( [model] );
 
                 expect( collection.starred ).toEqual( {} );
             } );
@@ -1219,6 +1247,10 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
             spyOn( collection, "onRemove" ).and.callThrough();
             spyOn( collection, "onReset" ).and.callThrough();
             spyOn( collection, "onAll" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( 'calls the onSelectNone handler when triggering a select:none event with a custom label', function () {

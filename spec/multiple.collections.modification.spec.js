@@ -8,13 +8,13 @@ describe( "models shared between multiple collections: adding and removing model
 
     var SingleSelectCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.One.applyTo( this, models );
         }
     } );
 
     var MultiSelectCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.Many.applyTo( this, models );
         }
     } );
 
@@ -90,6 +90,12 @@ describe( "models shared between multiple collections: adding and removing model
 
             singleCollectionB = new LoggedSingleSelectCollection( [model] );
             multiCollectionA = new LoggedMultiSelectCollection( [model] );
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
         } );
 
         it( "should remain selected in the originating collection", function () {
@@ -227,6 +233,12 @@ describe( "models shared between multiple collections: adding and removing model
             spyOn( model4, "trigger" ).and.callThrough();
             spyOn( singleCollectionA, "trigger" ).and.callThrough();
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            if ( singleCollectionB ) singleCollectionB.close();
+            multiCollectionA.close();
         } );
 
         it( "should be selected in a single-select collection it is added to", function () {
@@ -373,6 +385,11 @@ describe( "models shared between multiple collections: adding and removing model
             spyOn( model2, "trigger" ).and.callThrough();
             spyOn( singleCollectionA, "trigger" ).and.callThrough();
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            if ( singleCollectionA ) singleCollectionA.close();
+            if ( multiCollectionA ) multiCollectionA.close();
         } );
 
         it( "should no longer be selected in a single-select collection", function () {
@@ -545,6 +562,12 @@ describe( "models shared between multiple collections: adding and removing model
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            singleCollectionB.close();
+            multiCollectionA.close();
+        } );
+
         it( "should be selected in a single-select collection it is added to", function () {
             singleCollectionA.reset( [model1] );
             expect( singleCollectionA.selected ).toBe( model1 );
@@ -715,6 +738,11 @@ describe( "models shared between multiple collections: adding and removing model
             spyOn( multiCollectionA, "trigger" ).and.callThrough();
         } );
 
+        afterEach( function () {
+            singleCollectionA.close();
+            multiCollectionA.close();
+        } );
+
         it( "should no longer be selected in a single-select collection", function () {
             singleCollectionA.reset();
             expect( singleCollectionA.selected ).toBeUndefined();
@@ -829,6 +857,11 @@ describe( "models shared between multiple collections: adding and removing model
                 spyOn( multiCollectionA, "trigger" ).and.callThrough();
             } );
 
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
+            } );
+
             it( 'should set _externalEvent: "add" in the select:one event when added to a single-select collection', function () {
                 singleCollectionA.add( model2 );
                 expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "select:one", model2, singleCollectionA, { _externalEvent: "add", label: "selected" } );
@@ -878,6 +911,11 @@ describe( "models shared between multiple collections: adding and removing model
                 spyOn( model2, "trigger" ).and.callThrough();
                 spyOn( singleCollectionA, "trigger" ).and.callThrough();
                 spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
             } );
 
             it( 'should not propagate the _externalEvent: "remove" option to the deselected model when the model is removed from all collections (single-select collection last)', function () {
@@ -945,6 +983,10 @@ describe( "models shared between multiple collections: adding and removing model
                 model2.select();
 
                 collection = new SingleSelectCollection();
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             describe( 'is registered with a set of models', function () {
@@ -1019,6 +1061,10 @@ describe( "models shared between multiple collections: adding and removing model
                 model2.select();
 
                 collection = new MultiSelectCollection();
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             describe( 'is registered with a set of models', function () {

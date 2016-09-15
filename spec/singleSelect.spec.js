@@ -27,6 +27,10 @@ describe( "single-select collection", function () {
             collection = new Collection();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "as an instance of Backbone.Collection", function () {
             expect( collection instanceof Backbone.Collection ).toBe( true );
         } );
@@ -60,6 +64,10 @@ describe( "single-select collection", function () {
             } );
 
             model.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should hang on to the currently selected model", function () {
@@ -112,6 +120,10 @@ describe( "single-select collection", function () {
             model.select( {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should hang on to the currently selected model", function () {
             expect( collection.selected ).toBe( model );
         } );
@@ -150,6 +162,10 @@ describe( "single-select collection", function () {
             } );
 
             collection.select( model );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should hang on to the currently selected model", function () {
@@ -202,6 +218,10 @@ describe( "single-select collection", function () {
             collection.select( model, {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should hang on to the currently selected model", function () {
             expect( collection.selected ).toBe( model );
         } );
@@ -228,6 +248,10 @@ describe( "single-select collection", function () {
             spyOn( collection, "trigger" ).and.callThrough();
 
             collection.select( model );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should not trigger a select:one event", function () {
@@ -258,6 +282,10 @@ describe( "single-select collection", function () {
             collection.select( model, {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not trigger a reselected event", function () {
             expect( model.trigger ).not.toHaveBeenCalledWithInitial( "reselected" );
         } );
@@ -280,6 +308,10 @@ describe( "single-select collection", function () {
             spyOn( m1, "deselect" ).and.callThrough();
 
             m2.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should hang on to the currently selected model", function () {
@@ -318,6 +350,10 @@ describe( "single-select collection", function () {
             m2.select( {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should hang on to the currently selected model", function () {
             expect( collection.selected ).toBe( m2 );
         } );
@@ -346,6 +382,10 @@ describe( "single-select collection", function () {
             spyOn( collection, "trigger" ).and.callThrough();
 
             collection.deselect();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should not trigger a selected, reselected or deselected event on the model", function () {
@@ -381,6 +421,10 @@ describe( "single-select collection", function () {
             } );
 
             model.deselect();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should not hang on to the currently selected model", function () {
@@ -434,6 +478,10 @@ describe( "single-select collection", function () {
             collection.deselect( model );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not hang on to the currently selected model", function () {
             expect( collection.selected ).toBeUndefined();
         } );
@@ -473,6 +521,10 @@ describe( "single-select collection", function () {
             collection.deselect( undefined, {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not hang on to the currently selected model", function () {
             expect( collection.selected ).toBeUndefined();
         } );
@@ -499,6 +551,10 @@ describe( "single-select collection", function () {
             spyOn( collection, "trigger" ).and.callThrough();
 
             collection.deselect( m2 );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should still hang on to the currently selected model", function () {
@@ -537,6 +593,10 @@ describe( "single-select collection", function () {
             m2.deselect();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should still hang on to the currently selected model", function () {
             expect( collection.selected ).toBe( m1 );
         } );
@@ -573,6 +633,10 @@ describe( "single-select collection", function () {
                 model.select( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a selected event and pass the custom option along in the options object (the last parameter)", function () {
                 expect( model.trigger ).toHaveBeenCalledWith( "selected", model, { foo: "bar", label: "selected" } );
             } );
@@ -593,6 +657,10 @@ describe( "single-select collection", function () {
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( model, {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a selected event and pass the custom option along in the options object (the last parameter)", function () {
@@ -618,6 +686,10 @@ describe( "single-select collection", function () {
                 model.select( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a reselected event and pass the custom option along in the options object (the last parameter)", function () {
                 expect( model.trigger ).toHaveBeenCalledWith( "reselected", model, { foo: "bar", label: "selected" } );
             } );
@@ -639,6 +711,10 @@ describe( "single-select collection", function () {
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.select( model, {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a reselected event and pass the custom option along in the options object (the last parameter)", function () {
@@ -664,6 +740,10 @@ describe( "single-select collection", function () {
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 m2.select( {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a deselected event on the first model and pass the custom option along in the options object (the last parameter)", function () {
@@ -699,6 +779,10 @@ describe( "single-select collection", function () {
                 collection.select( m2, {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a deselected event on the first model and pass the custom option along in the options object (the last parameter)", function () {
                 expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, { foo: "bar", label: "selected" } );
             } );
@@ -730,6 +814,10 @@ describe( "single-select collection", function () {
                 model.deselect( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a deselected event and pass the custom option along in the options object (the last parameter)", function () {
                 expect( model.trigger ).toHaveBeenCalledWith( "deselected", model, { foo: "bar", label: "selected" } );
             } );
@@ -753,6 +841,10 @@ describe( "single-select collection", function () {
                 collection.deselect( model, {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a deselected event and pass the custom option along in the options object (the last parameter)", function () {
                 expect( model.trigger ).toHaveBeenCalledWith( "deselected", model, { foo: "bar", label: "selected" } );
             } );
@@ -770,14 +862,19 @@ describe( "single-select collection", function () {
         beforeEach( function () {
             var SelectManyCollection = Backbone.Collection.extend( {
                 initialize: function ( models ) {
-                    Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+                    Backbone.Select.Many.applyTo( this, models );
                 }
             } );
 
             m1 = new Model();
             m2 = new Model();
-            collection = new Collection( [m1,m2], { enableModelSharing: true } );
+            collection = new Collection( [m1,m2] );
             otherCollection = new SelectManyCollection( [m1,m2] );
+        } );
+
+        afterEach( function () {
+            collection.close();
+            otherCollection.close();
         } );
 
         describe( 'When a model is selected with the _silentLocally option', function () {
@@ -915,6 +1012,10 @@ describe( "single-select collection", function () {
             spyOn( collection, "onAll" ).and.callThrough();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( 'calls the onSelect handler when triggering a select:one event', function () {
             collection.trigger( "select:one", model, collection, {foo: "bar"} );
             expect( collection.onSelect ).toHaveBeenCalledWith( model, collection, {foo: "bar"} );
@@ -958,6 +1059,10 @@ describe( "single-select collection", function () {
         beforeEach( function () {
             model = new Model();
             collection = new Collection( [model] );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         describe( 'The collection is returned', function () {
@@ -1017,6 +1122,10 @@ describe( "single-select collection", function () {
         describe( 'when model sharing is disabled', function () {
             var collection;
 
+            afterEach( function () {
+                if ( collection ) collection.close();
+            } );
+
             it( 'with no models being passed in during construction, the _modelSharingEnabled property is not set to true', function () {
                 // Ie, the property must not exist, or be false.
                 collection = new Collection();
@@ -1036,9 +1145,13 @@ describe( "single-select collection", function () {
             beforeEach( function () {
                 SharingCollection = Backbone.Collection.extend( {
                     initialize: function ( models ) {
-                        Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+                        Backbone.Select.One.applyTo( this, models );
                     }
                 } );
+            } );
+
+            afterEach( function () {
+                if ( collection ) collection.close();
             } );
 
             it( 'with no models being passed in during construction, the _modelSharingEnabled property is true', function () {
@@ -1084,6 +1197,10 @@ describe( "single-select collection", function () {
                     collection = new Collection( models );
                 } );
 
+                afterEach( function () {
+                    collection.close();
+                } );
+
                 it( 'returns the same array of models as Backbone.Collection.filter', function () {
                     var result = collection.select( filter );
                     expect( result ).toEqual( [ model0, model2 ] );
@@ -1099,7 +1216,8 @@ describe( "single-select collection", function () {
 
             describe( 'when Backbone.Collection.select has been overridden in the prototype chain', function () {
 
-                var model, CollectionWithCustomSelectFoo, CollectionWithCustomSelectBar;
+                var CollectionWithCustomSelectFoo, CollectionWithCustomSelectBar,
+                    model, collectionFoo, collectionBar;
 
                 beforeEach( function () {
 
@@ -1121,8 +1239,13 @@ describe( "single-select collection", function () {
                     model = new Model();
                 } );
 
+                afterEach( function () {
+                    if ( collectionFoo ) collectionFoo.close();
+                    if ( collectionBar ) collectionBar.close();
+                } );
+
                 it( 'returns the result of the modified select method', function () {
-                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    collectionFoo = new CollectionWithCustomSelectFoo( [model] );
                     expect( collectionFoo.select( "arg1", "arg2" ) ).toEqual( "foo:arg1:arg2" );
                 } );
 
@@ -1131,15 +1254,15 @@ describe( "single-select collection", function () {
 
                 it( 'returns the result of a another select method, which has been modified in different way, when that collection is instantiated after the original one', function () {
                     //noinspection JSUnusedLocalSymbols
-                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
-                    var collectionBar = new CollectionWithCustomSelectBar( [model] );
+                    collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    collectionBar = new CollectionWithCustomSelectBar( [model] );
                     expect( collectionBar.select( "arg1", "arg2" ) ).toEqual( "bar:arg1:arg2" );
                 } );
 
                 it( 'returns the result of a another select method, which has been modified in different way, when that collection is instantiated before the original one', function () {
-                    var collectionBar = new CollectionWithCustomSelectBar( [model] );
+                    collectionBar = new CollectionWithCustomSelectBar( [model] );
                     //noinspection JSUnusedLocalSymbols
-                    var collectionFoo = new CollectionWithCustomSelectFoo( [model] );
+                    collectionFoo = new CollectionWithCustomSelectFoo( [model] );
                     expect( collectionBar.select( "arg1", "arg2" ) ).toEqual( "bar:arg1:arg2" );
                 } );
             } );
@@ -1150,43 +1273,7 @@ describe( "single-select collection", function () {
     
     describe( 'Checking for memory leaks', function () {
 
-        describe( 'when a collection is replaced by another one and is not referenced by a variable any more, with model sharing disabled', function () {
-            var logger, LoggedCollection, m1, m2, collection;
-
-            beforeEach( function () {
-                logger = new Logger();
-
-                LoggedCollection = Collection.extend( {
-                    initialize: function ( models ) {
-                        this.on( "select:one", function ( model ) {
-                            logger.log( "select:one event: Model " + model.cid + " selected in collection " + this._pickyCid );
-                        } );
-                        this.on( "deselect:one", function ( model ) {
-                            logger.log( "deselect:one event: Model " + model.cid + " deselected in collection " + this._pickyCid );
-                        } );
-
-                        Collection.prototype.initialize.call( this, models );
-                    }
-                } );
-
-                m1 = new Model();
-                m2 = new Model();
-            } );
-
-            it( 'should no longer respond to model events', function () {
-                // With only variable holding a collection, only one 'select:*' event
-                // should be logged.
-
-                //noinspection JSUnusedAssignment
-                collection = new LoggedCollection( [m1, m2] );
-                collection = new LoggedCollection( [m1, m2] );
-
-                m2.select();
-                expect( logger.entries.length ).toBe( 1 );
-            } );
-        } );
-
-        describe( 'when a collection is replaced by another one and is not referenced by a variable any more, with model sharing enabled', function () {
+        describe( 'when a collection is replaced by another one and is not referenced by a variable any more', function () {
             var logger, Collection, LoggedCollection, m1, m2, collection;
 
             beforeEach( function () {
@@ -1195,7 +1282,7 @@ describe( "single-select collection", function () {
                     model: Model,
 
                     initialize: function ( models ) {
-                        Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+                        Backbone.Select.One.applyTo( this, models );
                     }
                 } );
 
@@ -1214,6 +1301,10 @@ describe( "single-select collection", function () {
 
                 m1 = new Model();
                 m2 = new Model();
+            } );
+
+            afterEach( function () {
+                if ( collection ) collection.close();
             } );
 
             it( 'should no longer respond to model events after calling close on it', function () {
@@ -1238,6 +1329,11 @@ describe( "single-select collection", function () {
             m2 = new Model();
             c1 = new Collection( [ m1 ] );
             c2 = new Collection( [ m2 ] );
+        } );
+
+        afterEach( function () {
+            c1.close();
+            c2.close();
         } );
 
         it( 'when overwriting the select() method on one collection, the select method of another collection stays intact', function () {

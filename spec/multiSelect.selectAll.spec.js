@@ -39,6 +39,10 @@ describe( "multi-select collection: selectAll", function () {
             collection.selectAll();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should trigger a select:all event", function () {
             expect( events["select:all"] ).toHaveBeenCalledOnce();
             expect( events["select:all"] ).toHaveBeenCalledWith( { selected: [m1, m2], deselected: [] }, collection, { label: "selected" } );
@@ -113,6 +117,10 @@ describe( "multi-select collection: selectAll", function () {
             collection.selectAll( {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not trigger an 'all' selected event", function () {
             expect( events["select:all:*"] ).not.toHaveBeenCalled();
         } );
@@ -144,6 +152,10 @@ describe( "multi-select collection: selectAll", function () {
             eventStates = getEventStateStore( [m1, m2, collection] );
 
             collection.selectAll();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should trigger a select:all event", function () {
@@ -218,6 +230,10 @@ describe( "multi-select collection: selectAll", function () {
             collection.selectAll();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should trigger a select:all event", function () {
             expect( events["select:all"] ).toHaveBeenCalledOnce();
             expect( events["select:all"] ).toHaveBeenCalledWith( { selected: [m1], deselected: [] }, collection, { label: "selected" } );
@@ -288,6 +304,10 @@ describe( "multi-select collection: selectAll", function () {
             collection.selectAll( {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not trigger an 'all' selected event", function () {
             expect( events["select:all:*"] ).not.toHaveBeenCalled();
         } );
@@ -322,6 +342,10 @@ describe( "multi-select collection: selectAll", function () {
 
             events = getEventSpies( collection );
             collection.selectAll();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should not trigger a select:all event", function () {
@@ -368,6 +392,10 @@ describe( "multi-select collection: selectAll", function () {
             collection.selectAll( {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not trigger a select:all event", function () {
             expect( events["select:all:*"] ).not.toHaveBeenCalled();
         } );
@@ -408,6 +436,10 @@ describe( "multi-select collection: selectAll", function () {
                 collection.selectAll( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a reselected event on the first model and pass the custom option along in the options object (the last parameter)", function () {
                 expect( m1.trigger ).toHaveBeenCalledWith( "reselected", m1, { foo: "bar", label: "selected" } );
             } );
@@ -438,6 +470,10 @@ describe( "multi-select collection: selectAll", function () {
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.selectAll( {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a selected event on the first model and pass the custom option along in the options object (the last parameter)", function () {

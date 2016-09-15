@@ -318,6 +318,10 @@ describe( "selectable model", function () {
             collection = new SelectOneCollection( [m1,m2] );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         describe( 'When a model is selected with the _silentLocally option', function () {
 
             beforeEach( function () {

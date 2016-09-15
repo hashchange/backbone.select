@@ -42,6 +42,10 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
             m3.select();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         describe( "When the targeted model hasn't been selected before,", function () {
 
             beforeEach( function () {
@@ -291,6 +295,10 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
             m2.select( { exclusive: true } );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( 'it selects the model', function () {
             expect( m2.selected ).toBe( true );
             expect( collection.selected[m2.cid] ).toBe( m2 );
@@ -374,11 +382,16 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
         var otherCollection;
 
         beforeEach( function () {
-            collection = new SelectManyCollection( [m1, m2], { enableModelSharing: true } );
-            otherCollection = new SelectManyCollection( [m1, m2, m3], { enableModelSharing: true } );
+            collection = new SelectManyCollection( [m1, m2] );
+            otherCollection = new SelectManyCollection( [m1, m2, m3] );
 
             m1.select();
             m3.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
+            otherCollection.close();
         } );
 
         describe( 'When calling select() with the exclusive option on one collection,', function () {
@@ -450,6 +463,10 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
             m1.select( { label: "starred" } );
             m3.select();
             m4.select( { label: "starred" } );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         describe( 'Calling select() with the `exclusive` option and a custom label on a collection', function () {
@@ -543,6 +560,10 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
 
             events = getEventSpies( [m1, m2, m3, m4, m5, collection] );
             eventStates = getEventStateStore( [m1, m2, m3, m4, m5, collection] );
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         describe( 'When calling deselect() on the collection for a model which had been selected,', function () {

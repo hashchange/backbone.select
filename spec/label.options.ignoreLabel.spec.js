@@ -1,6 +1,8 @@
 describe( 'Custom label options: ignoreLabel.', function () {
 
-    var Model = Backbone.Model.extend( {
+    var  m1, m2,
+
+        Model = Backbone.Model.extend( {
             initialize: function ( attributes, options ) {
                 Backbone.Select.Me.applyTo( this, options );
             }
@@ -26,8 +28,6 @@ describe( 'Custom label options: ignoreLabel.', function () {
         restoreJasmineRecursiveScreenOutput();
     } );
 
-    var m1, m2;
-
     beforeEach( function () {
         m1 = new Model();
         m2 = new Model();
@@ -43,7 +43,11 @@ describe( 'Custom label options: ignoreLabel.', function () {
         describe( 'A set of (two) labels is ignored in a collection.', function () {
 
             beforeEach( function () {
-                collection = new SelectOneCollection( undefined, { ignoreLabel: ["starred", "picked"], enableModelSharing: true } );
+                collection = new SelectOneCollection( undefined, { ignoreLabel: ["starred", "picked"] } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             describe( 'It leaves the property for the first label undefined', function () {
@@ -144,8 +148,12 @@ describe( 'Custom label options: ignoreLabel.', function () {
 
             // Just tests that the ignoreLabel option works with a string input for a single label. Basic test only.
 
+            afterEach( function () {
+                if ( collection ) collection.close();
+            } );
+
             it( 'It leaves the property for the ignored label undefined when select() is called on the collection with that label', function () {
-                collection = new SelectOneCollection( [model], { ignoreLabel: "starred", enableModelSharing: true } );
+                collection = new SelectOneCollection( [model], { ignoreLabel: "starred" } );
                 collection.select( model, { label: "starred" } );
 
                 expect( collection.starred ).toBeUndefined();
@@ -156,7 +164,11 @@ describe( 'Custom label options: ignoreLabel.', function () {
         describe( 'When a label is ignored, a select() call on the collection still works normally', function () {
 
             beforeEach( function () {
-                collection = new SelectOneCollection( [model], { ignoreLabel: "starred", enableModelSharing: true } );
+                collection = new SelectOneCollection( [model], { ignoreLabel: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'with the default label', function () {
@@ -172,6 +184,10 @@ describe( 'Custom label options: ignoreLabel.', function () {
         } );
 
         describe( 'Interplay of ignoreLabel and the default label', function () {
+
+            afterEach( function () {
+                if ( collection ) collection.close();
+            } );
 
             it( 'When trying to ignore the "selected" label without changing the default label of the collection, an error is thrown', function () {
                 expect( function () {
@@ -209,7 +225,11 @@ describe( 'Custom label options: ignoreLabel.', function () {
         describe( 'A set of (two) labels is ignored in a collection.', function () {
 
             beforeEach( function () {
-                collection = new SelectManyCollection( undefined, { ignoreLabel: ["starred", "picked"], enableModelSharing: true } );
+                collection = new SelectManyCollection( undefined, { ignoreLabel: ["starred", "picked"] } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             describe( 'It leaves the property for the first label undefined', function () {
@@ -310,8 +330,12 @@ describe( 'Custom label options: ignoreLabel.', function () {
 
             // Just tests that the ignoreLabel option works with a string input for a single label. Basic test only.
 
+            afterEach( function () {
+                if ( collection ) collection.close();
+            } );
+
             it( 'It leaves the property for the ignored label undefined when select() is called on the collection with that label', function () {
-                collection = new SelectManyCollection( [model], { ignoreLabel: "starred", enableModelSharing: true } );
+                collection = new SelectManyCollection( [model], { ignoreLabel: "starred" } );
                 collection.select( model, { label: "starred" } );
 
                 expect( collection.starred ).toBeUndefined();
@@ -324,7 +348,11 @@ describe( 'Custom label options: ignoreLabel.', function () {
 
             beforeEach( function () {
                 expected = {};
-                collection = new SelectManyCollection( [model], { ignoreLabel: "starred", enableModelSharing: true } );
+                collection = new SelectManyCollection( [model], { ignoreLabel: "starred" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( 'with the default label', function () {
@@ -348,6 +376,10 @@ describe( 'Custom label options: ignoreLabel.', function () {
 
             beforeEach( function () {
                 expected = {};
+            } );
+
+            afterEach( function () {
+                if ( collection ) collection.close();
             } );
 
             it( 'When trying to ignore the "selected" label without changing the default label of the collection, an error is thrown', function () {
@@ -379,23 +411,28 @@ describe( 'Custom label options: ignoreLabel.', function () {
     } );
 
     describe( '_pickyIgnoredLabels property.', function () {
+        var collection;
 
         // NB A model doesn't ignore labels and doesn't have a _pickyIgnoredLabels property.
+
+        afterEach( function () {
+            if ( collection ) collection.close();
+        } );
 
         describe( 'Select.One collection', function () {
 
             it( 'By default, _pickyIgnoredLabels is an empty array', function () {
-                var collection = new SelectOneCollection();
+                collection = new SelectOneCollection();
                 expect( collection._pickyIgnoredLabels ).toEqual( [] );
             } );
 
             it( 'When a label is ignored, it appears in the _pickyIgnoredLabels array', function () {
-                var collection = new SelectOneCollection( undefined, { ignoreLabel: "starred" } );
+                collection = new SelectOneCollection( undefined, { ignoreLabel: "starred" } );
                 expect( collection._pickyIgnoredLabels ).toEqual( ["starred"] );
             } );
 
             it( 'When multiple labels are ignored, they appear in the _pickyIgnoredLabels array', function () {
-                var collection = new SelectOneCollection( undefined, { ignoreLabel: ["starred", "picked"] } );
+                collection = new SelectOneCollection( undefined, { ignoreLabel: ["starred", "picked"] } );
                 expect( collection._pickyIgnoredLabels ).toEqual( ["starred", "picked"] );
             } );
 
@@ -404,17 +441,17 @@ describe( 'Custom label options: ignoreLabel.', function () {
         describe( 'Select.Many collection', function () {
 
             it( 'By default, _pickyIgnoredLabels is an empty array', function () {
-                var collection = new SelectManyCollection();
+                collection = new SelectManyCollection();
                 expect( collection._pickyIgnoredLabels ).toEqual( [] );
             } );
 
             it( 'When a label is ignored, it appears in the _pickyIgnoredLabels array', function () {
-                var collection = new SelectManyCollection( undefined, { ignoreLabel: "starred" } );
+                collection = new SelectManyCollection( undefined, { ignoreLabel: "starred" } );
                 expect( collection._pickyIgnoredLabels ).toEqual( ["starred"] );
             } );
 
             it( 'When multiple labels are ignored, they appear in the _pickyIgnoredLabels array', function () {
-                var collection = new SelectManyCollection( undefined, { ignoreLabel: ["starred", "picked"] } );
+                collection = new SelectManyCollection( undefined, { ignoreLabel: ["starred", "picked"] } );
                 expect( collection._pickyIgnoredLabels ).toEqual( ["starred", "picked"] );
             } );
 

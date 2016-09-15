@@ -39,6 +39,10 @@ describe( "multi-select collection: invertSelection", function () {
             collection.invertSelection();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should trigger a select:all event", function () {
             expect( events["select:all"] ).toHaveBeenCalledOnce();
             expect( events["select:all"] ).toHaveBeenCalledWith( { selected: [m1, m2], deselected: [] }, collection, { label: "selected" } );
@@ -113,6 +117,10 @@ describe( "multi-select collection: invertSelection", function () {
             collection.invertSelection( {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not trigger an 'all' selected event", function () {
             expect( events["select:all:*"] ).not.toHaveBeenCalled();
         } );
@@ -144,6 +152,10 @@ describe( "multi-select collection: invertSelection", function () {
             eventStates = getEventStateStore( [m1, m2, collection] );
 
             collection.invertSelection();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should trigger a select:some event", function () {
@@ -235,6 +247,10 @@ describe( "multi-select collection: invertSelection", function () {
             collection.invertSelection();
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should trigger a select:some event", function () {
             expect( events["select:some"] ).toHaveBeenCalledOnce();
             expect( events["select:some"] ).toHaveBeenCalledWith( { selected: [m1], deselected: [m2] }, collection, { label: "selected" } );
@@ -322,6 +338,10 @@ describe( "multi-select collection: invertSelection", function () {
             collection.invertSelection( {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not trigger a select:some event", function () {
             expect( events["select:some:*"] ).not.toHaveBeenCalled();
         } );
@@ -358,6 +378,10 @@ describe( "multi-select collection: invertSelection", function () {
             eventStates = getEventStateStore( [m1, m2, collection] );
 
             collection.invertSelection();
+        } );
+
+        afterEach( function () {
+            collection.close();
         } );
 
         it( "should trigger a select:none event", function () {
@@ -434,6 +458,10 @@ describe( "multi-select collection: invertSelection", function () {
             collection.invertSelection( {silent: true} );
         } );
 
+        afterEach( function () {
+            collection.close();
+        } );
+
         it( "should not trigger a select:none event", function () {
             expect( events["select:none:*"] ).not.toHaveBeenCalled();
         } );
@@ -468,6 +496,10 @@ describe( "multi-select collection: invertSelection", function () {
                 collection.invertSelection( {foo: "bar"} );
             } );
 
+            afterEach( function () {
+                collection.close();
+            } );
+
             it( "should trigger a deselected event on the first model and pass the custom option along in the options object (the last parameter)", function () {
                 expect( m1.trigger ).toHaveBeenCalledWith( "deselected", m1, { foo: "bar", label: "selected" } );
             } );
@@ -495,6 +527,10 @@ describe( "multi-select collection: invertSelection", function () {
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.invertSelection( {foo: "bar"} );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a selected event on the first model and pass the custom option along in the options object (the last parameter)", function () {
@@ -526,6 +562,10 @@ describe( "multi-select collection: invertSelection", function () {
                 spyOn( collection, "trigger" ).and.callThrough();
 
                 collection.invertSelection( { foo: "bar" } );
+            } );
+
+            afterEach( function () {
+                collection.close();
             } );
 
             it( "should trigger a deselected event on the first model and pass the custom option along in the options object (the last parameter)", function () {

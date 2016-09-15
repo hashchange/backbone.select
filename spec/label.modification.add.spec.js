@@ -8,13 +8,13 @@ describe( 'Custom labels: Adding models to a collection', function () {
 
     var SelectOneCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.One.applyTo( this, models );
         }
     } );
 
     var SelectManyCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.Many.applyTo( this, models );
         }
     } );
 
@@ -53,6 +53,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                         events = getEventSpies( [m1, m2, m3 ], ["selected", "starred"] );
 
                         selectOneCollection = new SelectOneCollection( [m1, m2, m3] );
+                    } );
+
+                    afterEach( function () {
+                        selectOneCollection.close();
                     } );
 
                     describe( 'Status', function () {
@@ -134,6 +138,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                         events = getEventSpies( [m1, m2, m3, m4 ], ["selected", "starred"] );
 
                         selectOneCollection = new SelectOneCollection( [m1, m2, m3, m4] );
+                    } );
+
+                    afterEach( function () {
+                        selectOneCollection.close();
                     } );
 
                     describe( 'Status', function () {
@@ -231,6 +239,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                         selectManyCollection = new SelectManyCollection( [m1, m2, m3] );
                     } );
 
+                    afterEach( function () {
+                        selectManyCollection.close();
+                    } );
+
                     describe( 'Status', function () {
 
                         it( 'all models retain their status for the "selected" label', function () {
@@ -298,6 +310,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                         events = getEventSpies( [m1, m2, m3, m4 ], ["selected", "starred"] );
 
                         selectManyCollection = new SelectManyCollection( [m1, m2, m3, m4] );
+                    } );
+
+                    afterEach( function () {
+                        selectManyCollection.close();
                     } );
 
                     describe( 'Status', function () {
@@ -381,6 +397,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                         selectOneCollection.add( m3 );
                     } );
 
+                    afterEach( function () {
+                        selectOneCollection.close();
+                    } );
+
                     describe( 'with each model changing only one selection ("selected" or "starred") at a time', function () {
 
                         it( 'the last model for the "selected" label retains its status, the other is deselected', function () {
@@ -453,6 +473,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                             events = getEventSpies( [m1, m2, m3, selectOneCollection ], ["selected", "starred"] );
 
                             selectOneCollection.add( m3 );
+                        } );
+
+                        afterEach( function () {
+                            selectOneCollection.close();
                         } );
 
                         describe( 'model events', function () {
@@ -531,6 +555,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                             events = getEventSpies( [m1, m2, m3, m4, selectOneCollection ], ["selected", "starred"] );
 
                             selectOneCollection.add( m4 );
+                        } );
+
+                        afterEach( function () {
+                            selectOneCollection.close();
                         } );
 
                         describe( 'model events', function () {
@@ -644,6 +672,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                         selectManyCollection.add( m3 );
                     } );
 
+                    afterEach( function () {
+                        selectManyCollection.close();
+                    } );
+
                     it( 'all models retain their status for the "selected" label', function () {
                         expect( m1.selected ).toBe( true );
                         expect( m2.selected ).toBe( true );
@@ -681,6 +713,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                             events = getEventSpies( [m1, m2, m3, selectManyCollection ], ["selected", "starred"] );
 
                             selectManyCollection.add( m3 );
+                        } );
+
+                        afterEach( function () {
+                            selectManyCollection.close();
                         } );
 
                         describe( 'model events', function () {
@@ -753,6 +789,10 @@ describe( 'Custom labels: Adding models to a collection', function () {
                             events = getEventSpies( [m1, m2, m3, m4, selectManyCollection ], ["selected", "starred"] );
 
                             selectManyCollection.add( m4 );
+                        } );
+
+                        afterEach( function () {
+                            selectManyCollection.close();
                         } );
 
                         describe( 'model events', function () {

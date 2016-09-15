@@ -8,13 +8,13 @@ describe( 'Custom labels: Removing models from a collection.', function () {
 
     var SelectOneCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.One.applyTo( this, models );
         }
     } );
 
     var SelectManyCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.Many.applyTo( this, models );
         }
     } );
 
@@ -50,6 +50,10 @@ describe( 'Custom labels: Removing models from a collection.', function () {
 
             beforeEach( function () {
                 selectOneCollection = new SelectOneCollection( [m1, m2, m3, m4] );
+            } );
+
+            afterEach( function () {
+                selectOneCollection.close();
             } );
 
             describe( 'The removed model is "starred"', function () {
@@ -264,6 +268,10 @@ describe( 'Custom labels: Removing models from a collection.', function () {
                     beforeEach( function () {
                         otherCollection = new SelectOneCollection( [m4] );
                         selectOneCollection.remove( m4 );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
                     } );
 
                     describe( 'Status', function () {
@@ -485,6 +493,10 @@ describe( 'Custom labels: Removing models from a collection.', function () {
                 expected = {};
             } );
 
+            afterEach( function () {
+                selectManyCollection.close();
+            } );
+
             describe( 'The removed model is "starred"', function () {
 
                 beforeEach( function () {
@@ -497,6 +509,10 @@ describe( 'Custom labels: Removing models from a collection.', function () {
                     beforeEach( function () {
                         otherCollection = new SelectManyCollection( [m4] );
                         selectManyCollection.remove( m4 );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
                     } );
 
                     describe( 'Status', function () {
@@ -727,6 +743,10 @@ describe( 'Custom labels: Removing models from a collection.', function () {
                     beforeEach( function () {
                         otherCollection = new SelectManyCollection( [m4] );
                         selectManyCollection.remove( m4 );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
                     } );
 
                     describe( 'Status', function () {

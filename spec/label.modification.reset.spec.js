@@ -8,13 +8,13 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
     var SelectOneCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.One.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.One.applyTo( this, models );
         }
     } );
 
     var SelectManyCollection = Backbone.Collection.extend( {
         initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models, { enableModelSharing: true } );
+            Backbone.Select.Many.applyTo( this, models );
         }
     } );
 
@@ -57,6 +57,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
                     events = getEventSpies( [m1, m2, m3, m4, selectOneCollection], ["selected", "starred"] );
 
                     selectOneCollection.reset( [ m1, m2, m3, m4 ] );
+                } );
+
+                afterEach( function () {
+                    selectOneCollection.close();
                 } );
 
                 describe( 'Status', function () {
@@ -154,6 +158,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
                     selectOneCollection = new SelectOneCollection( [ m1, m2, m3, m4 ] );
                 } );
 
+                afterEach( function () {
+                    selectOneCollection.close();
+                } );
+
                 describe( 'The removed models are also part of another collection', function () {
                     var otherCollection;
 
@@ -162,6 +170,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
                         events = getEventSpies( [m1, m2, m3, m4, selectOneCollection], ["selected", "starred"] );
 
                         selectOneCollection.reset();
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
                     } );
 
                     describe( 'Status', function () {
@@ -346,6 +358,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
                     selectOneCollection = new SelectOneCollection( [ m1, m2, m3, m4 ] );
                 } );
 
+                afterEach( function () {
+                    selectOneCollection.close();
+                } );
+
                 describe( 'The removed models are also part of another collection', function () {
                     var otherCollection;
 
@@ -355,6 +371,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         // m2 is part of the initial set and the new set.
                         selectOneCollection.reset( [ m2, m5, m6, m7 ] );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
                     } );
 
                     describe( 'Status', function () {
@@ -605,6 +625,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
                     selectManyCollection.reset( [ m1, m2, m3, m4 ] );
                 } );
 
+                afterEach( function () {
+                    selectManyCollection.close();
+                } );
+
                 describe( 'Status', function () {
 
                     it( 'all models retain their status for the "selected" label', function () {
@@ -690,6 +714,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
                     selectManyCollection = new SelectManyCollection( [ m1, m2, m3, m4 ] );
                 } );
 
+                afterEach( function () {
+                    selectManyCollection.close();
+                } );
+
                 describe( 'The removed models are also part of another collection', function () {
                     var otherCollection;
 
@@ -698,6 +726,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
                         events = getEventSpies( [m1, m2, m3, m4, selectManyCollection], ["selected", "starred"] );
 
                         selectManyCollection.reset();
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
                     } );
 
                     describe( 'Status', function () {
@@ -898,6 +930,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
                     selectManyCollection = new SelectManyCollection( [ m1, m2, m3, m4 ] );
                 } );
 
+                afterEach( function () {
+                    selectManyCollection.close();
+                } );
+
                 describe( 'The removed models are also part of another collection', function () {
                     var otherCollection;
 
@@ -907,6 +943,10 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         // m2 is part of the initial set and the new set.
                         selectManyCollection.reset( [ m2, m5, m6, m7 ] );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
                     } );
 
                     describe( 'Status', function () {
