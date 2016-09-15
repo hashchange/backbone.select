@@ -490,33 +490,29 @@
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
 
-                    if ( options && options.enableModelSharing ) {
+                    // model sharing
+                    _.each( models || [], function ( model ) {
+                        registerCollectionWithModel( model, hostObject );
 
-                        // model-sharing mode
-                        _.each( models || [], function ( model ) {
-                            registerCollectionWithModel( model, hostObject );
-
-                            forEachLabelInModel( model, function ( label ) {
-                                ensureLabelIsRegistered( label, hostObject );
-                                if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
-                                    if ( hostObject[label] ) hostObject[label].deselect( { label: label } );
-                                    hostObject[label] = model;
-                                }
-                            } );
+                        forEachLabelInModel( model, function ( label ) {
+                            ensureLabelIsRegistered( label, hostObject );
+                            if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
+                                if ( hostObject[label] ) hostObject[label].deselect( { label: label } );
+                                hostObject[label] = model;
+                            }
                         } );
+                    } );
 
-                        hostObject.listenTo( hostObject, '_selected', hostObject.select );
-                        hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
+                    hostObject.listenTo( hostObject, '_selected', hostObject.select );
+                    hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
 
-                        hostObject.listenTo( hostObject, 'reset', onResetSingleSelect );
-                        hostObject.listenTo( hostObject, 'add', onAdd );
-                        hostObject.listenTo( hostObject, 'remove', onRemove );
+                    hostObject.listenTo( hostObject, 'reset', onResetSingleSelect );
+                    hostObject.listenTo( hostObject, 'add', onAdd );
+                    hostObject.listenTo( hostObject, 'remove', onRemove );
 
-                        // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
-                        // Use it read-only.
-                        hostObject._modelSharingEnabled = true;
-
-                    }
+                    // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
+                    // Use it read-only.
+                    hostObject._modelSharingEnabled = true;
 
                 }
 
@@ -525,8 +521,7 @@
             Many: {
 
                 applyTo: function ( hostObject, models, options ) {
-                    var oldSelect,
-                        enableModelSharing = options && options.enableModelSharing;
+                    var oldSelect;
 
                     if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
                     if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
@@ -548,43 +543,28 @@
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
 
-                    if ( !enableModelSharing ) {
+                    // model sharing
+                    _.each( models || [], function ( model ) {
+                        registerCollectionWithModel( model, hostObject );
 
-                        // The default label of the models may not be the same as the default label of the collection.
-                        // So we need to make sure the default label of the models is acknowledged, and the collection
-                        // property for that label is available and initialized with an empty hash.
-                        //
-                        // To keep things fast, we just handle the first model here. We expect the default label of all
-                        // models to be the same. If not, model-sharing mode must be used instead, which scans all
-                        // models for labels.
-                        if ( models && models[0] ) ensureLabelIsRegistered( models[0]._pickyDefaultLabel, hostObject );
-
-                    } else {
-
-                        // model-sharing mode
-                        _.each( models || [], function ( model ) {
-                            registerCollectionWithModel( model, hostObject );
-
-                            forEachLabelInModel( model, function ( label ) {
-                                ensureLabelIsRegistered( label, hostObject );
-                                if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
-                                    hostObject[label][model.cid] = model;
-                                }
-                            } );
+                        forEachLabelInModel( model, function ( label ) {
+                            ensureLabelIsRegistered( label, hostObject );
+                            if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
+                                hostObject[label][model.cid] = model;
+                            }
                         } );
+                    } );
 
-                        hostObject.listenTo( hostObject, '_selected', hostObject.select );
-                        hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
+                    hostObject.listenTo( hostObject, '_selected', hostObject.select );
+                    hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
 
-                        hostObject.listenTo( hostObject, 'reset', onResetMultiSelect );
-                        hostObject.listenTo( hostObject, 'add', onAdd );
-                        hostObject.listenTo( hostObject, 'remove', onRemove );
+                    hostObject.listenTo( hostObject, 'reset', onResetMultiSelect );
+                    hostObject.listenTo( hostObject, 'add', onAdd );
+                    hostObject.listenTo( hostObject, 'remove', onRemove );
 
-                        // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
-                        // Use it read-only.
-                        hostObject._modelSharingEnabled = true;
-
-                    }
+                    // Mode flag, part of the API (monitored by tests). Can be queried safely by other components.
+                    // Use it read-only.
+                    hostObject._modelSharingEnabled = true;
 
                 }
 
