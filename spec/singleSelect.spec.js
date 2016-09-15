@@ -1042,10 +1042,11 @@ describe( "single-select collection", function () {
         } );
 
         it( 'does not automatically call an event handler named after a standard Backbone event (e.g. onAdd)', function () {
-            collection.trigger( "add", model );
-            collection.trigger( "remove", model );
-            collection.trigger( "reset" );
-            collection.trigger( "all", model );
+            collection.trigger( "add", model, collection );
+            collection.trigger( "remove", model, collection );
+            collection.trigger( "reset", collection, { previousModels: [] } );
+            collection.trigger( "all", "add", model, collection );
+
             expect( collection.onAdd ).not.toHaveBeenCalled();
             expect( collection.onRemove ).not.toHaveBeenCalled();
             expect( collection.onReset ).not.toHaveBeenCalled();
