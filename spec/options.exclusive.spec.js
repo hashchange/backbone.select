@@ -33,8 +33,6 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
 
     describe( 'Calling select() with the `exclusive` option on a collection.', function () {
         
-        // NB These tests must work without model sharing being enabled.
-
         beforeEach( function () {
             collection = new SelectManyCollection( [m1, m2, m3, m4] );
 
@@ -279,9 +277,6 @@ describe( 'Options: exclusive, for Backbone.Select.Many collections.', function 
     } );
 
     describe( 'Calling select() with the `exclusive` option on a model.', function () {
-
-        // NB These tests must work without model sharing being enabled. Model sharing is tested separately in the
-        // interaction specs, below.
 
         beforeEach( function () {
             collection = new SelectManyCollection( [m1, m2, m3, m4] );

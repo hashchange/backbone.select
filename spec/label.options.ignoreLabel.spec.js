@@ -59,15 +59,8 @@ describe( 'Custom label options: ignoreLabel.', function () {
                     expect( collection.starred ).toBeUndefined();
                 } );
 
-                it( 'when a model in the collection is selected for that label (model sharing enabled)', function () {
+                it( 'when a model in the collection is selected for that label', function () {
                     collection.add( model );
-                    model.select( { label: "starred" } );
-
-                    expect( collection.starred ).toBeUndefined();
-                } );
-
-                it( 'when a model in the collection is selected for that label (no model sharing enabled)', function () {
-                    collection = new SelectOneCollection( [model], { ignoreLabel: ["starred", "picked"] } );
                     model.select( { label: "starred" } );
 
                     expect( collection.starred ).toBeUndefined();
@@ -105,15 +98,8 @@ describe( 'Custom label options: ignoreLabel.', function () {
                     expect( collection.picked ).toBeUndefined();
                 } );
 
-                it( 'when a model in the collection is selected for that label (model sharing enabled)', function () {
+                it( 'when a model in the collection is selected for that label', function () {
                     collection.add( model );
-                    model.select( { label: "picked" } );
-
-                    expect( collection.picked ).toBeUndefined();
-                } );
-
-                it( 'when a model in the collection is selected for that label (no model sharing enabled)', function () {
-                    collection = new SelectOneCollection( [model], { ignoreLabel: ["starred", "picked"] } );
                     model.select( { label: "picked" } );
 
                     expect( collection.picked ).toBeUndefined();
@@ -241,15 +227,8 @@ describe( 'Custom label options: ignoreLabel.', function () {
                     expect( collection.starred ).toBeUndefined();
                 } );
 
-                it( 'when a model in the collection is selected for that label (model sharing enabled)', function () {
+                it( 'when a model in the collection is selected for that label', function () {
                     collection.add( model );
-                    model.select( { label: "starred" } );
-
-                    expect( collection.starred ).toBeUndefined();
-                } );
-
-                it( 'when a model in the collection is selected for that label (no model sharing enabled)', function () {
-                    collection = new SelectManyCollection( [model], { ignoreLabel: ["starred", "picked"] } );
                     model.select( { label: "starred" } );
 
                     expect( collection.starred ).toBeUndefined();
@@ -287,15 +266,8 @@ describe( 'Custom label options: ignoreLabel.', function () {
                     expect( collection.picked ).toBeUndefined();
                 } );
 
-                it( 'when a model in the collection is selected for that label (model sharing enabled)', function () {
+                it( 'when a model in the collection is selected for that label', function () {
                     collection.add( model );
-                    model.select( { label: "picked" } );
-
-                    expect( collection.picked ).toBeUndefined();
-                } );
-
-                it( 'when a model in the collection is selected for that label (no model sharing enabled)', function () {
-                    collection = new SelectManyCollection( [model], { ignoreLabel: ["starred", "picked"] } );
                     model.select( { label: "picked" } );
 
                     expect( collection.picked ).toBeUndefined();

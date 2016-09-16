@@ -969,7 +969,7 @@ describe( "models shared between multiple collections: adding and removing model
 
     describe( 'registering and unregistering a collection with models', function () {
 
-        describe( 'A single-select collection in model-sharing mode', function () {
+        describe( 'A single-select collection', function () {
 
             var model1, model2, model3, models, collection;
 
@@ -1047,7 +1047,7 @@ describe( "models shared between multiple collections: adding and removing model
             } );
         } );
 
-        describe( 'A multi-select collection in model-sharing mode', function () {
+        describe( 'A multi-select collection', function () {
 
             var model1, model2, model3, models, collection;
 

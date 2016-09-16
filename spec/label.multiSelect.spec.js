@@ -1178,15 +1178,7 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 expect( collection.starred ).toEqual( {} );
             } );
 
-            it( 'for a deselection, even if that deselection is a no-op (model sharing enabled)', function () {
-                collection = new Collection( [model] );
-                model.deselect( { label: "starred" } );
-                expect( collection.starred ).toEqual( {} );
-            } );
-
             it( 'for a deselection, even if that deselection is a no-op and happened before the model was added to the collection', function () {
-                // NB We need to enable model sharing to account for the manipulation of models before they are part of
-                // the collection.
                 model.deselect( { label: "starred" } );
                 collection = new Collection( undefined );
                 collection.add( [model] );
@@ -1195,8 +1187,6 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
             } );
 
             it( 'for a deselection, even if that deselection is a no-op and happened before the model was passed in when creating the collection', function () {
-                // NB We need to enable model sharing to account for the manipulation of models before they are part of
-                // the collection.
                 model.deselect( { label: "starred" } );
                 collection = new Collection( [model] );
 

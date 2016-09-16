@@ -754,17 +754,11 @@ describe( 'Custom label options: defaultLabel.', function () {
     describe( 'Select.Many: A collection property is created for a custom default label, and holds a hash,', function () {
         var model, collection;
 
-        it( 'for a default label defined in a model, even if the label has not actually been used', function () {
-            model = new Model( undefined, { defaultLabel: "starred" } );
-            collection = new SelectManyCollection( [model] );
-            expect( collection.starred ).toEqual( {} );
-        } );
-
         afterEach( function () {
             collection.close();
         } );
 
-        it( 'for a default label defined in a model, even if the label has not actually been used (model sharing enabled)', function () {
+        it( 'for a default label defined in a model, even if the label has not actually been used', function () {
             model = new Model( undefined, { defaultLabel: "starred" } );
             collection = new SelectManyCollection( [model] );
             expect( collection.starred ).toEqual( {} );
