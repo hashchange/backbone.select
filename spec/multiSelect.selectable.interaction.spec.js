@@ -1363,7 +1363,7 @@ describe( "multi-select collection: interaction with selectable models", functio
 
     } );
 
-    describe( '_silentLocally option', function () {
+    describe( 'silentLocally option', function () {
         var model, collection, otherCollection, events;
 
         beforeEach( function () {
@@ -1383,11 +1383,11 @@ describe( "multi-select collection: interaction with selectable models", functio
             otherCollection.close();
         } );
 
-        describe( 'When a model is selected with the _silentLocally option', function () {
+        describe( 'When a model is selected with the silentLocally option', function () {
 
             beforeEach( function () {
                 events = getEventSpies( [model, collection, otherCollection] );
-                collection.select( model, { _silentLocally: true } );
+                collection.select( model, { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger any select:* event on the collection', function () {
@@ -1411,12 +1411,12 @@ describe( "multi-select collection: interaction with selectable models", functio
 
         } );
 
-        describe( 'When a model is deselected with the _silentLocally option', function () {
+        describe( 'When a model is deselected with the silentLocally option', function () {
 
             beforeEach( function () {
                 model.select();
                 events = getEventSpies( [model, collection, otherCollection] );
-                collection.deselect( model, { _silentLocally: true } );
+                collection.deselect( model, { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger any select:* event on the collection', function () {
@@ -1440,12 +1440,12 @@ describe( "multi-select collection: interaction with selectable models", functio
 
         } );
 
-        describe( 'When a model is reselected with the _silentLocally option', function () {
+        describe( 'When a model is reselected with the silentLocally option', function () {
 
             beforeEach( function () {
                 model.select();
                 events = getEventSpies( [model, collection, otherCollection] );
-                collection.select( model, { _silentLocally: true } );
+                collection.select( model, { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger a reselect:any event or any select:* event on the collection', function () {

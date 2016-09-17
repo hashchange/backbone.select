@@ -856,7 +856,7 @@ describe( "single-select collection", function () {
 
     } );
 
-    describe( '_silentLocally option', function () {
+    describe( 'silentLocally option', function () {
         var m1, m2, collection, otherCollection, events;
 
         beforeEach( function () {
@@ -877,12 +877,12 @@ describe( "single-select collection", function () {
             otherCollection.close();
         } );
 
-        describe( 'When a model is selected with the _silentLocally option', function () {
+        describe( 'When a model is selected with the silentLocally option', function () {
 
             beforeEach( function () {
                 m2.select();
                 events = getEventSpies( [m1, m2, collection, otherCollection] );
-                collection.select( m1, { _silentLocally: true } );
+                collection.select( m1, { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger a select:one event on the collection', function () {
@@ -916,12 +916,12 @@ describe( "single-select collection", function () {
 
         } );
 
-        describe( 'When a model is deselected with the _silentLocally option', function () {
+        describe( 'When a model is deselected with the silentLocally option', function () {
 
             beforeEach( function () {
                 m1.select();
                 events = getEventSpies( [m1, collection, otherCollection] );
-                collection.deselect( m1, { _silentLocally: true } );
+                collection.deselect( m1, { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger a deselect:one event on the collection', function () {
@@ -943,12 +943,12 @@ describe( "single-select collection", function () {
 
         } );
 
-        describe( 'When a model is reselected with the _silentLocally option', function () {
+        describe( 'When a model is reselected with the silentLocally option', function () {
 
             beforeEach( function () {
                 m1.select();
                 events = getEventSpies( [m1, collection, otherCollection] );
-                collection.select( m1, { _silentLocally: true } );
+                collection.select( m1, { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger a reselect:one or select:one event on the collection', function () {

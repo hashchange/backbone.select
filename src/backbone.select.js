@@ -48,7 +48,7 @@
                     var label, reselected, eventOptions, forwardedOptions;
 
                     options = initOptions( options );
-                    if ( options._processedBy[this._pickyCid] ) return this;
+                    if ( options["@bbs:processedBy"][this._pickyCid] ) return this;
 
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) ) return this;
@@ -56,38 +56,38 @@
                     reselected = model && this[label] === model ? model : undefined;
 
                     if ( !reselected ) {
-                        // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options:
+                        // Using eventQueueAppendOnly instead of eventQueue for the forwarded options:
                         //
                         // When a deselect sub action is initiated from a select action, the deselection events are
                         // added to the common event queue. But the event queue must not be resolved prematurely during
                         // the deselection phase. Resolution is prevented by naming the queue differently.
                         //
                         // See getActiveQueue() for a detailed description of the process. (Also explains why
-                        // _processedBy is omitted in the call.)
+                        // processedBy is omitted in the call.)
                         forwardedOptions = _.extend(
-                            _.omit( options, "_silentLocally", "_processedBy", "_eventQueue" ),
-                            { _eventQueueAppendOnly: getActiveQueue( options ) }
+                            _.omit( options, "@bbs:silentLocally", "@bbs:processedBy", "@bbs:eventQueue" ),
+                            { "@bbs:eventQueueAppendOnly": getActiveQueue( options ) }
                         );
 
                         this.deselect( undefined, forwardedOptions );
                         this[label] = model;
                     }
-                    options._processedBy[this._pickyCid] = { done: false };
+                    options["@bbs:processedBy"][this._pickyCid] = { done: false };
 
-                    if ( !options._processedBy[this[label].cid] ) this[label].select( stripLocalOptions( options ) );
+                    if ( !options["@bbs:processedBy"][this[label].cid] ) this[label].select( stripLocalOptions( options ) );
 
-                    if ( !(options.silent || options._silentLocally) ) {
+                    if ( !( options.silent || options["@bbs:silentLocally"] ) ) {
 
                         eventOptions = toEventOptions( options, label, this );
                         if ( reselected ) {
-                            if ( !options._silentReselect ) queueEventSet( "reselect:one", label, [ model, this, eventOptions ], this, options );
+                            if ( !options["@bbs:silentReselect"] ) queueEventSet( "reselect:one", label, [ model, this, eventOptions ], this, options );
                         } else {
                             queueEventSet( "select:one", label, [ model, this, eventOptions ], this, options );
                         }
 
                     }
 
-                    options._processedBy[this._pickyCid].done = true;
+                    options["@bbs:processedBy"][this._pickyCid].done = true;
                     processEventQueue( options );
 
                     return this;
@@ -97,25 +97,25 @@
                     var label;
 
                     options = initOptions( options );
-                    if ( options._processedBy[this._pickyCid] ) return this;
+                    if ( options["@bbs:processedBy"][this._pickyCid] ) return this;
 
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) || !this[label] ) return this;
 
-                    // The _messageOnly flag is used for a noop which is supposed to convey the label name only, and
+                    // The messageOnly flag is used for a noop which is supposed to convey the label name only, and
                     // make sure it is registered. That's done, so we can bail out now.
-                    if ( options._messageOnly ) return this;
+                    if ( options["@bbs:messageOnly"] ) return this;
 
                     model = model || this[label];
                     if ( this[label] !== model ) return this;
 
-                    options._processedBy[this._pickyCid] = { done: false };
+                    options["@bbs:processedBy"][this._pickyCid] = { done: false };
 
                     delete this[label];
-                    if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
-                    if ( !(options.silent || options._silentLocally) ) queueEventSet( "deselect:one", label, [ model, this, toEventOptions( options, label, this ) ], this, options );
+                    if ( !options["@bbs:skipModelCall"] ) model.deselect( stripLocalOptions( options ) );
+                    if ( !( options.silent || options["@bbs:silentLocally"] ) ) queueEventSet( "deselect:one", label, [ model, this, toEventOptions( options, label, this ) ], this, options );
 
-                    options._processedBy[this._pickyCid].done = true;
+                    options["@bbs:processedBy"][this._pickyCid].done = true;
                     processEventQueue( options );
 
                     return this;
@@ -146,19 +146,19 @@
                     prevSelected = _.clone( this[label] );
                     reselected = this[label][model.cid] ? [model] : [];
 
-                    if ( reselected.length && options._processedBy[this._pickyCid] ) return this;
+                    if ( reselected.length && options["@bbs:processedBy"][this._pickyCid] ) return this;
 
                     if ( options.exclusive ) {
-                        // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select()
-                        // in Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted
-                        // in the call).
+                        // Using eventQueueAppendOnly instead of eventQueue for the forwarded options: See .select() in
+                        // Select.One or, in more detail, getActiveQueue() (also explains why processedBy is omitted in
+                        // the call).
                         forwardedOptions = _.extend(
-                            _.omit( options, "_eventQueue", "exclusive" ),
-                            { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                            _.omit( options, "@bbs:eventQueue", "exclusive" ),
+                            { "@bbs:eventQueueAppendOnly": getActiveQueue( options ), "@bbs:silentLocally": true }
                         );
 
                         this.each( function ( iteratedModel ) {
-                            if ( iteratedModel !== model ) this.deselect( iteratedModel, _.omit( forwardedOptions, "_processedBy" ) );
+                            if ( iteratedModel !== model ) this.deselect( iteratedModel, _.omit( forwardedOptions, "@bbs:processedBy" ) );
                         }, this );
                     }
 
@@ -166,12 +166,12 @@
                         this[label][model.cid] = model;
                         setSelectionSize( _.size( this[label] ), this, label );
                     }
-                    options._processedBy[this._pickyCid] = { done: false };
+                    options["@bbs:processedBy"][this._pickyCid] = { done: false };
 
-                    if ( !options._processedBy[model.cid] ) model.select( stripLocalOptions( options ) );
+                    if ( !options["@bbs:processedBy"][model.cid] ) model.select( stripLocalOptions( options ) );
                     triggerMultiSelectEvents( this, prevSelected, options, reselected );
 
-                    options._processedBy[this._pickyCid].done = true;
+                    options["@bbs:processedBy"][this._pickyCid].done = true;
                     processEventQueue( options );
 
                     return this;
@@ -183,28 +183,28 @@
                     if ( !model ) return this.deselectAll( options );
 
                     options = initOptions( options );
-                    if ( options._processedBy[this._pickyCid] ) return this;
+                    if ( options["@bbs:processedBy"][this._pickyCid] ) return this;
 
                     label = getLabel( options, this );
                     if ( isIgnoredLabel( label, this ) ) return this;
 
-                    // The _messageOnly flag is used for a noop which is supposed to convey the label name only, and
+                    // The messageOnly flag is used for a noop which is supposed to convey the label name only, and
                     // make sure it is registered. That's done, so we can bail out now.
-                    if ( options._messageOnly ) return this;
+                    if ( options["@bbs:messageOnly"] ) return this;
 
                     prevSelected = _.clone( this[label] );
 
                     if ( !this[label][model.cid] ) return this;
 
-                    options._processedBy[this._pickyCid] = { done: false };
+                    options["@bbs:processedBy"][this._pickyCid] = { done: false };
 
                     delete this[label][model.cid];
                     setSelectionSize( _.size( this[label] ), this, label );
 
-                    if ( !options._skipModelCall ) model.deselect( stripLocalOptions( options ) );
+                    if ( !options["@bbs:skipModelCall"] ) model.deselect( stripLocalOptions( options ) );
                     triggerMultiSelectEvents( this, prevSelected, options );
 
-                    options._processedBy[this._pickyCid].done = true;
+                    options["@bbs:processedBy"][this._pickyCid].done = true;
                     processEventQueue( options );
 
                     return this;
@@ -220,27 +220,27 @@
 
                     prevSelected = _.clone( this[label] );
 
-                    // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select() in
-                    // Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted in the
+                    // Using eventQueueAppendOnly instead of eventQueue for the forwarded options: See .select() in
+                    // Select.One or, in more detail, getActiveQueue() (also explains why processedBy is omitted in the
                     // call).
                     forwardedOptions = _.extend(
-                        _.omit( options, "_eventQueue", "exclusive" ),
-                        { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                        _.omit( options, "@bbs:eventQueue", "exclusive" ),
+                        { "@bbs:eventQueueAppendOnly": getActiveQueue( options ), "@bbs:silentLocally": true }
                     );
 
                     this.each( function ( model ) {
                         if ( this[label][model.cid] ) reselected.push( model );
-                        this.select( model, _.omit( forwardedOptions, "_processedBy" ) );
+                        this.select( model, _.omit( forwardedOptions, "@bbs:processedBy" ) );
                     }, this );
 
                     setSelectionSize( _.size( this[label] ), this, label );
 
                     triggerMultiSelectEvents( this, prevSelected, options, reselected );
 
-                    if ( options._processedBy[this._pickyCid] ) {
-                        options._processedBy[this._pickyCid].done = true;
+                    if ( options["@bbs:processedBy"][this._pickyCid] ) {
+                        options["@bbs:processedBy"][this._pickyCid].done = true;
                     } else {
-                        options._processedBy[this._pickyCid] = { done: true };
+                        options["@bbs:processedBy"][this._pickyCid] = { done: true };
                     }
                     processEventQueue( options );
 
@@ -256,19 +256,19 @@
 
                     prevSelected = _.clone( this[label] );
 
-                    // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select() in
-                    // Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted in the
+                    // Using eventQueueAppendOnly instead of eventQueue for the forwarded options: See .select() in
+                    // Select.One or, in more detail, getActiveQueue() (also explains why processedBy is omitted in the
                     // call).
                     forwardedOptions = _.extend(
-                        _.omit( options, "_eventQueue", "exclusive" ),
-                        { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                        _.omit( options, "@bbs:eventQueue", "exclusive" ),
+                        { "@bbs:eventQueueAppendOnly": getActiveQueue( options ), "@bbs:silentLocally": true }
                     );
 
                     this.each( function ( model ) {
                         if ( this[label][model.cid] ) {
-                            this.deselect( model, _.omit( forwardedOptions, "_processedBy" ) );
+                            this.deselect( model, _.omit( forwardedOptions, "@bbs:processedBy" ) );
                         } else {
-                            this.select( model, _.omit( forwardedOptions, "_processedBy" ) );
+                            this.select( model, _.omit( forwardedOptions, "@bbs:processedBy" ) );
                         }
                     }, this );
 
@@ -276,10 +276,10 @@
 
                     triggerMultiSelectEvents( this, prevSelected, options );
 
-                    if ( options._processedBy[this._pickyCid] ) {
-                        options._processedBy[this._pickyCid].done = true;
+                    if ( options["@bbs:processedBy"][this._pickyCid] ) {
+                        options["@bbs:processedBy"][this._pickyCid].done = true;
                     } else {
-                        options._processedBy[this._pickyCid] = { done: true };
+                        options["@bbs:processedBy"][this._pickyCid] = { done: true };
                     }
                     processEventQueue( options );
 
@@ -296,26 +296,26 @@
                     if ( getSelectionSize( this, label ) === 0 ) return this;
                     prevSelected = _.clone( this[label] );
 
-                    // Using _eventQueueAppendOnly instead of _eventQueue for the forwarded options: See .select() in
-                    // Select.One or, in more detail, getActiveQueue() (also explains why _processedBy is omitted in the
+                    // Using eventQueueAppendOnly instead of eventQueue for the forwarded options: See .select() in
+                    // Select.One or, in more detail, getActiveQueue() (also explains why processedBy is omitted in the
                     // call).
                     forwardedOptions = _.extend(
-                        _.omit( options, "_eventQueue" ),
-                        { _eventQueueAppendOnly: getActiveQueue( options ), _silentLocally: true }
+                        _.omit( options, "@bbs:eventQueue" ),
+                        { "@bbs:eventQueueAppendOnly": getActiveQueue( options ), "@bbs:silentLocally": true }
                     );
 
                     this.each( function ( model ) {
-                        this.deselect( model, _.omit( forwardedOptions, "_processedBy" ) );
+                        this.deselect( model, _.omit( forwardedOptions, "@bbs:processedBy" ) );
                     }, this );
 
                     setSelectionSize( 0, this, label );
 
                     triggerMultiSelectEvents( this, prevSelected, options );
 
-                    if ( options._processedBy[this._pickyCid] ) {
-                        options._processedBy[this._pickyCid].done = true;
+                    if ( options["@bbs:processedBy"][this._pickyCid] ) {
+                        options["@bbs:processedBy"][this._pickyCid].done = true;
                     } else {
-                        options._processedBy[this._pickyCid] = { done: true };
+                        options["@bbs:processedBy"][this._pickyCid] = { done: true };
                     }
                     processEventQueue( options );
 
@@ -362,9 +362,9 @@
                     var label, reselected, eventOptions;
 
                     options = initOptions( options );
-                    if ( options._processedBy[this.cid] ) return this;
+                    if ( options["@bbs:processedBy"][this.cid] ) return this;
 
-                    options._processedBy[this.cid] = { done: false };
+                    options["@bbs:processedBy"][this.cid] = { done: false };
 
                     label = getLabel( options, this );
                     reselected = this[label];
@@ -375,20 +375,20 @@
                         this.trigger( "_selected", this, stripLocalOptionsExcept( options, "exclusive" ) );
                     } else if ( this.collection ) {
                         // Single collection only: no event listeners set up in collection, call it directly
-                        if ( !options._processedBy[this.collection._pickyCid] ) this.collection.select( this, stripLocalOptionsExcept( options, "exclusive" ) );
+                        if ( !options["@bbs:processedBy"][this.collection._pickyCid] ) this.collection.select( this, stripLocalOptionsExcept( options, "exclusive" ) );
                     }
 
-                    if ( !(options.silent || options._silentLocally) ) {
+                    if ( !( options.silent || options["@bbs:silentLocally"] ) ) {
                         eventOptions = toEventOptions( options, label, this );
 
                         if ( reselected ) {
-                            if ( !options._silentReselect ) queueEventSet( "reselected", label, [ this, eventOptions ], this, options );
+                            if ( !options["@bbs:silentReselect"] ) queueEventSet( "reselected", label, [ this, eventOptions ], this, options );
                         } else {
                             queueEventSet( "selected", label, [ this, eventOptions ], this, options );
                         }
                     }
 
-                    options._processedBy[this.cid].done = true;
+                    options["@bbs:processedBy"][this.cid].done = true;
                     processEventQueue( options );
 
                     return this;
@@ -398,29 +398,29 @@
                     var label, isNoop;
 
                     options = initOptions( options );
-                    if ( options._processedBy[this.cid] ) return this;
+                    if ( options["@bbs:processedBy"][this.cid] ) return this;
 
                     label = getLabel( options, this );
                     isNoop = !this[label];
 
-                    options._processedBy[this.cid] = { done: isNoop };
+                    options["@bbs:processedBy"][this.cid] = { done: isNoop };
                     this[label] = false;
 
                     if ( this._pickyCollections ) {
                         // Model-sharing mode: notify collections with an event
-                        if ( isNoop ) options = _.extend( options, { _messageOnly: true } );
+                        if ( isNoop ) options = _.extend( options, { "@bbs:messageOnly": true } );
                         this.trigger( "_deselected", this, stripLocalOptions( options ) );
                     } else if ( this.collection ) {
                         // Single collection only: no event listeners set up in collection, call it directly
-                        if ( isNoop ) options = _.extend( options, { _messageOnly: true } );
+                        if ( isNoop ) options = _.extend( options, { "@bbs:messageOnly": true } );
                         this.collection.deselect( this, stripLocalOptions( options ) );
                     }
 
                     if ( isNoop ) return this;
 
-                    if ( !(options.silent || options._silentLocally) ) queueEventSet( "deselected", label, [ this, toEventOptions( options, label, this ) ], this, options );
+                    if ( !( options.silent || options["@bbs:silentLocally"] ) ) queueEventSet( "deselected", label, [ this, toEventOptions( options, label, this ) ], this, options );
 
-                    options._processedBy[this.cid].done = true;
+                    options["@bbs:processedBy"][this.cid].done = true;
                     processEventQueue( options );
 
                     return this;
@@ -569,10 +569,10 @@
     // --------------
 
     /** @type {string[]}  options which are local to a method call, and not inherited by other method calls */
-    var localOptions = ["_silentLocally", "_externalEvent", "exclusive"],
+    var localOptions = ["@bbs:silentLocally", "_externalEvent", "exclusive"],
 
         /** @type {string[]}  options which are used internally for communicating across method calls, should not appear in public events */
-        internalOptions = ["_messageOnly", "_silentLocally", "_silentReselect", "_skipModelCall", "_processedBy", "_eventQueue", "_eventQueueAppendOnly"];
+        internalOptions = ["@bbs:messageOnly", "@bbs:silentLocally", "@bbs:silentReselect", "@bbs:skipModelCall", "@bbs:processedBy", "@bbs:eventQueue", "@bbs:eventQueueAppendOnly"];
 
     // Trigger events from a multi-select collection, based on the number of selected items.
     function triggerMultiSelectEvents ( collection, prevSelected, options, reselected ) {
@@ -586,7 +586,7 @@
             return _.map( cids, mapper );
         }
 
-        if ( options.silent || options._silentLocally ) return;
+        if ( options.silent || options["@bbs:silentLocally"] ) return;
 
         var diff,
             label = getLabel( options, collection ),
@@ -601,7 +601,7 @@
 
             unchanged = (selectionSize === prevSelectedCids.length && addedCids.length === 0 && removedCids.length === 0);
 
-        if ( reselected && reselected.length && !options._silentReselect ) {
+        if ( reselected && reselected.length && !options["@bbs:silentReselect"] ) {
             queueEventSet( "reselect:any", label, [ reselected, collection, toEventOptions( options, label, collection ) ], collection, options );
         }
 
@@ -631,6 +631,7 @@
     function onAdd ( model, collection ) {
         registerCollectionWithModel( model, collection );
         forEachLabelInModel( model, function ( label ) {
+            var selectOptions;
             // We want to keep the list of registered labels as small as possible in the collection, in order to keep
             // the processing overhead low.
             //
@@ -644,7 +645,8 @@
             // in client code.
             if ( collection._pickyType === "Backbone.Select.Many" ) ensureLabelIsRegistered( label, collection );
 
-            if ( model[label] ) collection.select( model, { _silentReselect: true, _externalEvent: "add", label: label } );
+            selectOptions = { "@bbs:silentReselect": true, _externalEvent: "add", label: label };
+            if ( model[label] ) collection.select( model, selectOptions );
         } );
 
     }
@@ -664,7 +666,7 @@
                 if ( model._pickyCollections && model._pickyCollections.length === 0 ) {
                     deselectOptions = _.extend( {}, options, { label: label } );
                 } else {
-                    deselectOptions = _.extend( {}, options, { label: label, _skipModelCall: true } );
+                    deselectOptions = _.extend( {}, options, { label: label, "@bbs:skipModelCall": true } );
                 }
 
                 collection.deselect( model, deselectOptions );
@@ -674,8 +676,7 @@
     }
 
     function onResetSingleSelect ( collection, options ) {
-        var selected,
-            excessiveSelections,
+        var selected, releaseOptions, deselectOptions, excessiveSelections,
             deselectOnRemove = {};
 
         forEachLabelInCollection( collection, function ( label ) {
@@ -683,8 +684,9 @@
             if ( removeThis ) deselectOnRemove[removeThis.cid] = removeThis;
         } );
 
+        releaseOptions = { "@bbs:silentLocally": true };
         _.each( deselectOnRemove, function ( model ) {
-            releaseModel( model, collection, { _silentLocally: true } );
+            releaseModel( model, collection, releaseOptions );
         } );
 
         _.each( options.previousModels, function ( model ) {
@@ -700,17 +702,20 @@
 
             selected = collection.filter( function ( model ) { return model[label]; } );
             excessiveSelections = _.initial( selected );
-            if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect( { label: label } ); } );
+
+            deselectOptions = { label: label };
+            if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect( deselectOptions ); } );
             if ( selected.length ) collection.select( _.last( selected ), { silent: true, label: label } );
 
         } );
     }
 
     function onResetMultiSelect ( collection, options ) {
-        var select,
+        var select, deselectOptions,
             deselect = _.filter( options.previousModels, function ( model ) { return isModelSelectedWithAnyCollectionLabel( model, collection ); } );
 
-        if ( deselect ) _.each( deselect, function ( model ) { releaseModel( model, collection, { _silentLocally: true } ); } );
+        deselectOptions = { "@bbs:silentLocally": true };
+        if ( deselect ) _.each( deselect, function ( model ) { releaseModel( model, collection, deselectOptions ); } );
 
         _.each( options.previousModels, function ( model ) {
             if ( model._pickyCollections ) model._pickyCollections = _.without( model._pickyCollections, collection._pickyCid );
@@ -734,7 +739,7 @@
 
     function unregisterCollectionWithModels ( collection ) {
         collection.each( function ( model ) {
-            releaseModel( model, collection, { _silentLocally: true } );
+            releaseModel( model, collection, { "@bbs:silentLocally": true } );
         } );
     }
 
@@ -865,8 +870,8 @@
 
     function initOptions ( options ) {
         options || (options = {});
-        options._processedBy || (options._processedBy = {});
-        options._eventQueue || (options._eventQueue = []);
+        options["@bbs:processedBy"] || (options["@bbs:processedBy"] = {});
+        options["@bbs:eventQueue"] || (options["@bbs:eventQueue"] = []);
 
         return options;
     }
@@ -880,38 +885,38 @@
     function getActiveQueue ( storage ) {
         // There are two properties which could store the queue:
         //
-        // - Usually, the queue is stored in the _eventQueue property.
+        // - Usually, the queue is stored in the eventQueue property.
         //
-        //   The queue will eventually be processed by the object which created it. The _eventQueue is created in the
+        //   The queue will eventually be processed by the object which created it. The eventQueue is created in the
         //   initial select/deselect method call which started the whole thing. When all secondary calls are done and
-        //   the end of that method is reached, the _eventQueue is processed.
+        //   the end of that method is reached, the eventQueue is processed.
         //
         //   Secondary calls on other objects just add to the queue. They don't resolve it when they reach their own
         //   processEventQueue() because its resolution is blocked by the original method. That method has created a
-        //   _processedBy entry for the calling object which is not yet marked as done. (All _processedBy entries must
-        //   be marked as done when the queue is processed.)
+        //   processedBy entry for the calling object which is not yet marked as done. (All processedBy entries must be
+        //   marked as done when the queue is processed.)
         //
         //   In the course of secondary calls, the original object is called back sometimes. These recursive, tertiary
         //   calls also don't resolve the queue (which would be premature). They also don't have to do any real work,
-        //   except for some minor tasks. Recursive, tertiary calls return early when a _processedBy entry for the
-        //   object exists, whether it is marked done or not. Hence, they don't reach processEventQueue().
+        //   except for some minor tasks. Recursive, tertiary calls return early when a processedBy entry for the object
+        //   exists, whether it is marked done or not. Hence, they don't reach processEventQueue().
         //
         // - Sometimes, though, recursive calls to methods on the original object _have_ to do real work and must be
-        //   followed through. For those calls, the _processedBy entry is not passed on. They don't return early
+        //   followed through. For those calls, the processedBy entry is not passed on. They don't return early
         //   (allowing them to do their work), add events to the queue etc, but when their end is reached,
         //   processEventQueue() must not process the queue.
         //
-        //   That's why they don't receive the queue in _eventQueue. Instead, the queue object is referenced in
-        //   _eventQueueAppendOnly during these calls. The _eventQueueAppendOnly property is left alone by
+        //   That's why they don't receive the queue in eventQueue. Instead, the queue object is referenced in
+        //   eventQueueAppendOnly during these calls. The eventQueueAppendOnly property is left alone by
         //   processEventQueue(), protecting the queue from premature resolution.
         //
-        //   New events in these recursive calls must be added to _eventQueueAppendOnly, not _eventQueue, which just
+        //   New events in these recursive calls must be added to eventQueueAppendOnly, not eventQueue, which just
         //   contains an unused, empty hash. The original calling method shares the reference, and will process the
         //   queue in the end, including the events added by the recursive call.
         //
-        // _eventQueueAppendOnly exists only when needed, and thus takes precedence. If it exists, it is the active
-        // queue, whereas _eventQueue just contains an unused, empty hash. If not, _eventQueue is the real thing.
-        return storage._eventQueueAppendOnly || storage._eventQueue;
+        // eventQueueAppendOnly exists only when needed, and thus takes precedence. If it exists, it is the active
+        // queue, whereas eventQueue just contains an unused, empty hash. If not, eventQueue is the real thing.
+        return storage["@bbs:eventQueueAppendOnly"] || storage["@bbs:eventQueue"];
     }
 
     function queueEvent ( storage, context, triggerArgs ) {
@@ -925,15 +930,15 @@
     function processEventQueue ( storage ) {
         var resolved, eventData;
 
-        if ( storage._eventQueue.length ) {
-            resolved = _.every( storage._processedBy, function ( entry ) {
+        if ( storage["@bbs:eventQueue"].length ) {
+            resolved = _.every( storage["@bbs:processedBy"], function ( entry ) {
                 return entry.done;
             } );
 
             if ( resolved ) {
-                mergeMultiSelectEvents( storage._eventQueue );
-                while ( storage._eventQueue.length ) {
-                    eventData = storage._eventQueue.pop();
+                mergeMultiSelectEvents( storage["@bbs:eventQueue"] );
+                while ( storage["@bbs:eventQueue"].length ) {
+                    eventData = storage["@bbs:eventQueue"].pop();
                     eventData.context.trigger.apply( eventData.context, eventData.triggerArgs );
                 }
             }

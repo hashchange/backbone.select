@@ -303,7 +303,7 @@ describe( "selectable model", function () {
 
     } );
 
-    describe( '_silentLocally option', function () {
+    describe( 'silentLocally option', function () {
         var m1, m2, collection, events;
 
         beforeEach( function () {
@@ -322,12 +322,12 @@ describe( "selectable model", function () {
             collection.close();
         } );
 
-        describe( 'When a model is selected with the _silentLocally option', function () {
+        describe( 'When a model is selected with the silentLocally option', function () {
 
             beforeEach( function () {
                 m2.select();
                 events = getEventSpies( [m1, m2, collection] );
-                m1.select( { _silentLocally: true } );
+                m1.select( { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger a "selected" event on the model', function () {
@@ -356,12 +356,12 @@ describe( "selectable model", function () {
 
         } );
 
-        describe( 'When a model is deselected with the _silentLocally option', function () {
+        describe( 'When a model is deselected with the silentLocally option', function () {
 
             beforeEach( function () {
                 m1.select();
                 events = getEventSpies( [m1, collection] );
-                m1.deselect( { _silentLocally: true } );
+                m1.deselect( { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger a "deselected" event on the model', function () {
@@ -378,12 +378,12 @@ describe( "selectable model", function () {
 
         } );
 
-        describe( 'When a model is reselected with the _silentLocally option', function () {
+        describe( 'When a model is reselected with the silentLocally option', function () {
 
             beforeEach( function () {
                 m1.select();
                 events = getEventSpies( [m1, collection] );
-                m1.select( { _silentLocally: true } );
+                m1.select( { "@bbs:silentLocally": true } );
             } );
 
             it( 'should not trigger a "reselected" event on the model', function () {
