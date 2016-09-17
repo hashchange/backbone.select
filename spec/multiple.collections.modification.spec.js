@@ -674,11 +674,6 @@ describe( "models shared between multiple collections: adding and removing model
             expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
         } );
 
-        it( 'should trigger a deselected event on a different model when the reset is inducing a deselection in another multi-select collection', function () {
-            singleCollectionA.reset( [model1, model2] );
-            expect( model1.trigger ).toHaveBeenCalledWith( "deselected", model1, { label: "selected" } );
-        } );
-
         it( 'should trigger a deselected event on the model when added to a singe-select collection together with other selected models, and it is not the last of them', function () {
             singleCollectionA.reset( [model1, model2] );
             expect( model1.trigger ).toHaveBeenCalledWith( "deselected", model1, { label: "selected" } );
