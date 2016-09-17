@@ -422,6 +422,15 @@ describe( "multi-select collection: general", function () {
 
                 m1 = new Model();
                 m2 = new Model();
+
+                // A model holds a reference to the first collection it is assigned to, in its .collection property.
+                // That reference keeps the first collection around as long as the model exists. This (small) memory
+                // leak is caused by Backbone itself.
+                //
+                // For testing the impact of Backbone.Select, that effect must not be at play. So the models are
+                // assigned to a throw-away collection first, which "occupies" the .collection property in the models,
+                // neutralizing it.
+                new Backbone.Collection( [m1, m2] );
             } );
 
             afterEach( function () {
