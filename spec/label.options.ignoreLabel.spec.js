@@ -73,6 +73,13 @@ describe( 'Custom label options: ignoreLabel.', function () {
                     expect( collection.starred ).toBeUndefined();
                 } );
 
+                it( 'when a model with that label is added to the collection, with options.silent enabled', function () {
+                    model.select( { label: "starred" } );
+                    collection.add( model, { silent: true } );
+
+                    expect( collection.starred ).toBeUndefined();
+                } );
+
                 it( 'when a model with that label is passed to the collection during instantiation', function () {
                     model.select( { label: "starred" } );
                     collection = new SelectOneCollection( [model], { ignoreLabel: ["starred", "picked"] } );
@@ -83,6 +90,13 @@ describe( 'Custom label options: ignoreLabel.', function () {
                 it( 'when a model with that label is passed to the collection during a reset()', function () {
                     model.select( { label: "starred" } );
                     collection.reset( [model] );
+
+                    expect( collection.starred ).toBeUndefined();
+                } );
+
+                it( 'when a model with that label is passed to the collection during a reset(), with options.silent enabled', function () {
+                    model.select( { label: "starred" } );
+                    collection.reset( [model], { silent: true } );
 
                     expect( collection.starred ).toBeUndefined();
                 } );
@@ -112,6 +126,13 @@ describe( 'Custom label options: ignoreLabel.', function () {
                     expect( collection.picked ).toBeUndefined();
                 } );
 
+                it( 'when a model with that label is added to the collection, with options.silent enabled', function () {
+                    model.select( { label: "picked" } );
+                    collection.add( model, { silent: true } );
+
+                    expect( collection.picked ).toBeUndefined();
+                } );
+
                 it( 'when a model with that label is passed to the collection during instantiation', function () {
                     model.select( { label: "picked" } );
                     collection = new SelectOneCollection( [model], { ignoreLabel: ["starred", "picked"] } );
@@ -122,6 +143,13 @@ describe( 'Custom label options: ignoreLabel.', function () {
                 it( 'when a model with that label is passed to the collection during a reset()', function () {
                     model.select( { label: "picked" } );
                     collection.reset( [model] );
+
+                    expect( collection.picked ).toBeUndefined();
+                } );
+
+                it( 'when a model with that label is passed to the collection during a reset(), with options.silent enabled', function () {
+                    model.select( { label: "picked" } );
+                    collection.reset( [model], { silent: true } );
 
                     expect( collection.picked ).toBeUndefined();
                 } );
@@ -241,6 +269,13 @@ describe( 'Custom label options: ignoreLabel.', function () {
                     expect( collection.starred ).toBeUndefined();
                 } );
 
+                it( 'when a model with that label is added to the collection, with options.silent enabled', function () {
+                    model.select( { label: "starred" } );
+                    collection.add( model, { silent: true } );
+
+                    expect( collection.starred ).toBeUndefined();
+                } );
+
                 it( 'when a model with that label is passed to the collection during instantiation', function () {
                     model.select( { label: "starred" } );
                     collection = new SelectManyCollection( [model], { ignoreLabel: ["starred", "picked"] } );
@@ -251,6 +286,13 @@ describe( 'Custom label options: ignoreLabel.', function () {
                 it( 'when a model with that label is passed to the collection during a reset()', function () {
                     model.select( { label: "starred" } );
                     collection.reset( [model] );
+
+                    expect( collection.starred ).toBeUndefined();
+                } );
+
+                it( 'when a model with that label is passed to the collection during a reset(), with options.silent enabled', function () {
+                    model.select( { label: "starred" } );
+                    collection.reset( [model], { silent: true } );
 
                     expect( collection.starred ).toBeUndefined();
                 } );
@@ -280,6 +322,13 @@ describe( 'Custom label options: ignoreLabel.', function () {
                     expect( collection.picked ).toBeUndefined();
                 } );
 
+                it( 'when a model with that label is added to the collection, with options.silent enabled', function () {
+                    model.select( { label: "picked" } );
+                    collection.add( model, { silent: true } );
+
+                    expect( collection.picked ).toBeUndefined();
+                } );
+
                 it( 'when a model with that label is passed to the collection during instantiation', function () {
                     model.select( { label: "picked" } );
                     collection = new SelectManyCollection( [model], { ignoreLabel: ["starred", "picked"] } );
@@ -290,6 +339,13 @@ describe( 'Custom label options: ignoreLabel.', function () {
                 it( 'when a model with that label is passed to the collection during a reset()', function () {
                     model.select( { label: "picked" } );
                     collection.reset( [model] );
+
+                    expect( collection.picked ).toBeUndefined();
+                } );
+
+                it( 'when a model with that label is passed to the collection during a reset(), with options.silent enabled', function () {
+                    model.select( { label: "picked" } );
+                    collection.reset( [model], { silent: true } );
 
                     expect( collection.picked ).toBeUndefined();
                 } );

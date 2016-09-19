@@ -152,6 +152,66 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
             } );
 
+            describe( 'Adding items to an empty collection with reset(), with options.silent enabled', function () {
+
+                beforeEach( function () {
+                    selectOneCollection = new SelectOneCollection();
+                    events = getEventSpies( [m1, m2, m3, m4, selectOneCollection], ["selected", "starred"] );
+
+                    selectOneCollection.reset( [ m1, m2, m3, m4 ], { silent: true } );
+                } );
+
+                afterEach( function () {
+                    selectOneCollection.close();
+                } );
+
+                describe( 'Status', function () {
+
+                    it( 'the last model for the "selected" label retains its status, the others are deselected', function () {
+                        expect( m1.selected ).toBe( false );
+                        expect( m2.selected ).toBe( false );
+                        expect( m3.selected ).toBeFalsy();
+                        expect( m4.selected ).toBe( true );
+                    } );
+
+                    it( 'the "selected" property of the collection is set to the last "selected" model', function () {
+                        expect( selectOneCollection.selected ).toBe( m4 );
+                    } );
+
+                    it( 'the last model for the "starred" label retains its status, the others are deselected', function () {
+                        expect( m1.starred ).toBeFalsy();
+                        expect( m2.starred ).toBe( false );
+                        expect( m3.starred ).toBe( false );
+                        expect( m4.starred ).toBe( true );
+                    } );
+
+                    it( 'the "starred" property of the collection is set to the last "starred" model', function () {
+                        expect( selectOneCollection.starred ).toBe( m4 );
+                    } );
+
+                } );
+
+                describe( 'Model events', function () {
+
+                    it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                        expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                        expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                        expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                        expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                    } );
+
+                } );
+
+                describe( 'Collection events', function () {
+
+                    it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                        expect( events.get( selectOneCollection, "*" ) ).not.toHaveBeenCalled();
+                    } );
+
+                } );
+
+            } );
+
             describe( 'Emptying a collection with reset().', function () {
 
                 beforeEach( function () {
@@ -245,6 +305,67 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                 } );
 
+                describe( 'The removed models are also part of another collection, and removed with options.silent enabled', function () {
+                    var otherCollection;
+
+                    beforeEach( function () {
+                        otherCollection = new SelectManyCollection( [ m1, m2, m3, m4 ] );
+                        events = getEventSpies( [m1, m2, m3, m4, selectOneCollection], ["selected", "starred"] );
+
+                        selectOneCollection.reset( null, { silent: true } );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
+                    } );
+
+                    describe( 'Status', function () {
+
+                        it( 'the models retain their "selected" status', function () {
+                            expect( m1.selected ).toBe( false );
+                            expect( m2.selected ).toBe( false );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( true );
+                        } );
+
+                        it( 'the models retain their "starred" status', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m2.starred ).toBe( false );
+                            expect( m3.starred ).toBe( false );
+                            expect( m4.starred ).toBe( true );
+                        } );
+
+                        it( 'the "selected" property of the collection is set to undefined', function () {
+                            expect( selectOneCollection.selected ).toBeUndefined();
+                        } );
+
+                        it( 'the "starred" property of the collection is set to undefined', function () {
+                            expect( selectOneCollection.starred ).toBeUndefined();
+                        } );
+
+                    } );
+
+                    describe( 'Model events', function () {
+
+                        it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                            expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                    describe( 'Collection events', function () {
+
+                        it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                            expect( events.get( selectOneCollection, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                } );
+
                 describe( 'The removed models are not part of another collection', function () {
 
                     beforeEach( function () {
@@ -332,6 +453,61 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         it( "should not trigger a reselect:one event, including any of the namespaces", function () {
                             expect( events.get( selectOneCollection, "reselect:one:*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                } );
+
+                describe( 'The removed models are not part of another collection, and removed with options.silent enabled', function () {
+
+                    beforeEach( function () {
+                        events = getEventSpies( [m1, m2, m3, m4, selectOneCollection], ["selected", "starred"] );
+
+                        selectOneCollection.reset( null, { silent: true } );
+                    } );
+
+                    describe( 'Status', function () {
+
+                        it( 'the removed models lose their "selected" status', function () {
+                            expect( m1.selected ).toBe( false );
+                            expect( m2.selected ).toBe( false );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( false );
+                        } );
+
+                        it( 'the removed models lose their "starred" status', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m2.starred ).toBe( false );
+                            expect( m3.starred ).toBe( false );
+                            expect( m4.starred ).toBe( false );
+                        } );
+
+                        it( 'the "selected" property of the collection is set to undefined', function () {
+                            expect( selectOneCollection.selected ).toBeUndefined();
+                        } );
+
+                        it( 'the "starred" property of the collection is set to undefined', function () {
+                            expect( selectOneCollection.starred ).toBeUndefined();
+                        } );
+
+                    } );
+
+                    describe( 'Model events', function () {
+
+                        it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                            expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                    describe( 'Collection events', function () {
+
+                        it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                            expect( events.get( selectOneCollection, "*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );
@@ -451,6 +627,9 @@ describe( 'Custom labels: Resetting a collection.', function () {
                             expect( events.get( m2, "selected:*" ) ).not.toHaveBeenCalled();
                             expect( events.get( m3, "selected:*" ) ).not.toHaveBeenCalled();
                             expect( events.get( m4, "selected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m5, "selected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m6, "selected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m7, "selected:*" ) ).not.toHaveBeenCalled();
                         } );
 
                         it( 'should not trigger a reselected event, including for any of the namespaces, for any model', function () {
@@ -458,6 +637,9 @@ describe( 'Custom labels: Resetting a collection.', function () {
                             expect( events.get( m2, "reselected:*" ) ).not.toHaveBeenCalled();
                             expect( events.get( m3, "reselected:*" ) ).not.toHaveBeenCalled();
                             expect( events.get( m4, "reselected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m5, "reselected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m6, "reselected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m7, "reselected:*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );
@@ -474,6 +656,83 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         it( "should not trigger a reselect:one event, including any of the namespaces", function () {
                             expect( events.get( selectOneCollection, "reselect:one:*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                } );
+
+                describe( 'The removed models are also part of another collection, and removed with options.silent enabled', function () {
+                    var otherCollection;
+
+                    beforeEach( function () {
+                        otherCollection = new SelectManyCollection( [ m1, m2, m3, m4 ] );
+                        events = getEventSpies( [m1, m2, m3, m4, m5, m6, m7, selectOneCollection], ["selected", "starred"] );
+
+                        // m2 is part of the initial set and the new set.
+                        selectOneCollection.reset( [ m2, m5, m6, m7 ], { silent: true } );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
+                    } );
+
+                    describe( 'Status', function () {
+
+                        it( 'the permanently removed models retain their "selected" status', function () {
+                            expect( m1.selected ).toBe( false );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( true );
+                        } );
+
+                        it( 'the permanently removed models retain their "starred" status', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m3.starred ).toBe( false );
+                            expect( m4.starred ).toBe( true );
+                        } );
+
+                        it( 'the last "selected" of the added models retains its status, the others are deselected', function () {
+                            expect( m2.selected ).toBe( false );
+                            expect( m5.selected ).toBe( false );
+                            expect( m6.selected ).toBeFalsy();
+                            expect( m7.selected ).toBe( true );
+                        } );
+
+                        it( 'the "selected" property of the collection is set to the last "selected" model', function () {
+                            expect( selectOneCollection.selected ).toBe( m7 );
+                        } );
+
+                        it( 'the last "starred" of the added models retains its status, the others are deselected', function () {
+                            expect( m2.starred ).toBe( false );
+                            expect( m5.starred ).toBeFalsy();
+                            expect( m6.starred ).toBe( false );
+                            expect( m7.starred ).toBe( true );
+                        } );
+
+                        it( 'the "starred" property of the collection is set to the last "starred" model', function () {
+                            expect( selectOneCollection.starred ).toBe( m7 );
+                        } );
+
+                    } );
+
+                    describe( 'Model events', function () {
+
+                        it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                            expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m5, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m6, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m7, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                    describe( 'Collection events', function () {
+
+                        it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                            expect( events.get( selectOneCollection, "*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );
@@ -576,6 +835,9 @@ describe( 'Custom labels: Resetting a collection.', function () {
                             expect( events.get( m2, "selected:*" ) ).not.toHaveBeenCalled();
                             expect( events.get( m3, "selected:*" ) ).not.toHaveBeenCalled();
                             expect( events.get( m4, "selected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m5, "selected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m6, "selected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m7, "selected:*" ) ).not.toHaveBeenCalled();
                         } );
 
                         it( 'should not trigger a reselected event, including for any of the namespaces, for any model', function () {
@@ -583,6 +845,9 @@ describe( 'Custom labels: Resetting a collection.', function () {
                             expect( events.get( m2, "reselected:*" ) ).not.toHaveBeenCalled();
                             expect( events.get( m3, "reselected:*" ) ).not.toHaveBeenCalled();
                             expect( events.get( m4, "reselected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m5, "reselected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m6, "reselected:*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m7, "reselected:*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );
@@ -599,6 +864,77 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         it( "should not trigger a reselect:one event, including any of the namespaces", function () {
                             expect( events.get( selectOneCollection, "reselect:one:*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                } );
+
+                describe( 'The removed models are not part of another collection, and removed with options.silent enabled', function () {
+
+                    beforeEach( function () {
+                        events = getEventSpies( [m1, m2, m3, m4, m5, m6, m7, selectOneCollection], ["selected", "starred"] );
+
+                        // m2 is part of the initial set and the new set.
+                        selectOneCollection.reset( [ m2, m5, m6, m7 ], { silent: true } );
+                    } );
+
+                    describe( 'Status', function () {
+
+                        it( 'the permanently removed models lose their "selected" status', function () {
+                            expect( m1.selected ).toBe( false );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( false );
+                        } );
+
+                        it( 'the permanently removed models lose their "starred" status', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m3.starred ).toBe( false );
+                            expect( m4.starred ).toBe( false );
+                        } );
+
+                        it( 'the last "selected" of the added models retains its status, the others are deselected', function () {
+                            expect( m2.selected ).toBe( false );
+                            expect( m5.selected ).toBe( false );
+                            expect( m6.selected ).toBeFalsy();
+                            expect( m7.selected ).toBe( true );
+                        } );
+
+                        it( 'the "selected" property of the collection is set to the last "selected" model', function () {
+                            expect( selectOneCollection.selected ).toBe( m7 );
+                        } );
+
+                        it( 'the last "starred" of the added models retains its status, the others are deselected', function () {
+                            expect( m2.starred ).toBe( false );
+                            expect( m5.starred ).toBeFalsy();
+                            expect( m6.starred ).toBe( false );
+                            expect( m7.starred ).toBe( true );
+                        } );
+
+                        it( 'the "starred" property of the collection is set to the last "starred" model', function () {
+                            expect( selectOneCollection.starred ).toBe( m7 );
+                        } );
+
+                    } );
+
+                    describe( 'Model events', function () {
+
+                        it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                            expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m5, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m6, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m7, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                    describe( 'Collection events', function () {
+
+                        it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                            expect( events.get( selectOneCollection, "*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );
@@ -708,6 +1044,72 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
             } );
 
+            describe( 'Adding items to an empty collection with reset(), with options.silent enabled', function () {
+
+                beforeEach( function () {
+                    selectManyCollection = new SelectManyCollection();
+                    events = getEventSpies( [m1, m2, m3, m4, selectManyCollection], ["selected", "starred"] );
+
+                    selectManyCollection.reset( [ m1, m2, m3, m4 ], { silent: true } );
+                } );
+
+                afterEach( function () {
+                    selectManyCollection.close();
+                } );
+
+                describe( 'Status', function () {
+
+                    it( 'all models retain their status for the "selected" label', function () {
+                        expect( m1.selected ).toBe( true );
+                        expect( m2.selected ).toBe( true );
+                        expect( m3.selected ).toBeFalsy();
+                        expect( m4.selected ).toBe( true );
+                    } );
+
+                    it( 'the "selected" property of the collection contains the "selected" models', function () {
+                        expected[m1.cid] = m1;
+                        expected[m2.cid] = m2;
+                        expected[m4.cid] = m4;
+                        expect( selectManyCollection.selected ).toEqual( expected );
+                    } );
+
+                    it( 'all models retain their status for the "starred" label', function () {
+                        expect( m1.starred ).toBeFalsy();
+                        expect( m2.starred ).toBe( true );
+                        expect( m3.starred ).toBe( true );
+                        expect( m4.starred ).toBe( true );
+                    } );
+
+                    it( 'the "starred" property of the collection contains the "starred" models', function () {
+                        expected[m2.cid] = m2;
+                        expected[m3.cid] = m3;
+                        expected[m4.cid] = m4;
+                        expect( selectManyCollection.starred ).toEqual( expected );
+                    } );
+
+                } );
+
+                describe( 'Model events', function () {
+
+                    it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                        expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                        expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                        expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                        expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                    } );
+
+                } );
+
+                describe( 'Collection events', function () {
+
+                    it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                        expect( events.get( selectManyCollection, "*" ) ).not.toHaveBeenCalled();
+                    } );
+
+                } );
+
+            } );
+
             describe( 'Emptying a collection with reset().', function () {
 
                 beforeEach( function () {
@@ -799,6 +1201,67 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         it( "should not trigger a reselect:any event, including any of the namespaces", function () {
                             expect( events.get( selectManyCollection, "reselect:any:*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                } );
+
+                describe( 'The removed models are also part of another collection, and removed with options.silent enabled', function () {
+                    var otherCollection;
+
+                    beforeEach( function () {
+                        otherCollection = new SelectManyCollection( [ m1, m2, m3, m4 ] );
+                        events = getEventSpies( [m1, m2, m3, m4, selectManyCollection], ["selected", "starred"] );
+
+                        selectManyCollection.reset( null, { silent: true } );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
+                    } );
+
+                    describe( 'Status', function () {
+
+                        it( 'all models retain their status for the "selected" label', function () {
+                            expect( m1.selected ).toBe( true );
+                            expect( m2.selected ).toBe( true );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( true );
+                        } );
+
+                        it( 'all models retain their status for the "starred" label', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m2.starred ).toBe( true );
+                            expect( m3.starred ).toBe( true );
+                            expect( m4.starred ).toBe( true );
+                        } );
+
+                        it( 'the "selected" property of the collection is set to an empty object', function () {
+                            expect( selectManyCollection.selected ).toEqual( {} );
+                        } );
+
+                        it( 'the "starred" property of the collection is set to an empty object', function () {
+                            expect( selectManyCollection.starred ).toEqual( {} );
+                        } );
+
+                    } );
+
+                    describe( 'Model events', function () {
+
+                        it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                            expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                    describe( 'Collection events', function () {
+
+                        it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                            expect( events.get( selectManyCollection, "*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );
@@ -904,6 +1367,61 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         it( "should not trigger a reselect:any event, including any of the namespaces", function () {
                             expect( events.get( selectManyCollection, "reselect:any:*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                } );
+
+                describe( 'The removed models are not part of another collection, and removed with options.silent enabled', function () {
+
+                    beforeEach( function () {
+                        events = getEventSpies( [m1, m2, m3, m4, selectManyCollection], ["selected", "starred"] );
+
+                        selectManyCollection.reset( null, { silent: true } );
+                    } );
+
+                    describe( 'Status', function () {
+
+                        it( 'the removed models lose their "selected" status', function () {
+                            expect( m1.selected ).toBe( false );
+                            expect( m2.selected ).toBe( false );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( false );
+                        } );
+
+                        it( 'the removed models lose their "starred" status', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m2.starred ).toBe( false );
+                            expect( m3.starred ).toBe( false );
+                            expect( m4.starred ).toBe( false );
+                        } );
+
+                        it( 'the "selected" property of the collection is set to an empty object', function () {
+                            expect( selectManyCollection.selected ).toEqual( {} );
+                        } );
+
+                        it( 'the "starred" property of the collection is set to an empty object', function () {
+                            expect( selectManyCollection.starred ).toEqual( {} );
+                        } );
+
+                    } );
+
+                    describe( 'Model events', function () {
+
+                        it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                            expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                    describe( 'Collection events', function () {
+
+                        it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                            expect( events.get( selectManyCollection, "*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );
@@ -1043,6 +1561,89 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         it( "should not trigger a reselect:any event, including any of the namespaces", function () {
                             expect( events.get( selectManyCollection, "reselect:any:*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                } );
+
+                describe( 'The removed models are also part of another collection, and removed with options.silent enabled', function () {
+                    var otherCollection;
+
+                    beforeEach( function () {
+                        otherCollection = new SelectManyCollection( [ m1, m2, m3, m4 ] );
+                        events = getEventSpies( [m1, m2, m3, m4, m5, m6, m7, selectManyCollection], ["selected", "starred"] );
+
+                        // m2 is part of the initial set and the new set.
+                        selectManyCollection.reset( [ m2, m5, m6, m7 ], { silent: true } );
+                    } );
+
+                    afterEach( function () {
+                        otherCollection.close();
+                    } );
+
+                    describe( 'Status', function () {
+
+                        it( 'the permanently removed models retain their "selected" status', function () {
+                            expect( m1.selected ).toBe( true );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( true );
+                        } );
+
+                        it( 'the permanently removed models retain their "starred" status', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m3.starred ).toBe( true );
+                            expect( m4.starred ).toBe( true );
+                        } );
+
+                        it( 'the added models retain their "selected" status', function () {
+                            expect( m2.selected ).toBe( true );
+                            expect( m5.selected ).toBe( true );
+                            expect( m6.selected ).toBeFalsy();
+                            expect( m7.selected ).toBe( true );
+                        } );
+
+                        it( 'the "selected" property of the collection contains the added "selected" models', function () {
+                            expected[m2.cid] = m2;
+                            expected[m5.cid] = m5;
+                            expected[m7.cid] = m7;
+                            expect( selectManyCollection.selected ).toEqual( expected );
+                        } );
+
+                        it( 'the added models retain their "starred" status', function () {
+                            expect( m2.starred ).toBe( true );
+                            expect( m5.starred ).toBeFalsy();
+                            expect( m6.starred ).toBe( true );
+                            expect( m7.starred ).toBe( true );
+                        } );
+
+                        it( 'the "starred" property of the collection contains the added "starred" models', function () {
+                            expected[m2.cid] = m2;
+                            expected[m6.cid] = m6;
+                            expected[m7.cid] = m7;
+                            expect( selectManyCollection.starred ).toEqual( expected );
+                        } );
+
+                    } );
+
+                    describe( 'Model events', function () {
+
+                        it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                            expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m5, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m6, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m7, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                    describe( 'Collection events', function () {
+
+                        it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                            expect( events.get( selectManyCollection, "*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );
@@ -1196,6 +1797,91 @@ describe( 'Custom labels: Resetting a collection.', function () {
 
                         it( "should not trigger a reselect:any event, including any of the namespaces", function () {
                             expect( events.get( selectManyCollection, "reselect:any:*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                } );
+
+                describe( 'The removed models are not part of another collection, and removed with options.silent enabled', function () {
+
+                    beforeEach( function () {
+                        events = getEventSpies( [m1, m2, m3, m4, m5, m6, m7, selectManyCollection], ["selected", "starred"] );
+
+                        // m2 is part of the initial set and the new set.
+                        selectManyCollection.reset( [ m2, m5, m6, m7 ], { silent: true } );
+                    } );
+
+                    describe( 'Status', function () {
+
+                        it( 'the permanently removed models lose their "selected" status', function () {
+                            expect( m1.selected ).toBe( false );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( false );
+                        } );
+
+                        it( 'the permanently removed models lose their "starred" status', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m3.starred ).toBe( false );
+                            expect( m4.starred ).toBe( false );
+                        } );
+
+                        it( 'the removed and re-added model loses its "selected" status', function () {
+                            // That happens because a reset() does indeed imply a remove(), followed by an add(). The
+                            // model loses its selected status when it is removed (because it is no longer part of any
+                            // collection, for an instant anyway).
+                            expect( m2.selected ).toBe( false );
+                        } );
+
+                        it( 'the newly added models retain their "selected" status', function () {
+                            expect( m5.selected ).toBe( true );
+                            expect( m6.selected ).toBeFalsy();
+                            expect( m7.selected ).toBe( true );
+                        } );
+
+                        it( 'the "selected" property of the collection contains the newly added "selected" models', function () {
+                            expected[m5.cid] = m5;
+                            expected[m7.cid] = m7;
+                            expect( selectManyCollection.selected ).toEqual( expected );
+                        } );
+
+                        it( 'the removed and re-added model loses its "starred" status', function () {
+                            // See the corresponding "selected" case, above.
+                            expect( m2.starred ).toBe( false );
+                        } );
+
+                        it( 'the newly added models retain their "starred" status', function () {
+                            expect( m5.starred ).toBeFalsy();
+                            expect( m6.starred ).toBe( true );
+                            expect( m7.starred ).toBe( true );
+                        } );
+
+                        it( 'the "starred" property of the collection contains the newly added "starred" models', function () {
+                            expected[m6.cid] = m6;
+                            expected[m7.cid] = m7;
+                            expect( selectManyCollection.starred ).toEqual( expected );
+                        } );
+
+                    } );
+
+                    describe( 'Model events', function () {
+
+                        it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                            expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m5, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m6, "*" ) ).not.toHaveBeenCalled();
+                            expect( events.get( m7, "*" ) ).not.toHaveBeenCalled();
+                        } );
+
+                    } );
+
+                    describe( 'Collection events', function () {
+
+                        it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                            expect( events.get( selectManyCollection, "*" ) ).not.toHaveBeenCalled();
                         } );
 
                     } );

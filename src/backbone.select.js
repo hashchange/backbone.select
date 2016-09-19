@@ -490,6 +490,10 @@
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
 
+                    patchSilentAdd( hostObject );
+                    patchSilentRemove( hostObject );
+                    patchSilentReset( hostObject );
+
                     // model sharing
                     _.each( models || [], function ( model ) {
                         registerCollectionWithModel( model, hostObject );
@@ -506,6 +510,9 @@
                     hostObject.listenTo( hostObject, '_selected', hostObject.select );
                     hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
 
+                    // NB Calls to reset, add, remove are handled by listening to the corresponding event. That doesn't
+                    // work when the call is silenced (silent option). Then, the handler is called directly (sans event)
+                    // by the patched version of each method.
                     hostObject.listenTo( hostObject, 'reset', onResetSingleSelect );
                     hostObject.listenTo( hostObject, 'add', onAdd );
                     hostObject.listenTo( hostObject, 'remove', onRemove );
@@ -539,6 +546,10 @@
                     augmentTrigger( hostObject );
                     overloadSelect( oldSelect, hostObject );
 
+                    patchSilentAdd( hostObject );
+                    patchSilentRemove( hostObject );
+                    patchSilentReset( hostObject );
+
                     // model sharing
                     _.each( models || [], function ( model ) {
                         registerCollectionWithModel( model, hostObject );
@@ -554,6 +565,9 @@
                     hostObject.listenTo( hostObject, '_selected', hostObject.select );
                     hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
 
+                    // NB Calls to reset, add, remove are handled by listening to the corresponding event. That doesn't
+                    // work when the call is silenced (silent option). Then, the handler is called directly (sans event)
+                    // by the patched version of each method.
                     hostObject.listenTo( hostObject, 'reset', onResetMultiSelect );
                     hostObject.listenTo( hostObject, 'add', onAdd );
                     hostObject.listenTo( hostObject, 'remove', onRemove );
@@ -572,7 +586,7 @@
     var localOptions = ["@bbs:silentLocally", "_externalEvent", "exclusive"],
 
         /** @type {string[]}  options which are used internally for communicating across method calls, should not appear in public events */
-        internalOptions = ["@bbs:messageOnly", "@bbs:silentLocally", "@bbs:silentReselect", "@bbs:skipModelCall", "@bbs:processedBy", "@bbs:eventQueue", "@bbs:eventQueueAppendOnly"];
+        internalOptions = ["@bbs:messageOnly", "@bbs:silentLocally", "@bbs:silentReselect", "@bbs:skipModelCall", "@bbs:processedBy", "@bbs:eventQueue", "@bbs:eventQueueAppendOnly", "@bbs:inReset"];
 
     // Trigger events from a multi-select collection, based on the number of selected items.
     function triggerMultiSelectEvents ( collection, prevSelected, options, reselected ) {
@@ -628,7 +642,7 @@
         }
     }
 
-    function onAdd ( model, collection ) {
+    function onAdd ( model, collection, options ) {
         registerCollectionWithModel( model, collection );
         forEachLabelInModel( model, function ( label ) {
             var selectOptions;
@@ -646,6 +660,8 @@
             if ( collection._pickyType === "Backbone.Select.Many" ) ensureLabelIsRegistered( label, collection );
 
             selectOptions = { "@bbs:silentReselect": true, _externalEvent: "add", label: label };
+            if ( options.silent ) selectOptions.silent = options.silent;
+
             if ( model[label] ) collection.select( model, selectOptions );
         } );
 
@@ -685,6 +701,8 @@
         } );
 
         releaseOptions = { "@bbs:silentLocally": true };
+        if ( options.silent ) releaseOptions.silent = options.silent;
+
         _.each( deselectOnRemove, function ( model ) {
             releaseModel( model, collection, releaseOptions );
         } );
@@ -704,6 +722,8 @@
             excessiveSelections = _.initial( selected );
 
             deselectOptions = { label: label };
+            if ( options.silent ) deselectOptions.silent = options.silent;
+
             if ( excessiveSelections.length ) _.each( excessiveSelections, function ( model ) { model.deselect( deselectOptions ); } );
             if ( selected.length ) collection.select( _.last( selected ), { silent: true, label: label } );
 
@@ -715,6 +735,8 @@
             deselect = _.filter( options.previousModels, function ( model ) { return isModelSelectedWithAnyCollectionLabel( model, collection ); } );
 
         deselectOptions = { "@bbs:silentLocally": true };
+        if ( options.silent ) deselectOptions.silent = options.silent;
+
         if ( deselect ) _.each( deselect, function ( model ) { releaseModel( model, collection, deselectOptions ); } );
 
         _.each( options.previousModels, function ( model ) {
@@ -1042,6 +1064,91 @@
             };
         })();
 
+    }
+
+    function patchSilentAdd ( context ) {
+        var add = context.add;
+
+        context.add = function () {
+            var returned, models, previousModels,
+
+                args = _.toArray( arguments ),
+                options = args[1] ? _.clone( args[1] ) : {},
+
+                isSilent = options.silent,
+                needsFakeEvent = isSilent && !options["@bbs:inReset"];
+
+            if ( isSilent ) previousModels = this.models.slice();
+
+            // Keep the internal inReset option out of the "add" event. Ie, get rid of the option before calling .add().
+            args[1] = stripInternalOptions( options );
+
+            models = returned = add.apply( this, args );
+
+            if ( needsFakeEvent && models ) {
+                if ( !_.isArray( models ) ) models = [models];
+                models = _.difference( models, previousModels );
+
+                _.each( models, function ( model ) {
+                    onAdd( model, this, options );
+                }, this );
+            }
+
+            return returned;
+        };
+    }
+
+    function patchSilentRemove ( context ) {
+        var remove = context.remove;
+
+        context.remove = function () {
+            var returned, removed,
+
+                options = arguments[1] ? _.clone( arguments[1] ) : {},
+                isSilent = options && options.silent;
+
+            removed = returned = remove.apply( this, arguments );
+
+            if ( isSilent ) {
+                if ( !_.isArray( removed ) ) removed = [removed];
+
+                _.each( removed, function ( model ) {
+                    onRemove( model, this, options );
+                }, this );
+            }
+
+            return returned;
+        };
+    }
+
+    function patchSilentReset ( context ) {
+        var reset = context.reset,
+            onReset = context._pickyType === "Backbone.Select.One" ? onResetSingleSelect : onResetMultiSelect;
+
+        context.reset = function () {
+            var returned, fakeEventOptions,
+
+                args = _.toArray( arguments ),
+                options = args[1] ? _.clone( args[1] ) : {},
+                isSilent = options && options.silent;
+
+            options["@bbs:inReset"] = true;
+            args[1] = options;
+
+            if ( isSilent ) {
+                fakeEventOptions = _.clone( options );
+                fakeEventOptions.previousModels = this.models;
+            }
+
+            // The internal inReset option must be passed to the reset() call. It is needed when reset() delegates part
+            // of its work to add() with an internal (and silent) call. Unfortunately, for that reason, we can't keep
+            // inReset out of the visible options when the "reset" event is fired.
+            returned = reset.apply( this, args );
+
+            if ( isSilent ) onReset( this, fakeEventOptions );
+
+            return returned;
+        };
     }
 
     // Creates a new trigger method which calls the predefined event handlers (onDeselect etc) as well as triggering the

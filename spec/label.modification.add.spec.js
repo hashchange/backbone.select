@@ -462,6 +462,80 @@ describe( 'Custom labels: Adding models to a collection', function () {
 
                 } );
 
+                describe( 'Status: When adding the models to the collection, with options.silent enabled', function () {
+
+                    beforeEach( function () {
+                        selectOneCollection = new SelectOneCollection();
+                        selectOneCollection.add( m1, { silent: true } );
+                        selectOneCollection.add( m2, { silent: true } );
+                        selectOneCollection.add( m3, { silent: true } );
+                    } );
+
+                    afterEach( function () {
+                        selectOneCollection.close();
+                    } );
+
+                    describe( 'with each model changing only one selection ("selected" or "starred") at a time', function () {
+
+                        it( 'the last model for the "selected" label retains its status, the other is deselected', function () {
+                            expect( m1.selected ).toBe( false );
+                            expect( m2.selected ).toBe( true );
+                            expect( m3.selected ).toBeFalsy();
+                        } );
+
+                        it( 'the "selected" property of the collection is set to the last "selected" model', function () {
+                            expect( selectOneCollection.selected ).toBe( m2 );
+                        } );
+
+                        it( 'the last model for the "starred" label retains its status, the other is deselected', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m2.starred ).toBe( false );
+                            expect( m3.starred ).toBe( true );
+                        } );
+
+                        it( 'the "starred" property of the collection is set to the last "starred" model', function () {
+                            expect( selectOneCollection.starred ).toBe( m3 );
+                        } );
+
+                    } );
+
+                    describe( 'with the last model changing both selections ("selected" and "starred") at the same time', function () {
+                        var m4;
+
+                        beforeEach( function () {
+                            m4 = new Model();
+                            m4.select();
+                            m4.select( { label: "starred" } );
+
+                            selectOneCollection.add( m4, { silent: true } );
+                        } );
+
+                        it( 'the last model for the "selected" label retains its status, the other is deselected', function () {
+                            expect( m1.selected ).toBe( false );
+                            expect( m2.selected ).toBe( false );
+                            expect( m3.selected ).toBeFalsy();
+                            expect( m4.selected ).toBe( true );
+                        } );
+
+                        it( 'the "selected" property of the collection is set to the last "selected" model', function () {
+                            expect( selectOneCollection.selected ).toBe( m4 );
+                        } );
+
+                        it( 'the last model for the "starred" label retains its status, the other is deselected', function () {
+                            expect( m1.starred ).toBeFalsy();
+                            expect( m2.starred ).toBe( false );
+                            expect( m3.starred ).toBe( false );
+                            expect( m4.starred ).toBe( true );
+                        } );
+
+                        it( 'the "starred" property of the collection is set to the last "starred" model', function () {
+                            expect( selectOneCollection.starred ).toBe( m4 );
+                        } );
+
+                    } );
+
+                } );
+
                 describe( 'Events', function () {
 
                     describe( 'When adding a model which is "starred"', function () {
@@ -537,6 +611,41 @@ describe( 'Custom labels: Adding models to a collection', function () {
 
                             it( "should not trigger a reselect:one event, including any of the namespaces", function () {
                                 expect( events.get( selectOneCollection, "reselect:one:*" ) ).not.toHaveBeenCalled();
+                            } );
+
+                        } );
+
+                    } );
+
+                    describe( 'When adding a model which is "starred", with options.silent enabled', function () {
+                        var events;
+
+                        beforeEach( function () {
+                            selectOneCollection = new SelectOneCollection( [m1, m2] );
+
+                            events = getEventSpies( [m1, m2, m3, selectOneCollection ], ["selected", "starred"] );
+
+                            selectOneCollection.add( m3, { silent: true } );
+                        } );
+
+                        afterEach( function () {
+                            selectOneCollection.close();
+                        } );
+
+                        describe( 'model events', function () {
+
+                            it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                                expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            } );
+
+                        } );
+
+                        describe( 'collection events', function () {
+
+                            it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                                expect( events.get( selectOneCollection, "*" ) ).not.toHaveBeenCalled();
                             } );
 
                         } );
@@ -652,6 +761,45 @@ describe( 'Custom labels: Adding models to a collection', function () {
 
                     } );
 
+                    describe( 'When adding a model which is both "selected" and "starred", with options.silent enabled', function () {
+                        var m4, events;
+
+                        beforeEach( function () {
+                            m4 = new Model();
+                            m4.select();
+                            m4.select( { label: "starred" } );
+
+                            selectOneCollection = new SelectOneCollection( [m1, m2, m3] );
+                            events = getEventSpies( [m1, m2, m3, m4, selectOneCollection ], ["selected", "starred"] );
+
+                            selectOneCollection.add( m4, { silent: true } );
+                        } );
+
+                        afterEach( function () {
+                            selectOneCollection.close();
+                        } );
+
+                        describe( 'model events', function () {
+
+                            it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                                expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                            } );
+
+                        } );
+
+                        describe( 'collection events', function () {
+
+                            it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                                expect( events.get( selectOneCollection, "*" ) ).not.toHaveBeenCalled();
+                            } );
+
+                        } );
+
+                    } );
+
                 } );
 
             } );
@@ -670,6 +818,45 @@ describe( 'Custom labels: Adding models to a collection', function () {
                         selectManyCollection.add( m1 );
                         selectManyCollection.add( m2 );
                         selectManyCollection.add( m3 );
+                    } );
+
+                    afterEach( function () {
+                        selectManyCollection.close();
+                    } );
+
+                    it( 'all models retain their status for the "selected" label', function () {
+                        expect( m1.selected ).toBe( true );
+                        expect( m2.selected ).toBe( true );
+                        expect( m3.selected ).toBeFalsy();
+                    } );
+
+                    it( 'the "selected" property of the collection contains the "selected" models', function () {
+                        expected[m1.cid] = m1;
+                        expected[m2.cid] = m2;
+                        expect( selectManyCollection.selected ).toEqual( expected );
+                    } );
+
+                    it( 'all models retain their status for the "starred" label', function () {
+                        expect( m1.starred ).toBeFalsy();
+                        expect( m2.starred ).toBe( true );
+                        expect( m3.starred ).toBe( true );
+                    } );
+
+                    it( 'the "starred" property of the collection contains the "starred" models', function () {
+                        expected[m2.cid] = m2;
+                        expected[m3.cid] = m3;
+                        expect( selectManyCollection.starred ).toEqual( expected );
+                    } );
+
+                } );
+
+                describe( 'Status: When adding the models to the collection, with options.silent enabled', function () {
+
+                    beforeEach( function () {
+                        selectManyCollection = new SelectManyCollection();
+                        selectManyCollection.add( m1, { silent: true } );
+                        selectManyCollection.add( m2, { silent: true } );
+                        selectManyCollection.add( m3, { silent: true } );
                     } );
 
                     afterEach( function () {
@@ -777,6 +964,41 @@ describe( 'Custom labels: Adding models to a collection', function () {
 
                     } );
 
+                    describe( 'When adding a model which is "starred", with options.silent enabled', function () {
+                        var events;
+
+                        beforeEach( function () {
+                            selectManyCollection = new SelectManyCollection( [m1, m2] );
+
+                            events = getEventSpies( [m1, m2, m3, selectManyCollection ], ["selected", "starred"] );
+
+                            selectManyCollection.add( m3, { silent: true } );
+                        } );
+
+                        afterEach( function () {
+                            selectManyCollection.close();
+                        } );
+
+                        describe( 'model events', function () {
+
+                            it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                                expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                            } );
+
+                        } );
+
+                        describe( 'collection events', function () {
+
+                            it( 'should not trigger a selection-related event, including for any of the namespaces', function () {
+                                expect( events.get( selectManyCollection, "*" ) ).not.toHaveBeenCalled();
+                            } );
+
+                        } );
+
+                    } );
+
                     describe( 'When adding a model which is both "selected" and "starred"', function () {
                         var m4, events;
 
@@ -864,6 +1086,45 @@ describe( 'Custom labels: Adding models to a collection', function () {
 
                             it( "should not trigger a reselect:any event, including any of the namespaces", function () {
                                 expect( events.get( selectManyCollection, "reselect:any:*" ) ).not.toHaveBeenCalled();
+                            } );
+
+                        } );
+
+                    } );
+
+                    describe( 'When adding a model which is both "selected" and "starred", with options.silent enabled', function () {
+                        var m4, events;
+
+                        beforeEach( function () {
+                            m4 = new Model();
+                            m4.select();
+                            m4.select( { label: "starred" } );
+
+                            selectManyCollection = new SelectManyCollection( [m1, m2, m3] );
+                            events = getEventSpies( [m1, m2, m3, m4, selectManyCollection ], ["selected", "starred"] );
+
+                            selectManyCollection.add( m4, { silent: true } );
+                        } );
+
+                        afterEach( function () {
+                            selectManyCollection.close();
+                        } );
+
+                        describe( 'model events', function () {
+
+                            it( 'should not trigger a selection-related event, including for any of the namespaces, for any model', function () {
+                                expect( events.get( m1, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m2, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m3, "*" ) ).not.toHaveBeenCalled();
+                                expect( events.get( m4, "*" ) ).not.toHaveBeenCalled();
+                            } );
+
+                        } );
+
+                        describe( 'collection events', function () {
+
+                            it( "should not trigger a selection-related event, including for any of the namespaces", function () {
+                                expect( events.get( selectManyCollection, "*" ) ).not.toHaveBeenCalled();
                             } );
 
                         } );
