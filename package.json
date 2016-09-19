@@ -60,11 +60,13 @@
     "karma-jasmine-matchers": "~3.0.1",
     "karma-opera-launcher": "~1.0.0",
     "karma-phantomjs-launcher": "~1.0.2",
+    "karma-qunit": "^1.2.0",
     "karma-requirejs": "~1.0.0",
     "karma-safari-launcher": "1.0.0",
     "karma-script-launcher": "~1.0.0",
     "karma-slimerjs-launcher": "~1.1.0",
     "phantomjs-prebuilt": "^2.1.12",
+    "qunitjs": "^2.0.1",
     "require-from-string": "^1.2.0",
     "requirejs": "^2.3.1"
   }

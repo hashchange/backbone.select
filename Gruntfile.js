@@ -131,17 +131,16 @@ module.exports = function(grunt) {
 
     karma: {
       options: {
-        configFile: 'karma.conf.js',
         browsers: ['PhantomJS'],
+        reporters: ['progress'],
+        singleRun: true,
         port: KARMA_PORT
       },
-      test: {
-        reporters: ['progress'],
-        singleRun: true
+      "test-select": {
+        configFile: 'karma.conf.js'
       },
-      build: {
-        reporters: ['progress'],
-        singleRun: true
+      "test-backbone": {
+         configFile: 'karma.backbone.conf.js'
       }
     },
 
@@ -348,11 +347,13 @@ module.exports = function(grunt) {
 
   grunt.registerTask('lint', ['jshint:components']);
   grunt.registerTask('hint', ['jshint:components']);        // alias
-  grunt.registerTask('test', ['jshint:components', 'karma:test']);
+  grunt.registerTask('test', ['jshint:components', 'karma']);
+  grunt.registerTask('test-select', ['jshint:components', 'karma:test-select']);
+  grunt.registerTask('test-backbone', ['jshint:components', 'karma:test-backbone']);
   grunt.registerTask('webtest', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:testNoReload']);
   grunt.registerTask('interactive', ['preprocess:interactive', 'sails-linker:interactive_spec', 'connect:test', 'watch:livereloadTest']);
   grunt.registerTask('demo', ['connect:demo', 'focus:demo']);
-  grunt.registerTask('build', ['jshint:components', 'karma:build', 'preprocess:build', 'concat', 'uglify', 'jshint:concatenated', 'requirejs']);
+  grunt.registerTask('build', ['jshint:components', 'karma', 'preprocess:build', 'concat', 'uglify', 'jshint:concatenated', 'requirejs']);
   grunt.registerTask('ci', ['build', 'watch:build']);
   grunt.registerTask('setver', ['replace:version']);
   grunt.registerTask('getver', function () {
@@ -364,6 +365,10 @@ module.exports = function(grunt) {
 
   // Special tasks, not mentioned in Readme documentation:
   //
+  // - test-backbone:
+  //   runs a (modified) selection of Backbone unit tests for checking compliance with the Backbone spec
+  // - test-select:
+  //   runs the Backbone.Select test suite, without the Backbone unit tests (ie, without the test-backbone task)
   // - requirejs:
   //   creates build files for the AMD demo with r.js
   // - build-dirty:
