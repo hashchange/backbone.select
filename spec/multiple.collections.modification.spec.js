@@ -1,22 +1,6 @@
 describe( "models shared between multiple collections: adding and removing models with add(), remove(), reset(), and while instantiating", function () {
 
-    var Model = Backbone.Model.extend( {
-        initialize: function () {
-            Backbone.Select.Me.applyTo( this );
-        }
-    } );
-
-    var SingleSelectCollection = Backbone.Collection.extend( {
-        initialize: function ( models ) {
-            Backbone.Select.One.applyTo( this, models );
-        }
-    } );
-
-    var MultiSelectCollection = Backbone.Collection.extend( {
-        initialize: function ( models ) {
-            Backbone.Select.Many.applyTo( this, models );
-        }
-    } );
+    var Model, SingleSelectCollection, MultiSelectCollection;
 
     beforeAll( function () {
         limitJasmineRecursiveScreenOutput();
@@ -24,6 +8,28 @@ describe( "models shared between multiple collections: adding and removing model
 
     afterAll( function () {
         restoreJasmineRecursiveScreenOutput();
+    } );
+
+    beforeEach( function () {
+
+        Model = Backbone.Model.extend( {
+            initialize: function () {
+                Backbone.Select.Me.applyTo( this );
+            }
+        } );
+
+        SingleSelectCollection = Backbone.Collection.extend( {
+            initialize: function ( models ) {
+                Backbone.Select.One.applyTo( this, models );
+            }
+        } );
+
+        MultiSelectCollection = Backbone.Collection.extend( {
+            initialize: function ( models ) {
+                Backbone.Select.Many.applyTo( this, models );
+            }
+        } );
+
     } );
 
     describe( "when creating additional collections with a model that is already selected", function () {
@@ -486,6 +492,561 @@ describe( "models shared between multiple collections: adding and removing model
 
         it( 'should not trigger an event on another multi-select collection holding the model', function () {
             singleCollectionA.add( model2, { silent: true } );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+    } );
+
+    describe( "when a selected model is added with set()", function () {
+        var model1, model2, model3, model4, model5,
+            singleCollectionA, singleCollectionB, multiCollectionA;
+
+        beforeEach( function () {
+            model1 = new Model();
+            model2 = new Model();
+            model3 = new Model();
+            model4 = new Model();
+
+            singleCollectionA = new SingleSelectCollection( [model1] );
+            multiCollectionA = new MultiSelectCollection( [model1, model2, model3] );
+
+            model1.select();
+            model2.select();
+            model3.select();
+            model4.select();
+
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( model3, "trigger" ).and.callThrough();
+            spyOn( model4, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            if ( singleCollectionB ) singleCollectionB.close();
+            multiCollectionA.close();
+        } );
+
+        it( "should be selected in a single-select collection it is added to", function () {
+            singleCollectionA.set( model2 );
+            expect( singleCollectionA.selected ).toBe( model2 );
+        } );
+
+        it( "should deselect any previously selected model in a single-select collection", function () {
+            singleCollectionA.set( model2 );
+            expect( model1.selected ).toBe( false );
+        } );
+
+        it( "should be added to the selected models in a multi-select collection", function () {
+            multiCollectionA.set( model4 );
+            expect( multiCollectionA.selected[model4.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should deselect other selected models in a multi-select collection if they are shared with the single-select collection the new model is added to", function () {
+            singleCollectionA.set( model2 );
+            expect( multiCollectionA.selected[model1.cid] ).toBeUndefined();
+        } );
+
+        it( "should leave other selected models untouched in a multi-select collection, provided they are not shared with the single-select collection the new model is added to", function () {
+            singleCollectionA.set( model2 );
+            expect( multiCollectionA.selected[model3.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should remain selected itself", function () {
+            singleCollectionA.set( model2 );
+            expect( model2.selected ).toBe( true );
+        } );
+
+        it( 'should not trigger a selected event on the model when added to a single-select collection', function () {
+            singleCollectionA.set( model2 );
+            expect( model2.trigger ).not.toHaveBeenCalledWithInitial( "selected" );
+        } );
+
+        it( 'should not trigger a reselected event on the model when added to a single-select collection', function () {
+            // The reselect event implies some sort of active 'select' action. Simply
+            // registering the model status in the new collection does not belong into
+            // that category. It does not reflect the action of a user reaffirming a
+            // selection.
+            singleCollectionA.set( model2 );
+            expect( model2.trigger ).not.toHaveBeenCalledWithInitial( "reselected" );
+        } );
+
+        it( 'should not trigger a selected event on the model when added to a multi-select collection', function () {
+            multiCollectionA.set( model4 );
+            expect( model4.trigger ).not.toHaveBeenCalledWithInitial( "selected" );
+        } );
+
+        it( 'should not trigger a reselected event on the model when added to a multi-select collection', function () {
+            // See the comment above for the rationale.
+            multiCollectionA.set( model4 );
+            expect( model4.trigger ).not.toHaveBeenCalledWithInitial( "reselected" );
+        } );
+
+        it( 'should trigger a deselected event on the previously selected model when added to a single-select collection', function () {
+            singleCollectionA.set( model2 );
+            expect( model1.trigger ).toHaveBeenCalledWith( "deselected", model1, { label: "selected" } );
+        } );
+
+        it( 'should not trigger a deselected event on a previously selected model when added to a multi-select collection, as long as old and new models are not shared with a single-select collection', function () {
+            // ... in which case only one of them can remain selected, of course. See test below.
+            multiCollectionA.set( model4 );
+            expect( model1.trigger ).not.toHaveBeenCalledWithInitial( "deselected" );
+        } );
+
+        it( 'should trigger a select:one event when added to a single-select collection', function () {
+            singleCollectionA.set( model2 );
+            expect( singleCollectionA.trigger ).toHaveBeenCalledWithInitial( "select:one", model2, singleCollectionA );
+            // or (full signature)
+            // expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "select:one", model2, singleCollectionA, { label: "selected", _externalEvent: "add" } );
+        } );
+
+        it( 'should trigger a deselect:one event when added to a single-select collection', function () {
+            singleCollectionA.set( model2 );
+            expect( singleCollectionA.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model1, singleCollectionA );
+            // or (full signature)
+            // expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "deselect:one", model1, singleCollectionA, { label: "selected", _externalEvent: "add" } );
+        } );
+
+        it( 'should not trigger a reselect:one event when added to a single-select collection', function () {
+            singleCollectionA.set( model2 );
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:one" );
+        } );
+
+        it( 'should trigger a select:some or select:all event when added to a multi-select collection', function () {
+            multiCollectionA.set( model4 );
+            expect( multiCollectionA.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [model4], deselected: [] }, multiCollectionA );
+            // or (full signature)
+            // expect( multiCollectionA.trigger ).toHaveBeenCalledWith( "select:all", { selected: [model4], deselected: [] }, multiCollectionA, { label: "selected", _externalEvent: "add" } );
+        } );
+
+        it( 'should not trigger a reselect:any event when added to a multi-select collection', function () {
+            multiCollectionA.set( model4 );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+        } );
+
+        it( 'should trigger a select:some or select:none event when the addition is inducing a deselection in another multi-select collection', function () {
+            singleCollectionA.set( model2 );
+            expect( multiCollectionA.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [model1] }, multiCollectionA, { label: "selected" } );
+        } );
+
+        it( 'should not trigger a select:all, select:some or select:none event when the addition does not deselect a model in another multi-select collection', function () {
+            model5 = new Model();
+            singleCollectionB = new SingleSelectCollection( [model5] );
+            model5.select();
+
+            singleCollectionB.set( model2 );
+
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "select:none" );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "select:some" );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
+        } );
+
+        it( 'should not trigger a reselect:one event on another single-select collection holding the model', function () {
+            singleCollectionB = new SingleSelectCollection();
+            singleCollectionB.set( model1 );
+
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:one" );
+        } );
+
+        it( 'should not trigger a reselect:any event on another multi-select collection holding the model', function () {
+            singleCollectionA.set( model2 );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+        } );
+
+    } );
+
+    describe( "when a selected model is added with set(), with options.silent enabled", function () {
+        var model1, model2, model3, model4, model5,
+            singleCollectionA, singleCollectionB, multiCollectionA;
+
+        beforeEach( function () {
+            model1 = new Model();
+            model2 = new Model();
+            model3 = new Model();
+            model4 = new Model();
+
+            singleCollectionA = new SingleSelectCollection( [model1] );
+            multiCollectionA = new MultiSelectCollection( [model1, model2, model3] );
+
+            model1.select();
+            model2.select();
+            model3.select();
+            model4.select();
+
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( model3, "trigger" ).and.callThrough();
+            spyOn( model4, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            if ( singleCollectionB ) singleCollectionB.close();
+            multiCollectionA.close();
+        } );
+
+        it( "should be selected in a single-select collection it is added to", function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( singleCollectionA.selected ).toBe( model2 );
+        } );
+
+        it( "should deselect any previously selected model in a single-select collection", function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( model1.selected ).toBe( false );
+        } );
+
+        it( "should be added to the selected models in a multi-select collection", function () {
+            multiCollectionA.set( model4, { silent: true } );
+            expect( multiCollectionA.selected[model4.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should deselect other selected models in a multi-select collection if they are shared with the single-select collection the new model is added to", function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( multiCollectionA.selected[model1.cid] ).toBeUndefined();
+        } );
+
+        it( "should leave other selected models untouched in a multi-select collection, provided they are not shared with the single-select collection the new model is added to", function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( multiCollectionA.selected[model3.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should remain selected itself", function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( model2.selected ).toBe( true );
+        } );
+
+        it( 'should not trigger an event on the model when added to a single-select collection', function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( model2.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger an event on the model when added to a multi-select collection', function () {
+            multiCollectionA.set( model4, { silent: true } );
+            expect( model4.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger an event on the previously selected model when added to a single-select collection', function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger an event on a previously selected model when added to a multi-select collection, as long as old and new models are not shared with a single-select collection', function () {
+            // ... in which case only one of them can remain selected, of course. See test below for that.
+            multiCollectionA.set( model4, { silent: true } );
+            expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger a single-select collection event when added to a single-select collection', function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger a multi-select collection event when added to a multi-select collection', function () {
+            multiCollectionA.set( model4, { silent: true } );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger a multi-select collection event when the addition is inducing a deselection in another multi-select collection', function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger a multi-select collection event when the addition does not deselect a model in another multi-select collection', function () {
+            model5 = new Model();
+            singleCollectionB = new SingleSelectCollection( [model5] );
+            model5.select();
+
+            singleCollectionB.set( model2, { silent: true } );
+
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger an event on another single-select collection holding the model', function () {
+            singleCollectionB = new SingleSelectCollection();
+            singleCollectionB.set( model1, { silent: true } );
+
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger an event on another multi-select collection holding the model', function () {
+            singleCollectionA.set( model2, { silent: true } );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+    } );
+
+    describe( "when a selected model is added with create()", function () {
+
+        // NB In order to create a model **selected**, we need to use a model type which self-selects in initialize().
+
+        var originalBackboneAjax,
+            model1, model2, model3,
+            singleCollectionA, singleCollectionB, multiCollectionA;
+
+        beforeAll( function () {
+            originalBackboneAjax = Backbone.ajax;
+            Backbone.ajax = function () {};
+        } );
+
+        afterAll( function () {
+            Backbone.ajax = originalBackboneAjax;
+        } );
+
+        beforeEach( function () {
+            var SelfSelectingModel = Model.extend( {
+
+                initialize: function () {
+                    Backbone.Select.Me.applyTo( this );
+                    spyOn( this, "trigger" ).and.callThrough();
+                    this.select();
+                },
+
+                urlRoot: "/"
+
+            } );
+
+            model1 = new Model();
+            model2 = new Model();
+            model3 = new Model();
+
+            singleCollectionA = new SingleSelectCollection( [model1], { model: SelfSelectingModel } );
+            multiCollectionA = new MultiSelectCollection( [model1, model2, model3], { model: SelfSelectingModel } );
+
+            model1.select();
+            model2.select();
+            model3.select();
+
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( model3, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            if ( singleCollectionB ) singleCollectionB.close();
+            multiCollectionA.close();
+        } );
+
+        it( "should be selected in a single-select collection it is created in", function () {
+            var createdModel = singleCollectionA.create( {} );
+            expect( singleCollectionA.selected ).toBe( createdModel );
+        } );
+
+        it( "should deselect any previously selected model in a single-select collection", function () {
+            singleCollectionA.create( {} );
+            expect( model1.selected ).toBe( false );
+        } );
+
+        it( "should be added to the selected models in a multi-select collection", function () {
+            var createdModel = multiCollectionA.create( {} );
+            expect( multiCollectionA.selected[createdModel.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should deselect other selected models in a multi-select collection if they are shared with the single-select collection the new model is created in", function () {
+            singleCollectionA.create( {} );
+            expect( multiCollectionA.selected[model1.cid] ).toBeUndefined();
+        } );
+
+        it( "should leave other selected models untouched in a multi-select collection, provided they are not shared with the single-select collection the new model is created in", function () {
+            singleCollectionA.create( {} );
+            expect( multiCollectionA.selected[model3.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should remain selected itself", function () {
+            var createdModel = singleCollectionA.create( {} );
+            expect( createdModel.selected ).toBe( true );
+        } );
+
+        it( 'should trigger a selected event on the model when created in a single-select collection', function () {
+            var createdModel = singleCollectionA.create( {} );
+            expect( createdModel.trigger ).toHaveBeenCalledWithInitial( "selected", createdModel );
+        } );
+
+        it( 'should not trigger a reselected event on the model when created a single-select collection', function () {
+            var createdModel = singleCollectionA.create( {} );
+            expect( createdModel.trigger ).not.toHaveBeenCalledWithInitial( "reselected" );
+        } );
+
+        it( 'should trigger a selected event on the model when created in a multi-select collection', function () {
+            var createdModel = multiCollectionA.create( {} );
+            expect( createdModel.trigger ).toHaveBeenCalledWithInitial( "selected", createdModel );
+        } );
+
+        it( 'should not trigger a reselected event on the model when created in a multi-select collection', function () {
+            var createdModel = multiCollectionA.create( {} );
+            expect( createdModel.trigger ).not.toHaveBeenCalledWithInitial( "reselected" );
+        } );
+
+        it( 'should trigger a deselected event on the previously selected model when created in a single-select collection', function () {
+            singleCollectionA.create( {} );
+            expect( model1.trigger ).toHaveBeenCalledWith( "deselected", model1, { label: "selected" } );
+        } );
+
+        it( 'should not trigger a deselected event on a previously selected model when created in a multi-select collection', function () {
+            multiCollectionA.create( {} );
+            expect( model1.trigger ).not.toHaveBeenCalledWithInitial( "deselected" );
+        } );
+
+        it( 'should trigger a select:one event when created in a single-select collection', function () {
+            var createdModel = singleCollectionA.create( {} );
+            expect( singleCollectionA.trigger ).toHaveBeenCalledWithInitial( "select:one", createdModel, singleCollectionA );
+            // or (full signature)
+            // expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "select:one", createdModel, singleCollectionA, { label: "selected", _externalEvent: "add" } );
+        } );
+
+        it( 'should trigger a deselect:one event when created in a single-select collection', function () {
+            singleCollectionA.create( {} );
+            expect( singleCollectionA.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model1, singleCollectionA );
+            // or (full signature)
+            // expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "deselect:one", model1, singleCollectionA, { label: "selected", _externalEvent: "add" } );
+        } );
+
+        it( 'should not trigger a reselect:one event when created in a single-select collection', function () {
+            singleCollectionA.create( {} );
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:one" );
+        } );
+
+        it( 'should trigger a select:some or select:all event when created in a multi-select collection', function () {
+            var createdModel = multiCollectionA.create( {} );
+            expect( multiCollectionA.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [createdModel], deselected: [] }, multiCollectionA );
+            // or (full signature)
+            // expect( multiCollectionA.trigger ).toHaveBeenCalledWith( "select:all", { selected: [createdModel], deselected: [] }, multiCollectionA, { label: "selected", _externalEvent: "add" } );
+        } );
+
+        it( 'should not trigger a reselect:any event when created in a multi-select collection', function () {
+            multiCollectionA.create( {} );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
+        } );
+
+        it( 'should trigger a select:some or select:none event when the model creation is inducing a deselection in another multi-select collection', function () {
+            singleCollectionA.create( {} );
+            expect( multiCollectionA.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [model1] }, multiCollectionA, { label: "selected" } );
+        } );
+
+    } );
+
+    describe( "when a selected model is added with create(), with options.silent enabled", function () {
+
+        // NB In order to create a model **selected**, we need to use a model type which self-selects in initialize().
+
+        var originalBackboneAjax,
+            model1, model2, model3,
+            singleCollectionA, singleCollectionB, multiCollectionA;
+
+        beforeAll( function () {
+            originalBackboneAjax = Backbone.ajax;
+            Backbone.ajax = function () {};
+        } );
+
+        afterAll( function () {
+            Backbone.ajax = originalBackboneAjax;
+        } );
+
+        beforeEach( function () {
+            var SelfSelectingModel = Model.extend( {
+
+                initialize: function () {
+                    Backbone.Select.Me.applyTo( this );
+                    spyOn( this, "trigger" ).and.callThrough();
+                    this.select();
+                },
+
+                urlRoot: "/"
+
+            } );
+
+            model1 = new Model();
+            model2 = new Model();
+            model3 = new Model();
+
+            singleCollectionA = new SingleSelectCollection( [model1], { model: SelfSelectingModel } );
+            multiCollectionA = new MultiSelectCollection( [model1, model2, model3], { model: SelfSelectingModel } );
+
+            model1.select();
+            model2.select();
+            model3.select();
+
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( model3, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            singleCollectionA.close();
+            if ( singleCollectionB ) singleCollectionB.close();
+            multiCollectionA.close();
+        } );
+
+        it( "should be selected in a single-select collection it is created in", function () {
+            var createdModel = singleCollectionA.create( {}, { silent: true } );
+            expect( singleCollectionA.selected ).toBe( createdModel );
+        } );
+
+        it( "should deselect any previously selected model in a single-select collection", function () {
+            singleCollectionA.create( {}, { silent: true } );
+            expect( model1.selected ).toBe( false );
+        } );
+
+        it( "should be added to the selected models in a multi-select collection", function () {
+            var createdModel = multiCollectionA.create( {}, { silent: true } );
+            expect( multiCollectionA.selected[createdModel.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should deselect other selected models in a multi-select collection if they are shared with the single-select collection the new model is created in", function () {
+            singleCollectionA.create( {}, { silent: true } );
+            expect( multiCollectionA.selected[model1.cid] ).toBeUndefined();
+        } );
+
+        it( "should leave other selected models untouched in a multi-select collection, provided they are not shared with the single-select collection the new model is created in", function () {
+            singleCollectionA.create( {}, { silent: true } );
+            expect( multiCollectionA.selected[model3.cid] ).not.toBeUndefined();
+        } );
+
+        it( "should remain selected itself", function () {
+            var createdModel = singleCollectionA.create( {}, { silent: true } );
+            expect( createdModel.selected ).toBe( true );
+        } );
+
+        it( 'should not trigger an event on the model when created in a single-select collection', function () {
+            var createdModel = singleCollectionA.create( {}, { silent: true } );
+            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger an event on the model when created in a multi-select collection', function () {
+            var createdModel = multiCollectionA.create( {}, { silent: true } );
+            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger an event on the previously selected model when created in a single-select collection', function () {
+            singleCollectionA.create( {}, { silent: true } );
+            expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger an event on a previously selected model when created in a multi-select collection', function () {
+            multiCollectionA.create( {}, { silent: true } );
+            expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger a single-select collection event when created in a single-select collection', function () {
+            singleCollectionA.create( {}, { silent: true } );
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger a multi-select collection event when created in a multi-select collection', function () {
+            multiCollectionA.create( {}, { silent: true } );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+        it( 'should not trigger a multi-select collection event when the model creation is inducing a deselection in another multi-select collection', function () {
+            singleCollectionA.create( {}, { silent: true } );
             expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
         } );
 
@@ -1376,6 +1937,156 @@ describe( "models shared between multiple collections: adding and removing model
             } );
         } );
 
+        describe( 'when a selected model is added with set()', function () {
+            var model1, model2, model3, singleCollectionA, multiCollectionA;
+
+            beforeEach( function () {
+                Model = Model.extend( {
+                    onDeselect: function ( model, options ) {
+                        this.externalEventOnDeselect = options && options._externalEvent;
+                    }
+                } );
+
+                MultiSelectCollection = MultiSelectCollection.extend( {
+                    onSelectSome: function ( diff, collection, options ) {
+                        this.externalEventOnSelectSome = options && options._externalEvent;
+                    }
+                } );
+
+                model1 = new Model();
+                model2 = new Model();
+                model3 = new Model();
+
+                singleCollectionA = new SingleSelectCollection( [model1] );
+                multiCollectionA = new MultiSelectCollection( [model1, model2] );
+
+                model1.select();
+                model2.select();
+                model3.select();
+
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
+            } );
+
+            it( 'should set _externalEvent: "add" in the select:one event when added to a single-select collection', function () {
+                singleCollectionA.set( model2 );
+                expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "select:one", model2, singleCollectionA, { _externalEvent: "add", label: "selected" } );
+            } );
+
+            it( 'should set _externalEvent: "add" in the deselect:one event when added to a single-select collection', function () {
+                singleCollectionA.set( model2 );
+                expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "deselect:one", model1, singleCollectionA, { _externalEvent: "add", label: "selected" } );
+            } );
+
+            it( 'should not propagate the _externalEvent: "add" option to the deselected model when added to a single-select collection', function () {
+                singleCollectionA.set( model2 );
+                expect( model1.externalEventOnDeselect ).toBeUndefined();
+            } );
+
+            it( 'should set _externalEvent: "add" in the select:some or select:all event when added to a multi-select collection', function () {
+                multiCollectionA.set( model3 );
+                expect( multiCollectionA.trigger ).toHaveBeenCalledWith( "select:all", { selected: [model3], deselected: [] }, multiCollectionA, { _externalEvent: "add", label: "selected" } );
+            } );
+
+            it( 'should not propagate the _externalEvent: "add" option to another collection when the addition is inducing a deselection there', function () {
+                singleCollectionA.set( model2 );
+                expect( multiCollectionA.externalEventOnSelectSome ).toBeUndefined();
+            } );
+        } );
+
+        describe( 'when a selected model is added with create()', function () {
+
+            // NB In order to create a model **selected**, we need to use a model type which self-selects in initialize().
+
+            var originalBackboneAjax,
+                model1, model2,
+                singleCollectionA, multiCollectionA;
+
+            beforeAll( function () {
+                originalBackboneAjax = Backbone.ajax;
+                Backbone.ajax = function () {};
+            } );
+
+            afterAll( function () {
+                Backbone.ajax = originalBackboneAjax;
+            } );
+
+            beforeEach( function () {
+                var SelfSelectingModel;
+
+                Model = Model.extend( {
+                    onDeselect: function ( model, options ) {
+                        this.externalEventOnDeselect = options && options._externalEvent;
+                    }
+                } );
+
+                SelfSelectingModel = Model.extend( {
+
+                    initialize: function () {
+                        Backbone.Select.Me.applyTo( this );
+                        spyOn( this, "trigger" ).and.callThrough();
+                        this.select();
+                    },
+
+                    urlRoot: "/"
+
+                } );
+
+                MultiSelectCollection = MultiSelectCollection.extend( {
+                    onSelectSome: function ( diff, collection, options ) {
+                        this.externalEventOnSelectSome = options && options._externalEvent;
+                    }
+                } );
+
+                model1 = new Model();
+                model2 = new Model();
+
+                singleCollectionA = new SingleSelectCollection( [model1], { model: SelfSelectingModel } );
+                multiCollectionA = new MultiSelectCollection( [model1, model2], { model: SelfSelectingModel } );
+
+                model1.select();
+                model2.select();
+
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
+            } );
+
+            it( 'should set _externalEvent: "add" in the select:one event when created in a single-select collection', function () {
+                var createdModel = singleCollectionA.create( {} );
+                expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "select:one", createdModel, singleCollectionA, { _externalEvent: "add", label: "selected" } );
+            } );
+
+            it( 'should set _externalEvent: "add" in the deselect:one event when created in a single-select collection', function () {
+                singleCollectionA.create( {} );
+                expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "deselect:one", model1, singleCollectionA, { _externalEvent: "add", label: "selected" } );
+            } );
+
+            it( 'should not propagate the _externalEvent: "add" option to the deselected model when created in a single-select collection', function () {
+                singleCollectionA.create( {} );
+                expect( model1.externalEventOnDeselect ).toBeUndefined();
+            } );
+
+            it( 'should set _externalEvent: "add" in the select:some or select:all event when created in a multi-select collection', function () {
+                var createdModel = multiCollectionA.create( {} );
+                expect( multiCollectionA.trigger ).toHaveBeenCalledWith( "select:all", { selected: [createdModel], deselected: [] }, multiCollectionA, { _externalEvent: "add", label: "selected" } );
+            } );
+
+            it( 'should not propagate the _externalEvent: "add" option to another collection when the model creation is inducing a deselection there', function () {
+                singleCollectionA.create( {} );
+                expect( multiCollectionA.externalEventOnSelectSome ).toBeUndefined();
+            } );
+        } );
+
         describe( 'when a selected model is removed', function () {
             var model1, model2,
                 singleCollectionA, multiCollectionA;
@@ -1457,16 +2168,31 @@ describe( "models shared between multiple collections: adding and removing model
 
     describe( 'registering and unregistering a collection with models', function () {
 
+        var originalBackboneAjax;
+
+        beforeAll( function () {
+            originalBackboneAjax = Backbone.ajax;
+            Backbone.ajax = function () {};
+        } );
+
+        afterAll( function () {
+            Backbone.ajax = originalBackboneAjax;
+        } );
+
         describe( 'A single-select collection', function () {
 
             var model1, model2, model3, models, collection;
 
             beforeEach( function () {
+                SingleSelectCollection = SingleSelectCollection.extend( {
+                    url: "/"
+                } );
+
                 model1 = new Model();
                 model2 = new Model();
                 model3 = new Model();
 
-                models = [ model1, model2, model3];
+                models = [model1, model2, model3];
 
                 model2.select();
 
@@ -1501,6 +2227,42 @@ describe( "models shared between multiple collections: adding and removing model
                     expect( model1._pickyCollections ).toContain( collection._pickyCid );
                     expect( model2._pickyCollections ).toContain( collection._pickyCid );
                     expect( model3._pickyCollections ).toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are added with set()', function () {
+                    collection.set( models );
+
+                    expect( model1._pickyCollections ).toContain( collection._pickyCid );
+                    expect( model2._pickyCollections ).toContain( collection._pickyCid );
+                    expect( model3._pickyCollections ).toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are added with set(), with options.silent enabled', function () {
+                    collection.set( models, { silent: true } );
+
+                    expect( model1._pickyCollections ).toContain( collection._pickyCid );
+                    expect( model2._pickyCollections ).toContain( collection._pickyCid );
+                    expect( model3._pickyCollections ).toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are added with create()', function () {
+                    var createdModel1 = collection.create( {} ),
+                        createdModel2 = collection.create( {} ),
+                        createdModel3 = collection.create( {} );
+
+                    expect( createdModel1._pickyCollections ).toContain( collection._pickyCid );
+                    expect( createdModel2._pickyCollections ).toContain( collection._pickyCid );
+                    expect( createdModel3._pickyCollections ).toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are added with create(), with options.silent enabled', function () {
+                    var createdModel1 = collection.create( {}, { silent: true } ),
+                        createdModel2 = collection.create( {}, { silent: true } ),
+                        createdModel3 = collection.create( {}, { silent: true } );
+
+                    expect( createdModel1._pickyCollections ).toContain( collection._pickyCid );
+                    expect( createdModel2._pickyCollections ).toContain( collection._pickyCid );
+                    expect( createdModel3._pickyCollections ).toContain( collection._pickyCid );
                 } );
 
                 it( 'when the models are passed in with a reset', function () {
@@ -1586,11 +2348,15 @@ describe( "models shared between multiple collections: adding and removing model
             var model1, model2, model3, models, collection;
 
             beforeEach( function () {
+                MultiSelectCollection = MultiSelectCollection.extend( {
+                    url: "/"
+                } );
+                
                 model1 = new Model();
                 model2 = new Model();
                 model3 = new Model();
 
-                models = [ model1, model2, model3];
+                models = [model1, model2, model3];
 
                 model2.select();
 
@@ -1625,6 +2391,42 @@ describe( "models shared between multiple collections: adding and removing model
                     expect( model1._pickyCollections ).toContain( collection._pickyCid );
                     expect( model2._pickyCollections ).toContain( collection._pickyCid );
                     expect( model3._pickyCollections ).toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are added with set()', function () {
+                    collection.set( models );
+
+                    expect( model1._pickyCollections ).toContain( collection._pickyCid );
+                    expect( model2._pickyCollections ).toContain( collection._pickyCid );
+                    expect( model3._pickyCollections ).toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are added with set(), with options.silent enabled', function () {
+                    collection.set( models, { silent: true } );
+
+                    expect( model1._pickyCollections ).toContain( collection._pickyCid );
+                    expect( model2._pickyCollections ).toContain( collection._pickyCid );
+                    expect( model3._pickyCollections ).toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are added with create()', function () {
+                    var createdModel1 = collection.create( {} ),
+                        createdModel2 = collection.create( {} ),
+                        createdModel3 = collection.create( {} );
+
+                    expect( createdModel1._pickyCollections ).toContain( collection._pickyCid );
+                    expect( createdModel2._pickyCollections ).toContain( collection._pickyCid );
+                    expect( createdModel3._pickyCollections ).toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are added with create(), with options.silent enabled', function () {
+                    var createdModel1 = collection.create( {}, { silent: true } ),
+                        createdModel2 = collection.create( {}, { silent: true } ),
+                        createdModel3 = collection.create( {}, { silent: true } );
+
+                    expect( createdModel1._pickyCollections ).toContain( collection._pickyCid );
+                    expect( createdModel2._pickyCollections ).toContain( collection._pickyCid );
+                    expect( createdModel3._pickyCollections ).toContain( collection._pickyCid );
                 } );
 
                 it( 'when the models are passed in with a reset', function () {
