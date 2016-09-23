@@ -1371,6 +1371,194 @@ describe( "models shared between multiple collections: adding and removing model
 
     } );
 
+    describe( "when a selected model is removed by calling destroy() on it", function () {
+
+        var model1, model2, model3, model4,
+            singleCollectionA, multiCollectionA;
+
+        beforeEach( function () {
+            model1 = new Model();
+            model2 = new Model();
+            model3 = new Model();
+            model4 = new Model();
+
+            singleCollectionA = new SingleSelectCollection( [model1, model3, model4] );
+            multiCollectionA = new MultiSelectCollection( [model2, model3, model4] );
+
+            model1.select();
+            model2.select();
+
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( model3, "trigger" ).and.callThrough();
+            spyOn( model4, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            if ( singleCollectionA ) singleCollectionA.close();
+            if ( multiCollectionA ) multiCollectionA.close();
+        } );
+
+        it( "should no longer be selected in a single-select collection", function () {
+            model1.destroy();
+            expect( singleCollectionA.selected ).toBeUndefined();
+        } );
+
+        it( "should no longer be selected in a multi-select collection", function () {
+            model2.destroy();
+            expect( multiCollectionA.selected[model2.cid] ).toBeUndefined();
+        } );
+
+        it( "should no longer be selected in any collection when it is part of multiple collections", function () {
+            model3.select();
+            model3.destroy();
+            expect( singleCollectionA.selected ).toBeUndefined();
+            expect( multiCollectionA.selected[model3.cid] ).toBeUndefined();
+        } );
+
+        it( "should no longer be selected itself if removed from all collections", function () {
+            model3.select();
+            model3.destroy();
+            expect( model3.selected ).toBe( false );
+        } );
+
+        it( 'should trigger a deselected event on the model when removed from a single-select collection', function () {
+            model1.destroy();
+            expect( model1.trigger ).toHaveBeenCalledWithInitial( "deselected", model1 );
+            // or (full signature)
+            // expect( model1.trigger ).toHaveBeenCalledWith( "deselected", model1, { label: "selected", index: 0 } );
+        } );
+
+        it( 'should trigger a deselected event on the model when removed from a multi-select collection', function () {
+            model2.destroy();
+            expect( model2.trigger ).toHaveBeenCalledWithInitial( "deselected", model2 );
+            // or (full signature)
+            // expect( model1.trigger ).toHaveBeenCalledWith( "deselected", model2, { label: "selected", index: 0 } );
+        } );
+
+        it( 'should trigger a deselect:one event on a single-select collection it is removed from', function () {
+            model1.destroy();
+            expect( singleCollectionA.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model1, singleCollectionA );
+            // or (full signature)
+            // expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "deselect:one", model1, singleCollectionA, { label: "selected", _externalEvent: "remove", index: 0 } );
+        } );
+
+        it( 'should trigger a select:some or select:none event on a multi-select collection it is removed from', function () {
+            model2.destroy();
+            expect( multiCollectionA.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [model2] }, multiCollectionA );
+            // or (full signature)
+            // expect( multiCollectionA.trigger ).toHaveBeenCalledWith( "select:none", { selected: [], deselected: [model2] }, multiCollectionA, { label: "selected", _externalEvent: "remove", index: 0 } );
+        } );
+
+        it( 'should trigger a select:all event on a multi-select collection it is removed from, if all remaining models are still selected', function () {
+            var model5 = new Model();
+            var model6 = new Model();
+
+            var multiCollection = new MultiSelectCollection( [model5, model6] );
+            model5.select();
+            model6.select();
+
+            spyOn( multiCollection, "trigger" ).and.callThrough();
+
+            model5.destroy();
+            expect( multiCollection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [], deselected: [model5] }, multiCollection );
+            // or (full signature)
+            // expect( multiCollection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [], deselected: [model5] }, multiCollection, { label: "selected", _externalEvent: "remove", index: 0 } );
+        } );
+
+    } );
+
+    describe( "when a selected model is removed by calling destroy() on it, with options.silent enabled", function () {
+
+        var model1, model2, model3, model4,
+            singleCollectionA, multiCollectionA;
+
+        beforeEach( function () {
+            model1 = new Model();
+            model2 = new Model();
+            model3 = new Model();
+            model4 = new Model();
+
+            singleCollectionA = new SingleSelectCollection( [model1, model3, model4] );
+            multiCollectionA = new MultiSelectCollection( [model2, model3, model4] );
+
+            model1.select();
+            model2.select();
+
+            spyOn( model1, "trigger" ).and.callThrough();
+            spyOn( model2, "trigger" ).and.callThrough();
+            spyOn( model3, "trigger" ).and.callThrough();
+            spyOn( model4, "trigger" ).and.callThrough();
+            spyOn( singleCollectionA, "trigger" ).and.callThrough();
+            spyOn( multiCollectionA, "trigger" ).and.callThrough();
+        } );
+
+        afterEach( function () {
+            if ( singleCollectionA ) singleCollectionA.close();
+            if ( multiCollectionA ) multiCollectionA.close();
+        } );
+
+        it( "should no longer be selected in a single-select collection", function () {
+            model1.destroy( { silent: true } );
+            expect( singleCollectionA.selected ).toBeUndefined();
+        } );
+
+        it( "should no longer be selected in a multi-select collection", function () {
+            model2.destroy( { silent: true } );
+            expect( multiCollectionA.selected[model2.cid] ).toBeUndefined();
+        } );
+
+        it( "should no longer be selected in any collection when it is part of multiple collections", function () {
+            model3.select();
+            model3.destroy( { silent: true } );
+            expect( singleCollectionA.selected ).toBeUndefined();
+            expect( multiCollectionA.selected[model3.cid] ).toBeUndefined();
+        } );
+
+        it( "should no longer be selected itself if removed from all collections", function () {
+            model3.select();
+            model3.destroy( { silent: true } );
+            expect( model3.selected ).toBe( false );
+        } );
+
+        it( 'should not trigger a deselected event on the model when removed from a single-select collection', function () {
+            model1.destroy( { silent: true } );
+            expect( model1.trigger ).not.toHaveBeenCalledWithInitial( "deselected" );
+        } );
+
+        it( 'should not trigger a deselected event on the model when removed from a multi-select collection', function () {
+            model2.destroy( { silent: true } );
+            expect( model2.trigger ).not.toHaveBeenCalledWithInitial( "deselected" );
+        } );
+
+        it( 'should not trigger a deselect:one event on a single-select collection it is removed from', function () {
+            model1.destroy( { silent: true } );
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "deselect:one" );
+        } );
+
+        it( 'should not trigger a select:some or select:none event on a multi-select collection it is removed from', function () {
+            model2.destroy( { silent: true } );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "select:none" );
+        } );
+
+        it( 'should not trigger a select:all event on a multi-select collection it is removed from, if all remaining models are still selected', function () {
+            var model5 = new Model();
+            var model6 = new Model();
+
+            var multiCollection = new MultiSelectCollection( [model5, model6] );
+            model5.select();
+            model6.select();
+
+            spyOn( multiCollection, "trigger" ).and.callThrough();
+
+            model5.destroy( { silent: true } );
+            expect( multiCollection.trigger ).not.toHaveBeenCalledWithInitial( "select:all" );
+        } );
+
+    } );
+
     describe( "when a selected model is added by resetting the collection", function () {
         var model1, model2, model3,
             singleCollectionA, singleCollectionB, multiCollectionA;
@@ -2154,6 +2342,74 @@ describe( "models shared between multiple collections: adding and removing model
             } );
         } );
 
+        describe( 'when a selected model is destroyed', function () {
+            var model1, model2, model3, model4,
+                singleCollectionA, multiCollectionA;
+
+            beforeEach( function () {
+                Model = Model.extend( {
+                    onDeselect: function ( model, options ) {
+                        this.externalEventOnDeselect = options && options._externalEvent;
+                    }
+                } );
+
+                model1 = new Model();
+                model2 = new Model();
+                model3 = new Model();
+                model4 = new Model();
+
+                singleCollectionA = new SingleSelectCollection( [model1, model3, model4] );
+                multiCollectionA = new MultiSelectCollection( [model2, model3, model4] );
+
+                model3.select();
+
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( singleCollectionA, "trigger" ).and.callThrough();
+                spyOn( multiCollectionA, "trigger" ).and.callThrough();
+            } );
+
+            afterEach( function () {
+                singleCollectionA.close();
+                multiCollectionA.close();
+            } );
+
+            it( 'should not propagate the _externalEvent: "remove" option to the destroyed model', function () {
+                model3.destroy();
+                expect( model3.externalEventOnDeselect ).toBeUndefined();
+            } );
+
+            it( 'should set _externalEvent: "remove" in the deselect:one event, and pass along options.index from the remove event, when the model is destroyed in a single-select collection', function () {
+                model1.select();
+                singleCollectionA.trigger.calls.reset();
+
+                model1.destroy();
+                expect( singleCollectionA.trigger ).toHaveBeenCalledWith( "deselect:one", model1, singleCollectionA, jasmine.objectContaining( { _externalEvent: "remove", index: 0, label: "selected" } ) );
+            } );
+
+            it( 'should set _externalEvent: "remove" in the select:some or select:none event, and pass along options.index from the remove event, when the model is destroyed in a multi-select collection', function () {
+                model2.select();
+                multiCollectionA.trigger.calls.reset();
+
+                model2.destroy();
+                expect( multiCollectionA.trigger ).toHaveBeenCalledWith( "select:some", { selected: [], deselected: [model2] }, multiCollectionA, jasmine.objectContaining( { _externalEvent: "remove", index: 0, label: "selected" } ) );
+            } );
+
+            it( 'should set _externalEvent: "remove" in the select:all event, and pass along options.index from the remove event, when the model is destroyed in a multi-select collection and all remaining models are still selected', function () {
+                var model5 = new Model();
+                var model6 = new Model();
+
+                var multiCollection = new MultiSelectCollection( [model5, model6] );
+                model5.select();
+                model6.select();
+
+                spyOn( multiCollection, "trigger" ).and.callThrough();
+
+                model5.destroy();
+                expect( multiCollection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [], deselected: [model5] }, multiCollection, jasmine.objectContaining( { _externalEvent: "remove", index: 0, label: "selected" } ) );
+            } );
+        } );
+
         // `reset` event:
         //
         // The _externalEvent: "reset" is not implemented. reset() is meant to
@@ -2321,6 +2577,28 @@ describe( "models shared between multiple collections: adding and removing model
                     expect( model3._pickyCollections ).not.toContain( collection._pickyCid );
                 } );
 
+                it( 'when the models are destroyed', function () {
+                    collection.add( models );
+                    _.each( models, function ( model ) {
+                        model.destroy();
+                    } );
+
+                    expect( model1._pickyCollections ).not.toContain( collection._pickyCid );
+                    expect( model2._pickyCollections ).not.toContain( collection._pickyCid );
+                    expect( model3._pickyCollections ).not.toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are destroyed, with options.silent enabled', function () {
+                    collection.add( models );
+                    _.each( models, function ( model ) {
+                        model.destroy( { silent: true } );
+                    } );
+
+                    expect( model1._pickyCollections ).not.toContain( collection._pickyCid );
+                    expect( model2._pickyCollections ).not.toContain( collection._pickyCid );
+                    expect( model3._pickyCollections ).not.toContain( collection._pickyCid );
+                } );
+
                 it( 'when the collection is reset', function () {
                     collection.add( models );
                     collection.reset();
@@ -2351,7 +2629,7 @@ describe( "models shared between multiple collections: adding and removing model
                 MultiSelectCollection = MultiSelectCollection.extend( {
                     url: "/"
                 } );
-                
+
                 model1 = new Model();
                 model2 = new Model();
                 model3 = new Model();
@@ -2479,6 +2757,28 @@ describe( "models shared between multiple collections: adding and removing model
                 it( 'when the models are removed, with options.silent enabled', function () {
                     collection.add( models );
                     collection.remove( models, { silent: true } );
+
+                    expect( model1._pickyCollections ).not.toContain( collection._pickyCid );
+                    expect( model2._pickyCollections ).not.toContain( collection._pickyCid );
+                    expect( model3._pickyCollections ).not.toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are destroyed', function () {
+                    collection.add( models );
+                    _.each( models, function ( model ) {
+                        model.destroy();
+                    } );
+
+                    expect( model1._pickyCollections ).not.toContain( collection._pickyCid );
+                    expect( model2._pickyCollections ).not.toContain( collection._pickyCid );
+                    expect( model3._pickyCollections ).not.toContain( collection._pickyCid );
+                } );
+
+                it( 'when the models are destroyed, with options.silent enabled', function () {
+                    collection.add( models );
+                    _.each( models, function ( model ) {
+                        model.destroy( { silent: true } );
+                    } );
 
                     expect( model1._pickyCollections ).not.toContain( collection._pickyCid );
                     expect( model2._pickyCollections ).not.toContain( collection._pickyCid );
