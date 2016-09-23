@@ -1730,6 +1730,31 @@ describe( "models shared between multiple collections: adding and removing model
             expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
         } );
 
+        it( 'should not leak the internal inReset flag into the options of the reset event (single-select collection)', function () {
+            // To make this test resilient against naming changes of internal flags, we test the absence of **any**
+            // unexpected options. We simply expect the unmodified default reset options object, which contains
+            // options.previousModels only.
+            var resetListener = jasmine.createSpy( "resetListener" );
+
+            singleCollectionA.on( "reset", resetListener );
+            singleCollectionA.reset( [model1, model2] );
+
+            expect( resetListener ).toHaveBeenCalledOnce();
+            expect( resetListener ).toHaveBeenCalledWith( singleCollectionA, { previousModels: [model1] } );
+        } );
+
+        it( 'should not leak the internal inReset flag into the options of the reset event (multi-select collection)', function () {
+            // To make this test resilient against naming changes of internal flags, we test the absence of **any**
+            // unexpected options. See above.
+            var resetListener = jasmine.createSpy( "resetListener" );
+
+            multiCollectionA.on( "reset", resetListener );
+            multiCollectionA.reset( [model1, model2] );
+
+            expect( resetListener ).toHaveBeenCalledOnce();
+            expect( resetListener ).toHaveBeenCalledWith( multiCollectionA, { previousModels: [model1, model2, model3] } );
+        } );
+
         it( "should remain selected itself", function () {
             singleCollectionA.reset( [model1] );
             expect( model1.selected ).toBe( true );
