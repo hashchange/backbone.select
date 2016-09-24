@@ -21,84 +21,48 @@ describe( 'Automatic creation of Select.Me models', function () {
             }
         } ),
 
-        Fixture = function ( modelsOrAttributeSets ) {
-            if ( _.some( modelsOrAttributeSets, function ( item ) { return item && item instanceof Backbone.Model; } ) ) {
-                this.models = modelsOrAttributeSets;
-            } else {
-                this.attributeSets = modelsOrAttributeSets;
-            }
 
-            this.options = {};
-        };
-
-    Fixture.prototype.createPopulatedCollection = function ( modelData, instantiationOptions ) {
-        var collection;
-
-        if ( this.creationMethod === "new" ) {
-            collection = new this.Collection( modelData, _.extend( {}, this.options, instantiationOptions ) );
-        } else {
-            collection = new this.Collection( null, instantiationOptions );
-            collection[this.creationMethod]( modelData, this.options );
-        }
-
-        return collection;
-    };
-
-    /**
-     * @name  Fixture
-     * @type  {Object}
-     *
-     * @property {Object[]} attributeSets
-     * @property {Object[]} modelDataSets
-     * @property {Function} Collection
-     * @property {Function} modelTemplate
-     * @property {string}   creationMethod
-     * @property {Object}   options
-     * @property {Function} createPopulatedCollection
-     */
-
-    function pickTests ( picks, configureFn ) {
-        if ( !configureFn.optOut ) configureFn.optOut = {};
-        if ( !configureFn.optIn ) configureFn.optIn = {};
-
-        if ( picks !== "default" ) {
-            _.each( picks.optOut, function ( name ) { configureFn.optOut[name] = true; } );
-            _.each( picks.optIn, function ( name ) { configureFn.optIn[name] = true; } );
-        }
-
-        return configureFn;
-    }
-
-    beforeAll( function () {
-        limitJasmineRecursiveScreenOutput();
-    } );
-
-    afterAll( function () {
-        restoreJasmineRecursiveScreenOutput();
-    } );
-
-    var collectionTypeScenarios = {
-            "Select.One collection": function ( fixture ) { fixture.Collection = SelectOneCollection; },
+        collectionTypeScenarios = {
+            "Select.One collection": function ( fixture ) { fixture.setBaseCollectionType( SelectOneCollection ); },
             "Select.Many collection": function ( fixture ) { fixture.Collection = SelectManyCollection; }
         },
 
         eventedPopulationScenarios = {
-            "Populating the collection during instantiation": pickTests( { optOut: ["singularItem"], optIn: ["defaultLabel"] }, function ( fixture ) { fixture.creationMethod = "new"; } ),
-            "Populating the collection with add": pickTests( "default", function ( fixture ) { fixture.creationMethod = "add"; } ),
-            "Populating the collection with reset": pickTests( { optOut: ["singularItem"] }, function ( fixture ) { fixture.creationMethod = "reset"; } ),
-            "Populating the collection with set": pickTests( "default", function ( fixture ) { fixture.creationMethod = "set"; } )
+            "Populating the collection during instantiation": pickTests( { optOut: "singularItemTests", optIn: "defaultLabelTest" }, function ( fixture ) {
+                fixture.creationMethod = "new";
+            } ),
+            "Populating the collection with add": pickTests( "default", function ( fixture ) {
+                fixture.creationMethod = "add";
+            } ),
+            "Populating the collection with reset": pickTests( { optOut: "singularItemTests" }, function ( fixture ) {
+                fixture.creationMethod = "reset";
+            } ),
+            "Populating the collection with set": pickTests( "default", function ( fixture ) {
+                fixture.creationMethod = "set";
+            } )
         },
 
         silentPopulationScenarios = {
-            "Populating the collection with add, with options.silent enabled": pickTests( "default", function ( fixture ) { fixture.creationMethod = "add"; fixture.options.silent =  true; } ),
-            "Populating the collection with reset, with options.silent enabled": pickTests( { optOut: ["singularItem"] }, function ( fixture ) { fixture.creationMethod = "reset"; fixture.options.silent =  true; } ),
-            "Populating the collection with set, with options.silent enabled": pickTests( "default", function ( fixture ) { fixture.creationMethod = "set"; fixture.options.silent =  true; } )
+            "Populating the collection with add, with options.silent enabled": pickTests( "default", function ( fixture ) {
+                fixture.creationMethod = "add";
+                fixture.options.silent = true;
+            } ),
+            "Populating the collection with reset, with options.silent enabled": pickTests( { optOut: "singularItemTests" }, function ( fixture ) {
+                fixture.creationMethod = "reset";
+                fixture.options.silent = true;
+            } ),
+            "Populating the collection with set, with options.silent enabled": pickTests( "default", function ( fixture ) {
+                fixture.creationMethod = "set";
+                fixture.options.silent = true;
+            } )
         },
 
         populationScenarios = _.extend( {}, eventedPopulationScenarios, silentPopulationScenarios ),
 
         parseScenarios = {
-            "models are created from an attributes hash": function ( fixture ) { fixture.modelDataSets = fixture.attributeSets; },
+            "models are created from an attributes hash": function ( fixture ) {
+                fixture.modelDataSets = fixture.attributeSets;
+            },
             "models are created from parsed input, with options.parse set": function ( fixture ) {
                 fixture.options.parse = true;
 
@@ -118,21 +82,30 @@ describe( 'Automatic creation of Select.Me models', function () {
             "collection.model is not set, models are created from Backbone.Model": function ( fixture ) {
                 fixture.modelTemplate = Backbone.Model;
             },
-            "collection.model is set to a custom type, without the Select.Me mixin applied": function ( fixture ) {
+            "collection.model is set to a custom type, which does not have the Select.Me mixin applied": function ( fixture ) {
                 fixture.modelTemplate = Backbone.Model.extend( { tellType: "custom" } );
                 fixture.Collection = fixture.Collection.extend( { model: fixture.modelTemplate } );
             },
-            "collection.model is set to a custom type, with the Select.Me mixin applied": function ( fixture ) {
+            "collection.model is set to a custom type, which has the Select.Me mixin applied": function ( fixture ) {
                 fixture.modelTemplate = SelectMeModel;
                 fixture.Collection = fixture.Collection.extend( { model: SelectMeModel } );
             }
         };
 
+
+    beforeAll( function () {
+        limitJasmineRecursiveScreenOutput();
+    } );
+
+    afterAll( function () {
+        restoreJasmineRecursiveScreenOutput();
+    } );
+
     describe( 'Creating models on the fly, from raw data', function () {
 
         beforeEach( function () {
 
-            f = new Fixture( [
+            f = new AutoCreationFixture( [
                 { number: 1 },
                 { number: 2 },
                 { number: 3 }
@@ -164,7 +137,7 @@ describe( 'Automatic creation of Select.Me models', function () {
                             configureModelTemplate( f );
                         } );
 
-                        if( !configurePopulation.optOut.singularItem ) {
+                        if( !hasOptedOut( configurePopulation, "singularItemTests" ) ) {
 
                             describe( 'data for single item, not wrapped in an array, is passed in', function () {
 
@@ -197,12 +170,12 @@ describe( 'Automatic creation of Select.Me models', function () {
                                     expect( model._pickyType ).toEqual( "Backbone.Select.Me" );
                                 } );
 
-                                if ( configurePopulation.optIn.defaultLabel ) {
+                                if ( hasOptedIn( configurePopulation, "defaultLabelTest" ) ) {
 
                                     it( 'the model shares the defaultLabel setting of the collection', function () {
                                         // Only happens when creating the collection. Then, collection and models are
                                         // created in a single process, and the options passed to the collection are
-                                        // affecting both.
+                                        // used for both.
                                         collection.close();
                                         collection = f.createPopulatedCollection( modelDataSet, { defaultLabel: "foo" } );
                                         expect( collection.at( 0 )._pickyDefaultLabel ).toEqual( "foo" );
@@ -253,12 +226,12 @@ describe( 'Automatic creation of Select.Me models', function () {
                                 expect( models[2]._pickyType ).toEqual( "Backbone.Select.Me" );
                             } );
 
-                            if ( configurePopulation.optIn.defaultLabel ) {
+                            if ( hasOptedIn( configurePopulation, "defaultLabelTest" ) ) {
 
                                 it( 'the models share the defaultLabel setting of the collection', function () {
                                     // Only happens when creating the collection. Then, collection and models are
                                     // created in a single process, and the options passed to the collection are
-                                    // affecting both.
+                                    // used for both.
                                     collection.close();
                                     collection = f.createPopulatedCollection( f.modelDataSets, { defaultLabel: "foo" } );
                                     expect( collection.at( 0 )._pickyDefaultLabel ).toEqual( "foo" );
