@@ -1755,6 +1755,59 @@ describe( "models shared between multiple collections: adding and removing model
             expect( resetListener ).toHaveBeenCalledWith( multiCollectionA, { previousModels: [model1, model2, model3] } );
         } );
 
+        it( 'should not leak the internal inReset flag into the options of the add event when reset is called with an explicit `silent: false` option (single-select collection)', function () {
+            // To make this test resilient against naming changes of internal flags, we test the absence of **any**
+            // unexpected options. We simply expect the unmodified default reset options object, which contains
+            // options.previousModels only.
+
+            // ATTN This Backbone behaviour may change at some point. If, in the future, silent: false no longer
+            // triggers an add event, the test can be removed.
+            var addListener = jasmine.createSpy( "addListener" );
+
+            singleCollectionA.on( "add", addListener );
+            singleCollectionA.reset( [model1, model2], { silent: false } );
+
+            expect( addListener ).toHaveBeenCalledTwice();
+            expect( addListener ).toHaveBeenCalledWith( model1, singleCollectionA, jasmine.any( Object ) );
+            expect( addListener ).toHaveBeenCalledWith( model2, singleCollectionA, jasmine.any( Object ) );
+
+            var allCallsAllArgs = addListener.calls.allArgs(),
+                allArgsByPosition = _.zip.apply( null, allCallsAllArgs ),
+                allOptionsObjects = allArgsByPosition[2] || [],
+                optionKeys = _.reduce( allOptionsObjects, function ( collected, optionsObject ) {
+                    return _.union( collected, _.keys( optionsObject ) );
+                }, [] );
+
+            expect( optionKeys ).not.toContain( jasmine.stringMatching( /^@bbs:/ ) );
+        } );
+
+        it( 'should not leak the internal inReset flag into the options of the add event when reset is called with an explicit `silent: false` option (multi-select collection)', function () {
+            // Because of the flurry of semi-internal stuff showing up in the add event options here, a the full
+            // expected options object would be a brittle construct. We have to make sure that no internal flags are
+            // present, so we check for anything that matches the @bbs: prefix.
+
+            // ATTN This Backbone behaviour may change at some point. If, in the future, silent: false no longer
+            // triggers an add event, the test can be removed.
+
+            var addListener = jasmine.createSpy( "addListener" );
+
+            multiCollectionA.on( "add", addListener );
+            multiCollectionA.reset( [model1, model2], { silent: false } );
+
+            expect( addListener ).toHaveBeenCalledTwice();
+            expect( addListener ).toHaveBeenCalledWith( model1, multiCollectionA, jasmine.any( Object ) );
+            expect( addListener ).toHaveBeenCalledWith( model2, multiCollectionA, jasmine.any( Object ) );
+
+            var allCallsAllArgs = addListener.calls.allArgs(),
+                allArgsByPosition = _.zip.apply( null, allCallsAllArgs ),
+                allOptionsObjects = allArgsByPosition[2] || [],
+                optionKeys = _.reduce( allOptionsObjects, function ( collected, optionsObject ) {
+                    return _.union( collected, _.keys( optionsObject ) );
+                }, [] );
+
+            expect( optionKeys ).not.toContain( jasmine.stringMatching( /^@bbs:/ ) );
+        } );
+
         it( "should remain selected itself", function () {
             singleCollectionA.reset( [model1] );
             expect( model1.selected ).toBe( true );
