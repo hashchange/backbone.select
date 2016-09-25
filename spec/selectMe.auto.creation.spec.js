@@ -62,19 +62,22 @@ describe( 'Automatic creation of Select.Me models', function () {
         parseScenarios = {
             "models are created from an attributes hash": function ( fixture ) {
                 fixture.modelDataSets = fixture.attributeSets;
+                fixture.firstModelDataSet = fixture.attributeSets[0];
             },
             "models are created from parsed input, with options.parse set": function ( fixture ) {
                 fixture.options.parse = true;
 
                 fixture.Collection = fixture.Collection.extend( {
-                    parse: function ( inputModelData ) {
-                        return _.isArray( inputModelData ) ? _.pluck( inputModelData, "nested" ) : inputModelData.nested;
+                    parse: function ( modelData ) {
+                        return _.isArray( modelData ) ? _.pluck( modelData, "nested" ) : [modelData.nested];
                     }
                 } );
 
                 fixture.modelDataSets = _.map( fixture.attributeSets, function ( attributeSet ) {
                     return { nested: attributeSet };
                 } );
+
+                fixture.firstModelDataSet = fixture.modelDataSets[0];
             }
         },
 
@@ -144,7 +147,7 @@ describe( 'Automatic creation of Select.Me models', function () {
                                 var modelDataSet, collection, model;
 
                                 beforeEach( function () {
-                                    modelDataSet = f.modelDataSets[0];
+                                    modelDataSet = f.firstModelDataSet;
                                     collection = f.createPopulatedCollection( modelDataSet );
                                     model = collection.at( 0 );
                                 } );
@@ -234,6 +237,7 @@ describe( 'Automatic creation of Select.Me models', function () {
                                     // used for both.
                                     collection.close();
                                     collection = f.createPopulatedCollection( f.modelDataSets, { defaultLabel: "foo" } );
+
                                     expect( collection.at( 0 )._pickyDefaultLabel ).toEqual( "foo" );
                                     expect( collection.at( 1 )._pickyDefaultLabel ).toEqual( "foo" );
                                     expect( collection.at( 2 )._pickyDefaultLabel ).toEqual( "foo" );
@@ -284,7 +288,7 @@ describe( 'Automatic creation of Select.Me models', function () {
                         var collection, model;
 
                         beforeEach( function () {
-                            var inputModel = f.createPlainModels()[0];
+                            var inputModel = f.createFirstPlainModel();
                             collection = f.createPopulatedCollection( inputModel );
                             model = collection.at( 0 );
                         } );
@@ -311,9 +315,8 @@ describe( 'Automatic creation of Select.Me models', function () {
                         } );
 
                         it( 'the model is selectable immediately after the collection mixin has been applied', function () {
-                            var firstSelectedItemInCollection,
-                                originalInitialize = collection.initialize,
-                                inputModel = f.createPlainModels()[0];
+                            var inputModel, firstSelectedItemInCollection,
+                                originalInitialize = collection.initialize;
 
                             f.Collection = f.Collection.extend( {
                                 initialize: function ( models, options ) {
@@ -330,6 +333,7 @@ describe( 'Automatic creation of Select.Me models', function () {
                             } );
 
                             collection.close();
+                            inputModel = f.createFirstPlainModel();
                             collection = f.createPopulatedCollection( inputModel );
 
                             if ( f.options.silent ) {
@@ -351,9 +355,8 @@ describe( 'Automatic creation of Select.Me models', function () {
                                 // Only happens when creating the collection. Then, collection and models are
                                 // created in a single process, and the options passed to the collection are
                                 // used for both.
-                                var inputModel = f.createPlainModels()[0];
                                 collection.close();
-                                collection = f.createPopulatedCollection( inputModel, { defaultLabel: "foo" } );
+                                collection = f.createPopulatedCollection( f.createFirstPlainModel(), { defaultLabel: "foo" } );
 
                                 expect( collection.at( 0 )._pickyDefaultLabel ).toEqual( "foo" );
                             } );
@@ -362,11 +365,10 @@ describe( 'Automatic creation of Select.Me models', function () {
 
                         it( 'options are passed on to the the Select.Me mixin as it is applied', function () {
                             // Testing with the defaultLabel option, the only option recognized by Select.Me.applyTo().
-                            var inputModel = f.createPlainModels()[0];
-
                             _.extend( f.options, { defaultLabel: "foo" } );
+
                             collection.close();
-                            collection = f.createPopulatedCollection( inputModel );
+                            collection = f.createPopulatedCollection( f.createFirstPlainModel() );
 
                             expect( collection.at( 0 )._pickyDefaultLabel ).toEqual( "foo" );
                         } );
@@ -457,6 +459,7 @@ describe( 'Automatic creation of Select.Me models', function () {
                             // used for both.
                             collection.close();
                             collection = f.createPopulatedCollection( f.createPlainModels(), { defaultLabel: "foo" } );
+
                             expect( collection.at( 0 )._pickyDefaultLabel ).toEqual( "foo" );
                             expect( collection.at( 1 )._pickyDefaultLabel ).toEqual( "foo" );
                             expect( collection.at( 2 )._pickyDefaultLabel ).toEqual( "foo" );

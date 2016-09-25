@@ -5,19 +5,25 @@
  *
  * @typedef {Object} AutoCreationFixture
  *
- * @property {(Object[]|undefined)}       attributeSets   the attribute sets underlying the fixture, as passed in
+ * @property {(Object[]|undefined)}        attributeSets      the attribute sets underlying the fixture, as passed in
  *
- * @property {(Object[]|undefined)}       modelDataSets   the actual model data sets, must be calculated from the
- *                                                        attribute sets, must be different from them when testing parse
- * @property {Backbone.Collection}        Collection      the collection class to use, derived from the base class but
- *                                                        modified as appropriate when the fixture is applied
- * @property {(Backbone.Model|undefined)} modelTemplate   the model type the collection should use when generating
- *                                                        models from data. When set to Backbone.Model, the
- *                                                        collection.model property is left undefined.
- * @property {string}                     creationMethod  the operation which should create the models: "new" (models
- *                                                        are created during instantiation), "add", "set", "reset"
- * @property {Object}                     options         the options applied during the operation which creates the
- *                                                        models
+ * @property {(Object|Object[]|undefined)} modelDataSets      the actual model data sets, must be calculated from the
+ *                                                            attribute sets, must be different from them when testing
+ *                                                            parse, can be a single (nested) object then
+ * @property {(Object|undefined)}          firstModelDataSet  the data for just a single model, must be calculated from
+ *                                                            modelDataSets. Either simply the first item when
+ *                                                            modelDataSets is an array, or a (nested) object in the
+ *                                                            format required by parse
+ * @property {Backbone.Collection}         Collection         the collection class to use, derived from the base class
+ *                                                            but modified as appropriate when the fixture is applied
+ * @property {(Backbone.Model|undefined)}  modelTemplate      the model type the collection should use when generating
+ *                                                            models from data. When set to Backbone.Model, the
+ *                                                            collection.model property is left undefined.
+ * @property {string}                      creationMethod     the operation which should create the models: "new"
+ *                                                            (models are created during instantiation), "add", "set",
+ *                                                            "reset"
+ * @property {Object}                      options            the options applied during the operation which creates the
+ *                                                            models
  */
 
 /**
@@ -54,6 +60,15 @@ AutoCreationFixture.prototype.createPlainModels = function () {
     return _.map( this.attributeSets, function ( attributeSet ) {
         return new Backbone.Model( attributeSet );
     } );
+};
+
+/**
+ * Creates and returns a Backbone.Model, generated from the first of the initial attribute sets.
+ *
+ * @returns {Backbone.Model}
+ */
+AutoCreationFixture.prototype.createFirstPlainModel = function () {
+    return this.createPlainModels()[0];
 };
 
 /**
