@@ -484,4 +484,80 @@ describe( 'Automatic creation of Select.Me models', function () {
 
     } );
 
+    describe( 'Creating models on the fly, special case: one item is undefined, in an array of otherwise valid data', function () {
+
+        beforeEach( function () {
+
+            f = new AutoCreationFixture( [
+                { number: 1 },
+                undefined,
+                { number: 3 }
+            ] );
+
+        } );
+
+        describeWithData( collectionTypeScenarios, function ( configureCollectionType ) {
+
+            beforeEach( function () {
+                configureCollectionType( f );
+            } );
+
+            describeWithData( eventedPopulationScenarios, function ( configurePopulation ) {
+
+                beforeEach( function () {
+                    configurePopulation( f );
+                } );
+
+                describeWithData( modelTemplateScenarios, function ( configureModelTemplate ) {
+
+                    var collection, models;
+
+                    beforeEach( function () {
+                        configureModelTemplate( f );
+
+                        collection = f.createPopulatedCollection( f.attributeSets );
+                        models = collection.models;
+                    } );
+
+                    afterEach( function () {
+                        collection.close();
+                    } );
+
+                    it( 'the collection has the expected number of models, including one for the undefined data', function () {
+                        expect( collection.length ).toEqual( 3 );
+                        expect( collection.models.length ).toEqual( 3 );
+                    } );
+
+                    it( 'the entry corresponding to the undefined input data has been turned into a model without attributes', function () {
+                        expect( models[1] ).toEqual( jasmine.any( f.modelTemplate ) );
+                        expect( models[1].attributes ).toEqual( {} );
+                    } );
+
+                    it( 'the other models are of the expected type', function () {
+                        expect( models[0] ).toEqual( jasmine.any( f.modelTemplate ) );
+                        expect( models[2] ).toEqual( jasmine.any( f.modelTemplate ) );
+                    } );
+
+                    it( 'the other models have the expected attributes', function () {
+                        expect( models[0].attributes ).toEqual( f.attributeSets[0] );
+                        expect( models[2].attributes ).toEqual( f.attributeSets[2] );
+                        expect( models[0].get( "number" ) ).toEqual( 1 );
+                        expect( models[2].get( "number" ) ).toEqual( 3 );
+
+                    } );
+
+                    it( 'all models, including the one created from undefined data, have the Select.Me mixin applied', function () {
+                        expect( models[0]._pickyType ).toEqual( "Backbone.Select.Me" );
+                        expect( models[1]._pickyType ).toEqual( "Backbone.Select.Me" );
+                        expect( models[2]._pickyType ).toEqual( "Backbone.Select.Me" );
+                    } );
+
+                } );
+
+            } );
+
+        } );
+
+    } );
+
 } );
