@@ -64,7 +64,7 @@ describe( 'Automatic creation of Select.Me models', function () {
                 fixture.modelDataSets = fixture.attributeSets;
                 fixture.firstModelDataSet = fixture.attributeSets[0];
             },
-            "models are created from parsed input, with options.parse set": function ( fixture ) {
+            "models are created from parsed input, with options.parse set (model data sets stored in an array)": function ( fixture ) {
                 fixture.options.parse = true;
 
                 fixture.Collection = fixture.Collection.extend( {
@@ -78,6 +78,25 @@ describe( 'Automatic creation of Select.Me models', function () {
                 } );
 
                 fixture.firstModelDataSet = fixture.modelDataSets[0];
+            },
+            "models are created from parsed input, with options.parse set (model data sets wrapped in single outer object)": function ( fixture ) {
+                fixture.options.parse = true;
+
+                fixture.Collection = fixture.Collection.extend( {
+                    parse: function ( modelDataObject ) {
+                        return _.pluck( modelDataObject.modelDataStore, "nested" );
+                    }
+                } );
+
+                fixture.modelDataSets = {
+                    modelDataStore: _.map( fixture.attributeSets, function ( attributeSet ) {
+                        return { nested: attributeSet };
+                    } )
+                };
+
+                fixture.firstModelDataSet = {
+                    modelDataStore: [ fixture.modelDataSets.modelDataStore[0] ]
+                };
             }
         },
 
