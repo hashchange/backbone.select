@@ -471,8 +471,7 @@
                     var oldSelect;
 
                     if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
-                    if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
-                    if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
+                    if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined, or null, if no models are passed in during instantiation, but even so, it must be provided." );
 
                     // Store a reference to the existing select method (most likely the default
                     // Backbone.Collection.select method). Used to overload the new select method.
@@ -494,18 +493,43 @@
                     patchSilentRemove( hostObject );
                     patchSilentReset( hostObject );
 
-                    // model sharing
-                    _.each( models || [], function ( model ) {
-                        registerCollectionWithModel( model, hostObject );
+                    if ( _.isArray( models ) ) {
 
-                        forEachLabelInModel( model, function ( label ) {
-                            ensureLabelIsRegistered( label, hostObject );
-                            if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
-                                if ( hostObject[label] ) hostObject[label].deselect( { label: label } );
-                                hostObject[label] = model;
-                            }
+                        // Setting up the models.
+                        _.each( models, function ( model ) {
+
+                            // Bail out if the item is not a model.
+                            //
+                            // In that case, Backbone creates the model(s) when the collection is populated, with a
+                            // silent reset(). That happens just before the constructor exits, after initialize() has
+                            // run. The model setup is deferred until after the reset. (It is handled by
+                            // onResetSingleSelect(), which is invoked at the end of the reset.)
+                            //
+                            // NB When Backbone models are passed in, the setup is done here. Then, selections can be
+                            // made immediately after the mixin is applied - ie, in initialize(). If raw model data is
+                            // passed in, selections can't be made in initialize().
+                            if ( !( model && model instanceof Backbone.Model ) ) return;
+
+                            // Auto-apply the Backbone.Select.Me mixin if not yet done for the model.
+                            //
+                            // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined for the
+                            // collection, the model will share it. If models need a different setting, do not rely on
+                            // an auto-applied mixin.
+                            ensureModelMixin( model, options );
+
+                            registerCollectionWithModel( model, hostObject );
+
+                            forEachLabelInModel( model, function ( label ) {
+                                ensureLabelIsRegistered( label, hostObject );
+                                if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
+                                    if ( hostObject[label] ) hostObject[label].deselect( { label: label } );
+                                    hostObject[label] = model;
+                                }
+                            } );
+
                         } );
-                    } );
+
+                    }
 
                     hostObject.listenTo( hostObject, '_selected', hostObject.select );
                     hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
@@ -527,8 +551,7 @@
                     var oldSelect;
 
                     if ( !_.isObject( hostObject ) ) throw new Error( "The host object is undefined or not an object." );
-                    if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined if no models are passed in during instantiation, but even so, it must be provided." );
-                    if ( !(_.isArray( models ) || _.isUndefined( models ) || _.isNull( models )) ) throw new Error( "The `models` parameter is not of the correct type. It must be either an array of models, or be undefined. (Null is acceptable, too)." );
+                    if ( arguments.length < 2 ) throw new Error( "The `models` parameter has not been passed to Select.One.applyTo. Its value can be undefined, or null, if no models are passed in during instantiation, but even so, it must be provided." );
 
                     // Store a reference to the existing select method (most likely the default
                     // Backbone.Collection.select method). Used to overload the new select method.
@@ -550,17 +573,42 @@
                     patchSilentRemove( hostObject );
                     patchSilentReset( hostObject );
 
-                    // model sharing
-                    _.each( models || [], function ( model ) {
-                        registerCollectionWithModel( model, hostObject );
+                    if ( _.isArray( models ) ) {
 
-                        forEachLabelInModel( model, function ( label ) {
-                            ensureLabelIsRegistered( label, hostObject );
-                            if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
-                                hostObject[label][model.cid] = model;
-                            }
+                        // Setting up the models.
+                        _.each( models, function ( model ) {
+
+                            // Bail out if the item is not a model.
+                            //
+                            // In that case, Backbone creates the model(s) when the collection is populated, with a
+                            // silent reset(). That happens just before the constructor exits, after initialize() has
+                            // run. The model setup is deferred until after the reset. (It is handled by
+                            // onResetMultiSelect(), which is invoked at the end of the reset.)
+                            //
+                            // NB When Backbone models are passed in, the setup is done here. Then, selections can be
+                            // made immediately after the mixin is applied - ie, in initialize(). If raw model data is
+                            // passed in, selections can't be made in initialize().
+                            if ( !( model && model instanceof Backbone.Model ) ) return;
+
+                            // Auto-apply the Backbone.Select.Me mixin if not yet done for the model.
+                            //
+                            // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined for the
+                            // collection, the model will share it. If models need a different setting, do not rely on
+                            // an auto-applied mixin.
+                            ensureModelMixin( model, options );
+
+                            registerCollectionWithModel( model, hostObject );
+
+                            forEachLabelInModel( model, function ( label ) {
+                                ensureLabelIsRegistered( label, hostObject );
+                                if ( model[label] && !isIgnoredLabel( label, hostObject ) ) {
+                                    hostObject[label][model.cid] = model;
+                                }
+                            } );
+
                         } );
-                    } );
+
+                    }
 
                     hostObject.listenTo( hostObject, '_selected', hostObject.select );
                     hostObject.listenTo( hostObject, '_deselected', hostObject.deselect );
@@ -643,6 +691,8 @@
     }
 
     function onAdd ( model, collection, options ) {
+        ensureModelMixin( model, options );
+
         registerCollectionWithModel( model, collection );
         forEachLabelInModel( model, function ( label ) {
             var selectOptions;
@@ -664,7 +714,6 @@
 
             if ( model[label] ) collection.select( model, selectOptions );
         } );
-
     }
 
     function onRemove ( model, collection, options ) {
@@ -712,6 +761,7 @@
         } );
 
         collection.each( function ( model ) {
+            ensureModelMixin( model, options );
             registerCollectionWithModel( model, collection );
             ensureModelLabelsInCollection( model, collection );
         } );
@@ -744,6 +794,7 @@
         } );
 
         collection.each( function ( model ) {
+            ensureModelMixin( model, options );
             registerCollectionWithModel( model, collection );
             ensureModelLabelsInCollection( model, collection );
         } );
@@ -811,6 +862,14 @@
         ensureLabelIsRegistered( options.label, obj );
 
         return options.label;
+    }
+
+    // Auto-apply the Backbone.Select.Me mixin if not yet done for the model.
+    //
+    // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined in the options, the model will be set
+    // up accordingly.
+    function ensureModelMixin( model, options ) {
+        if ( !model._pickyType ) Backbone.Select.Me.applyTo( model, options );
     }
 
     function ensureLabelIsRegistered ( name, obj ) {
