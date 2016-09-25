@@ -1140,6 +1140,7 @@
             if ( isSilent ) previousModels = this.models.slice();
 
             // Keep the internal inReset option out of the "add" event. Ie, get rid of the option before calling .add().
+            // (Is here for a weird edge case when reset() is called with an explicit `silent: false` option.)
             args[1] = stripInternalOptions( options );
 
             models = returned = add.apply( this, args );
@@ -1200,8 +1201,8 @@
             }
 
             // The internal inReset option must be passed to the reset() call. It is needed when reset() delegates part
-            // of its work to add() with an internal (and silent) call. Unfortunately, for that reason, we can't keep
-            // inReset out of the visible options when the "reset" event is fired.
+            // of its work to add() with an internal (and silent) call. For that reason, we can't remove inReset from
+            // the visible options before the "reset" event is fired - it has to be sanitized in trigger() itself.
             returned = reset.apply( this, args );
 
             if ( isSilent ) onReset( this, fakeEventOptions );
@@ -1213,6 +1214,9 @@
     // Creates a new trigger method which calls the predefined event handlers (onDeselect etc) as well as triggering the
     // event.
     //
+    // Also removes the internal inReset flag from the options of a reset event. That can only be done here, see comment
+    // in patchSilentReset().
+    //
     // Adapted from Marionette.triggerMethod.
     function augmentTrigger ( context ) {
 
@@ -1221,7 +1225,12 @@
             var origTrigger = context.trigger;
 
             // Return an augmented trigger method implementation, in order to replace the original trigger method
-            return function ( event, eventArgs ) {
+            return function ( event, /** ...* */ varArgs ) {
+
+                var args = _.toArray( arguments );
+
+                // Remove the internal inReset flag from a reset event.
+                if ( event === "reset" && _.isObject( args[2] ) && _.has( args[2], "@bbs:inReset" ) ) delete args[2]["@bbs:inReset"];
 
                 if ( isSelectionEvent( event ) ) {
                     // get the method name from the event name
@@ -1234,12 +1243,12 @@
                     // call the onMethodName if it exists
                     if ( _.isFunction( method ) ) {
                         // pass all trigger arguments, except the event name
-                        method.apply( this, _.tail( arguments ) );
+                        method.apply( this, _.tail( args ) );
                     }
                 }
 
                 // trigger the event
-                origTrigger.apply( this, arguments );
+                origTrigger.apply( this, args );
                 return this;
 
             };
