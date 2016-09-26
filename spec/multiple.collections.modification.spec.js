@@ -1730,7 +1730,7 @@ describe( "models shared between multiple collections: adding and removing model
             expect( multiCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "reselect:any" );
         } );
 
-        it( 'should not leak the internal inReset flag into the options of the reset event (single-select collection)', function () {
+        it( 'should not leak the internal backboneSubcall flag into the options of the reset event (single-select collection)', function () {
             // To make this test resilient against naming changes of internal flags, we test the absence of **any**
             // unexpected options. We simply expect the unmodified default reset options object, which contains
             // options.previousModels only.
@@ -1743,7 +1743,7 @@ describe( "models shared between multiple collections: adding and removing model
             expect( resetListener ).toHaveBeenCalledWith( singleCollectionA, { previousModels: [model1] } );
         } );
 
-        it( 'should not leak the internal inReset flag into the options of the reset event (multi-select collection)', function () {
+        it( 'should not leak the internal backboneSubcall flag into the options of the reset event (multi-select collection)', function () {
             // To make this test resilient against naming changes of internal flags, we test the absence of **any**
             // unexpected options. See above.
             var resetListener = jasmine.createSpy( "resetListener" );
@@ -1755,7 +1755,7 @@ describe( "models shared between multiple collections: adding and removing model
             expect( resetListener ).toHaveBeenCalledWith( multiCollectionA, { previousModels: [model1, model2, model3] } );
         } );
 
-        it( 'should not leak the internal inReset flag into the options of the add event when reset is called with an explicit `silent: false` option (single-select collection)', function () {
+        it( 'should not leak the internal backboneSubcall flag into the options of the add event when reset is called with an explicit `silent: false` option (single-select collection)', function () {
             // To make this test resilient against naming changes of internal flags, we test the absence of **any**
             // unexpected options. We simply expect the unmodified default reset options object, which contains
             // options.previousModels only.
@@ -1781,7 +1781,7 @@ describe( "models shared between multiple collections: adding and removing model
             expect( optionKeys ).not.toContain( jasmine.stringMatching( /^@bbs:/ ) );
         } );
 
-        it( 'should not leak the internal inReset flag into the options of the add event when reset is called with an explicit `silent: false` option (multi-select collection)', function () {
+        it( 'should not leak the internal backboneSubcall flag into the options of the add event when reset is called with an explicit `silent: false` option (multi-select collection)', function () {
             // Because of the flurry of semi-internal stuff showing up in the add event options here, a the full
             // expected options object would be a brittle construct. We have to make sure that no internal flags are
             // present, so we check for anything that matches the @bbs: prefix.

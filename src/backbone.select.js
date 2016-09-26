@@ -490,6 +490,7 @@
                     overloadSelect( oldSelect, hostObject );
 
                     patchSilentAdd( hostObject );
+                    patchSilentSet( hostObject );
                     patchSilentRemove( hostObject );
                     patchSilentReset( hostObject );
 
@@ -570,6 +571,7 @@
                     overloadSelect( oldSelect, hostObject );
 
                     patchSilentAdd( hostObject );
+                    patchSilentSet( hostObject );
                     patchSilentRemove( hostObject );
                     patchSilentReset( hostObject );
 
@@ -634,7 +636,7 @@
     var localOptions = ["@bbs:silentLocally", "_externalEvent", "exclusive"],
 
         /** @type {string[]}  options which are used internally for communicating across method calls, should not appear in public events */
-        internalOptions = ["@bbs:messageOnly", "@bbs:silentLocally", "@bbs:silentReselect", "@bbs:skipModelCall", "@bbs:processedBy", "@bbs:eventQueue", "@bbs:eventQueueAppendOnly", "@bbs:inReset"];
+        internalOptions = ["@bbs:messageOnly", "@bbs:silentLocally", "@bbs:silentReselect", "@bbs:skipModelCall", "@bbs:processedBy", "@bbs:eventQueue", "@bbs:eventQueueAppendOnly", "@bbs:backboneSubcall"];
 
     // Trigger events from a multi-select collection, based on the number of selected items.
     function triggerMultiSelectEvents ( collection, prevSelected, options, reselected ) {
@@ -1135,13 +1137,13 @@
                 options = args[1] ? _.clone( args[1] ) : {},
 
                 isSilent = options.silent,
-                needsFakeEvent = isSilent && !options["@bbs:inReset"];
+                isInSubcall = options["@bbs:backboneSubcall"],
+                needsFakeEvent = isSilent && !isInSubcall;
 
-            if ( isSilent ) previousModels = this.models.slice();
+            args[1] = options;
+            options["@bbs:backboneSubcall"] = true;
 
-            // Keep the internal inReset option out of the "add" event. Ie, get rid of the option before calling .add().
-            // (Is here for a weird edge case when reset() is called with an explicit `silent: false` option.)
-            args[1] = stripInternalOptions( options );
+            if ( needsFakeEvent ) previousModels = this.models && this.models.slice() || [];
 
             models = returned = add.apply( this, args );
 
@@ -1158,18 +1160,77 @@
         };
     }
 
+    function patchSilentSet ( context ) {
+        var set = context.set;
+
+        context.set = function () {
+            var returned, models, previousModels, addedModels, removedModels,
+
+                args = _.toArray( arguments ),
+                options = args[1] ? _.clone( args[1] ) : {},
+
+                isSilent = options.silent,
+                isInSubcall = options["@bbs:backboneSubcall"],
+                needsFakeEvent = isSilent && !isInSubcall;
+
+            args[1] = options;
+            options["@bbs:backboneSubcall"] = true;
+
+            if ( needsFakeEvent ) previousModels = this.models && this.models.slice() || [];
+
+            models = returned = set.apply( this, args );
+
+            if ( needsFakeEvent && models ) {
+
+                if ( !_.isArray( models ) ) models = [models];
+
+                // For consistency, the onRemove and onAdd handlers are called in the same order the events are fired
+                // by set() - ie, onRemove before onAdd.
+                if ( options.remove === undefined || !!options.remove ) {
+
+                    removedModels = _.difference( previousModels, models );
+
+                    _.each( removedModels, function ( model ) {
+                        onRemove( model, this, options );
+                    }, this );
+
+                }
+
+                if ( options.add === undefined || !!options.add ) {
+
+                    addedModels = _.difference( models, previousModels );
+
+                    _.each( addedModels, function ( model ) {
+                        onAdd( model, this, options );
+                    }, this );
+
+                }
+
+            }
+
+            return returned;
+        };
+    }
+
     function patchSilentRemove ( context ) {
         var remove = context.remove;
 
         context.remove = function () {
             var returned, removed,
 
-                options = arguments[1] ? _.clone( arguments[1] ) : {},
-                isSilent = options && options.silent;
+                args = _.toArray( arguments ),
+                options = args[1] ? _.clone( args[1] ) : {},
 
-            removed = returned = remove.apply( this, arguments );
+                isSilent = options.silent,
+                isInSubcall = options["@bbs:backboneSubcall"],
+                needsFakeEvent = isSilent && !isInSubcall;
 
-            if ( isSilent ) {
+            args[1] = options;
+            options["@bbs:backboneSubcall"] = true;
+
+            removed = returned = remove.apply( this, args );
+
+            if ( needsFakeEvent && removed ) {
                 if ( !_.isArray( removed ) ) removed = [removed];
 
                 _.each( removed, function ( model ) {
@@ -1190,22 +1251,26 @@
 
                 args = _.toArray( arguments ),
                 options = args[1] ? _.clone( args[1] ) : {},
-                isSilent = options && options.silent;
 
-            options["@bbs:inReset"] = true;
+                isSilent = options.silent,
+                isInSubcall = options["@bbs:backboneSubcall"],
+                needsFakeEvent = isSilent && !isInSubcall;
+
             args[1] = options;
+            options["@bbs:backboneSubcall"] = true;
 
-            if ( isSilent ) {
+            if ( needsFakeEvent ) {
                 fakeEventOptions = _.clone( options );
-                fakeEventOptions.previousModels = this.models;
+                fakeEventOptions.previousModels = this.models || [];
             }
 
-            // The internal inReset option must be passed to the reset() call. It is needed when reset() delegates part
-            // of its work to add() with an internal (and silent) call. For that reason, we can't remove inReset from
-            // the visible options before the "reset" event is fired - it has to be sanitized in trigger() itself.
+            // The internal backboneSubcall option must be passed to the reset() call. It is needed when reset()
+            // delegates part of its work to add() with an internal (and silent) call. For that reason, we can't remove
+            // backboneSubcall from the visible options before the "reset" event is fired - it has to be sanitized in
+            // trigger() itself.
             returned = reset.apply( this, args );
 
-            if ( isSilent ) onReset( this, fakeEventOptions );
+            if ( needsFakeEvent ) onReset( this, fakeEventOptions );
 
             return returned;
         };
@@ -1214,8 +1279,8 @@
     // Creates a new trigger method which calls the predefined event handlers (onDeselect etc) as well as triggering the
     // event.
     //
-    // Also removes the internal inReset flag from the options of a reset event. That can only be done here, see comment
-    // in patchSilentReset().
+    // Also removes the internal backboneSubcall flag from the options of a Backbone event. That can only be done here,
+    // see comment in patchSilentReset().
     //
     // Adapted from Marionette.triggerMethod.
     function augmentTrigger ( context ) {
@@ -1227,10 +1292,14 @@
             // Return an augmented trigger method implementation, in order to replace the original trigger method
             return function ( event, /** ...* */ varArgs ) {
 
-                var args = _.toArray( arguments );
+                var args = _.toArray( arguments ),
 
-                // Remove the internal inReset flag from a reset event.
-                if ( event === "reset" && _.isObject( args[2] ) && _.has( args[2], "@bbs:inReset" ) ) delete args[2]["@bbs:inReset"];
+                    isBackboneEvent_OptArg2 = event === "update" || event === "reset" || event === "sort" || event === "change",
+                    isBackboneEvent_OptArg3 = event === "add" || event === "remove" || event === "destroy";
+
+                // Remove the internal backboneSubcall flag from a Backbone event.
+                if ( isBackboneEvent_OptArg2 && _.isObject( args[2] ) && _.has( args[2], "@bbs:backboneSubcall" ) ) delete args[2]["@bbs:backboneSubcall"];
+                if ( isBackboneEvent_OptArg3 && _.isObject( args[3] ) && _.has( args[3], "@bbs:backboneSubcall" ) ) delete args[3]["@bbs:backboneSubcall"];
 
                 if ( isSelectionEvent( event ) ) {
                     // get the method name from the event name
