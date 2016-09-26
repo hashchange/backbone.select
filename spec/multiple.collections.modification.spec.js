@@ -1,4 +1,4 @@
-describe( "models shared between multiple collections: adding and removing models with add(), remove(), reset(), and while instantiating", function () {
+describe( "Models shared between multiple collections: adding and removing models during instantiation, and with add(), remove(), set(), reset(), and create()", function () {
 
     var Model, SingleSelectCollection, MultiSelectCollection;
 
@@ -799,10 +799,10 @@ describe( "models shared between multiple collections: adding and removing model
         beforeEach( function () {
             var SelfSelectingModel = Model.extend( {
 
-                initialize: function () {
-                    Backbone.Select.Me.applyTo( this );
+                initialize: function ( attributes, options ) {
+                    Backbone.Select.Me.applyTo( this, options );
                     spyOn( this, "trigger" ).and.callThrough();
-                    this.select();
+                    this.select( options );
                 },
 
                 urlRoot: "/"
@@ -951,10 +951,12 @@ describe( "models shared between multiple collections: adding and removing model
         beforeEach( function () {
             var SelfSelectingModel = Model.extend( {
 
-                initialize: function () {
-                    Backbone.Select.Me.applyTo( this );
+                initialize: function ( attributes, options ) {
+                    Backbone.Select.Me.applyTo( this, options );
                     spyOn( this, "trigger" ).and.callThrough();
-                    this.select();
+                    // NB In order to make the `silent` option apply to the selection process, it has to be passed on to
+                    // the call. Seems obvious, but is easy to miss.
+                    this.select( options );
                 },
 
                 urlRoot: "/"
@@ -1017,12 +1019,12 @@ describe( "models shared between multiple collections: adding and removing model
 
         it( 'should not trigger an event on the model when created in a single-select collection', function () {
             var createdModel = singleCollectionA.create( {}, { silent: true } );
-            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringEvents( jasmine.getInternalBackboneSelectEvents(), "request" );
         } );
 
         it( 'should not trigger an event on the model when created in a multi-select collection', function () {
             var createdModel = multiCollectionA.create( {}, { silent: true } );
-            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringEvents( jasmine.getInternalBackboneSelectEvents(), "request" );
         } );
 
         it( 'should not trigger an event on the previously selected model when created in a single-select collection', function () {
@@ -1037,12 +1039,12 @@ describe( "models shared between multiple collections: adding and removing model
 
         it( 'should not trigger a single-select collection event when created in a single-select collection', function () {
             singleCollectionA.create( {}, { silent: true } );
-            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringEvents( jasmine.getInternalBackboneSelectEvents(), "request" );
         } );
 
         it( 'should not trigger a multi-select collection event when created in a multi-select collection', function () {
             multiCollectionA.create( {}, { silent: true } );
-            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringEvents( jasmine.getInternalBackboneSelectEvents(), "request" );
         } );
 
         it( 'should not trigger a multi-select collection event when the model creation is inducing a deselection in another multi-select collection', function () {
