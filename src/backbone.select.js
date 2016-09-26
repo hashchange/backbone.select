@@ -370,13 +370,8 @@
                     reselected = this[label];
                     this[label] = true;
 
-                    if ( this._pickyCollections ) {
-                        // Model-sharing mode: notify collections with an event
-                        this.trigger( "_selected", this, stripLocalOptionsExcept( options, "exclusive" ) );
-                    } else if ( this.collection ) {
-                        // Single collection only: no event listeners set up in collection, call it directly
-                        if ( !options["@bbs:processedBy"][this.collection._pickyCid] ) this.collection.select( this, stripLocalOptionsExcept( options, "exclusive" ) );
-                    }
+                    // Notify collections with an event
+                    if ( this._pickyCollections )  this.trigger( "_selected", this, stripLocalOptionsExcept( options, "exclusive" ) );
 
                     if ( !( options.silent || options["@bbs:silentLocally"] ) ) {
                         eventOptions = toEventOptions( options, label, this );
@@ -406,14 +401,10 @@
                     options["@bbs:processedBy"][this.cid] = { done: isNoop };
                     this[label] = false;
 
+                    // Notify collections with an event
                     if ( this._pickyCollections ) {
-                        // Model-sharing mode: notify collections with an event
                         if ( isNoop ) options = _.extend( options, { "@bbs:messageOnly": true } );
                         this.trigger( "_deselected", this, stripLocalOptions( options ) );
-                    } else if ( this.collection ) {
-                        // Single collection only: no event listeners set up in collection, call it directly
-                        if ( isNoop ) options = _.extend( options, { "@bbs:messageOnly": true } );
-                        this.collection.deselect( this, stripLocalOptions( options ) );
                     }
 
                     if ( isNoop ) return this;
