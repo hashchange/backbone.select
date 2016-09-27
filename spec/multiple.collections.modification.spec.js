@@ -1444,6 +1444,52 @@ describe( "Models shared between multiple collections: adding and removing model
             // expect( multiCollection.trigger ).toHaveBeenCalledWith( "select:all", { selected: [], deselected: [model3] }, multiCollection, { label: "selected", _externalEvent: "remove", index: 0 } );
         } );
 
+        it( 'should trigger a select:none event on a multi-select collection it is removed from, if it has been the only model in a multi-select collection (not shared by another collection)', function () {
+            var model3 = new Model();
+
+            var multiCollection = new MultiSelectCollection( [model3] );
+            model3.select();
+
+            spyOn( multiCollection, "trigger" ).and.callThrough();
+
+            multiCollection.remove( model3 );
+            expect( multiCollection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [model3] }, multiCollection );
+        } );
+
+        it( 'should trigger a select:none event on a multi-select collection it is removed from, if it has been the only model in a multi-select collection (shared by another collection)', function () {
+            var multiCollection = new MultiSelectCollection( [model1] );
+
+            spyOn( multiCollection, "trigger" ).and.callThrough();
+
+            multiCollection.remove( model1 );
+            expect( multiCollection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [model1] }, multiCollection );
+        } );
+
+        it( 'should trigger a deselect:one event on a single-select collection it is removed from, and no other selection-related collection events, if it has been the only model in a multi-select collection (not shared by another collection)', function () {
+            var model3 = new Model();
+
+            var singleCollection = new SingleSelectCollection( [model3] );
+            model3.select();
+
+            spyOn( singleCollection, "trigger" ).and.callThrough();
+
+            singleCollection.remove( model3 );
+            expect( singleCollection.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model3, singleCollection );
+            expect( singleCollection.trigger ).not.toHaveBeenCalledWithInitial( "select:one" );
+            expect( singleCollection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:one" );
+        } );
+
+        it( 'should trigger a deselect:one event on a single-select collection it is removed from, and no other selection-related collection events, if it has been the only model in a multi-select collection (shared by another collection)', function () {
+            var singleCollection = new SingleSelectCollection( [model1] );
+
+            spyOn( singleCollection, "trigger" ).and.callThrough();
+
+            singleCollection.remove( model1 );
+            expect( singleCollection.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model1, singleCollection );
+            expect( singleCollection.trigger ).not.toHaveBeenCalledWithInitial( "select:one" );
+            expect( singleCollection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:one" );
+        } );
+
         it( 'should not trigger a deselect:one or select:one event on a single-select collection it remains part of', function () {
             multiCollectionA.remove( model1 );
             expect( singleCollectionA.trigger ).not.toHaveBeenCalledWithInitial( "deselect:one" );
