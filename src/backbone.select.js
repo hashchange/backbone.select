@@ -667,13 +667,13 @@
             deselected: mapCidsToModels( removedCids, collection, prevSelected )
         };
 
-        if ( selectionSize === length ) {
-            queueEventSet( "select:all", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
+        if ( selectionSize === 0 ) {
+            queueEventSet( "select:none", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
             return;
         }
 
-        if ( selectionSize === 0 ) {
-            queueEventSet( "select:none", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
+        if ( selectionSize === length ) {
+            queueEventSet( "select:all", label, [ diff, collection, toEventOptions( options, label, collection ) ], collection, options );
             return;
         }
 
