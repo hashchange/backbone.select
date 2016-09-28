@@ -86,6 +86,14 @@ function restoreJasmineRecursiveScreenOutput () {
 // collection object.
 if ( ! jasmine._addTheseCustomMatchers ) jasmine._addTheseCustomMatchers = {};
 
+/**
+ * @name jasmine.Matchers#toBeAtLeast
+ * @function
+ * @param   {number} floor
+ * @returns {boolean}
+ */
+
+/** @function */
 jasmine._addTheseCustomMatchers.toBeAtLeast = function ( util, customEqualityTesters ) {
     return {
         compare: function ( actual, expected ) {
@@ -101,6 +109,14 @@ jasmine._addTheseCustomMatchers.toBeAtLeast = function ( util, customEqualityTes
     }
 };
 
+/**
+ * @name jasmine.Matchers#toBeAtMost
+ * @function
+ * @param   {number} ceil
+ * @returns {boolean}
+ */
+
+/** @function */
 jasmine._addTheseCustomMatchers.toBeAtMost = function ( util, customEqualityTesters ) {
     return {
         compare: function ( actual, expected ) {
@@ -116,6 +132,13 @@ jasmine._addTheseCustomMatchers.toBeAtMost = function ( util, customEqualityTest
     }
 };
 
+/**
+ * @name jasmine.Matchers#toHaveBeenCalledOnce
+ * @function
+ * @returns {boolean}
+ */
+
+/** @function */
 jasmine._addTheseCustomMatchers.toHaveBeenCalledOnce = function ( util, customEqualityTesters ) {
     return {
         compare: function ( actual ) {
@@ -140,6 +163,12 @@ jasmine._addTheseCustomMatchers.toHaveBeenCalledOnce = function ( util, customEq
     }
 };
 
+/**
+ * @name jasmine.Matchers#toHaveBeenCalledTwice
+ * @returns {boolean}
+ */
+
+/** @function */
 jasmine._addTheseCustomMatchers.toHaveBeenCalledTwice = function ( util, customEqualityTesters ) {
     return {
         compare: function ( actual ) {
@@ -164,6 +193,12 @@ jasmine._addTheseCustomMatchers.toHaveBeenCalledTwice = function ( util, customE
     }
 };
 
+/**
+ * @name jasmine.Matchers#toHaveBeenCalledThrice
+ * @returns {boolean}
+ */
+
+/** @function */
 jasmine._addTheseCustomMatchers.toHaveBeenCalledThrice = function ( util, customEqualityTesters ) {
     return {
         compare: function ( actual ) {
@@ -188,6 +223,14 @@ jasmine._addTheseCustomMatchers.toHaveBeenCalledThrice = function ( util, custom
     }
 };
 
+/**
+ * @name jasmine.Matchers#toHaveCallCount
+ * @function
+ * @param   {number} expectedCallCount
+ * @returns {boolean}
+ */
+
+/** @function */
 jasmine._addTheseCustomMatchers.toHaveCallCount = function ( util, customEqualityTesters ) {
     return {
         compare: function ( actual, expected ) {

@@ -971,12 +971,12 @@ describe( "Models shared between multiple collections: adding models during inst
 
         it( 'should not trigger an event on the model when created in a single-select collection', function () {
             var createdModel = singleCollectionA.create( {}, { silent: true } );
-            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringEvents( jasmine.getInternalBackboneSelectEvents(), "request" );
+            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "request" );
         } );
 
         it( 'should not trigger an event on the model when created in a multi-select collection', function () {
             var createdModel = multiCollectionA.create( {}, { silent: true } );
-            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringEvents( jasmine.getInternalBackboneSelectEvents(), "request" );
+            expect( createdModel.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "request" );
         } );
 
         it( 'should not trigger an event on the previously selected model when created in a single-select collection', function () {
@@ -991,12 +991,12 @@ describe( "Models shared between multiple collections: adding models during inst
 
         it( 'should not trigger a single-select collection event when created in a single-select collection', function () {
             singleCollectionA.create( {}, { silent: true } );
-            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringEvents( jasmine.getInternalBackboneSelectEvents(), "request" );
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "request" );
         } );
 
         it( 'should not trigger a multi-select collection event when created in a multi-select collection', function () {
             multiCollectionA.create( {}, { silent: true } );
-            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringEvents( jasmine.getInternalBackboneSelectEvents(), "request" );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "request" );
         } );
 
         it( 'should not trigger a multi-select collection event when the model creation is inducing a deselection in another multi-select collection', function () {
