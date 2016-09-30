@@ -273,14 +273,36 @@ jasmine._addTheseCustomMatchers.toHaveBeenCalledOnceForEvents = function ( util,
 };
 
 /**
+ * @name jasmine.Matchers#toHaveBeenCalledTwiceForEvents
+ * @function
+ * @param   {...(string|string[])} exclusiveEvents  a sequence of string arguments, or a single array, or a combination of both
+ * @returns {boolean}
+ */
+
+/**
+ * Matcher specifically for `trigger` event spies, in the context of Backbone. Just like toHaveBeenCalledForEvents, but
+ * tests for exactly two calls.
+ */
+jasmine._addTheseCustomMatchers.toHaveBeenCalledTwiceForEvents = function ( util, customEqualityTesters ) {
+
+    return customToHaveBeenCalled( {
+        getExclusiveEvents: function () { return jasmine.util.argsToArray( arguments ).slice( 1 ); },
+        checkFilteredCallCount: function ( filteredCallCount ) { return filteredCallCount === 2; },
+        msgAction: "to have been called twice (only counting the specified events)",
+        showActual: true
+    } );
+
+};
+
+/**
  * @param {Object}          config
  * @param {function}        config.checkFilteredCallCount
  * @param {string}          config.msgAction
- * @param {boolean}         config.showActual
- * @param {boolean}         config.showActualWhenNegated
+ * @param {boolean}         [config.showActual=false]
+ * @param {boolean}         [config.showActualWhenNegated=false]
  * @param {function}        [config.getIgnoredEvents]
  * @param {function}        [config.getExclusiveEvents]
- * @returns {{compare: compare}}
+ * @returns {Object}
  */
 function customToHaveBeenCalled ( config ) {
 

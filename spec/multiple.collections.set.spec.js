@@ -633,4 +633,1027 @@ describe( "Models shared between multiple collections: adding and removing model
 
     } );
 
+    describe( 'when a selected model is added with set(), together with a selected model already in the collection', function () {
+
+        var model1, model2, collection;
+
+        beforeEach( function () {
+            model1 = new Model();
+            model2 = new Model();
+
+            model1.select();
+            model2.select();
+        } );
+
+        describe( 'in a Select.One collection', function () {
+
+            beforeEach( function () {
+                collection = new SingleSelectCollection( [model2] );
+
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
+            } );
+
+            afterEach( function () {
+                collection.close();
+            } );
+
+            describe( 'with the existing model passed in first', function () {
+
+                beforeEach( function () {
+                    collection.set( [model2, model1] );
+                } );
+
+                it( 'the new model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'the existing model is deselected', function () {
+                    expect( model2.selected ).toBe( false );
+                } );
+
+                it( 'the new model is selected in the collection', function () {
+                    expect( collection.selected ).toBe( model1 );
+                } );
+
+                it( 'no event is triggered on the new model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "add" );
+                } );
+
+                it( 'a deselected event is triggered on the existing model', function () {
+                    expect( model2.trigger ).toHaveBeenCalledWithInitial( "deselected", model2 );
+                } );
+
+                it( 'no reselected event is triggered on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalledWithInitial( "reselected" );
+                } );
+
+                it( 'a select:one collection event is triggered for the new model', function () {
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:one", model1, collection );
+                } );
+
+                it( 'a deselect:one collection event is triggered for the existing model', function () {
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model2, collection );
+                } );
+
+                it( 'no reselect:one event is triggered', function () {
+                    expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:one" );
+                } );
+
+            } );
+
+            describe( 'with the existing model passed in second', function () {
+
+                // NB This may be surprising, but the order does NOT matter. The result is exactly the same as in the
+                // previous test, where the existing model was passed in first.
+                //
+                // One might expect that the order would matter: that the first model gets deselected by the second -
+                // the last one wins. But that doesn't happen because set() just acts as a wrapper around three separate
+                // operations, executed in order:
+                //
+                // - remove() models which are not in the list
+                // - update models which already exist in the collection
+                // - add() the new models
+                //
+                // That sequence of operation takes precedence over the order of models in the array. Additions are
+                // last, so a selected model which is added "wins" and deselects an existing selected model.
+
+                beforeEach( function () {
+                    collection.set( [model1, model2] );
+                } );
+
+                it( 'the new model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'the existing model is deselected', function () {
+                    expect( model2.selected ).toBe( false );
+                } );
+
+                it( 'the new model is selected in the collection', function () {
+                    expect( collection.selected ).toBe( model1 );
+                } );
+
+                it( 'no event is triggered on the new model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "add" );
+                } );
+
+                it( 'a deselected event is triggered on the existing model', function () {
+                    expect( model2.trigger ).toHaveBeenCalledWithInitial( "deselected", model2 );
+                } );
+
+                it( 'no reselected event is triggered on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalledWithInitial( "reselected" );
+                } );
+
+                it( 'a select:one collection event is triggered for the new model', function () {
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:one", model1, collection );
+                } );
+
+                it( 'a deselect:one collection event is triggered for the existing model', function () {
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model2, collection );
+                } );
+
+                it( 'no reselect:one event is triggered', function () {
+                    expect( collection.trigger ).not.toHaveBeenCalledWithInitial( "reselect:one" );
+                } );
+
+            } );
+
+        } );
+
+        describe( 'in a Select.Many collection', function () {
+            
+            var model3;
+
+            beforeEach( function () {
+                model3 = new Model();
+            } );
+
+            afterEach( function () {
+                collection.close();
+            } );
+
+            describe( 'which also contains a third model, not selected, to be removed on set()', function () {
+
+                beforeEach( function () {
+                    collection = new MultiSelectCollection( [model2, model3] );
+
+                    spyOn( model1, "trigger" ).and.callThrough();
+                    spyOn( model2, "trigger" ).and.callThrough();
+                    spyOn( model3, "trigger" ).and.callThrough();
+                    spyOn( collection, "trigger" ).and.callThrough();
+
+                    collection.set( [model1, model2] );
+                } );
+
+                it( 'the new model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'the existing model remains selected', function () {
+                    expect( model2.selected ).toBe( true );
+                } );
+
+                it( 'the existing and new model are selected in the collection', function () {
+                    var expected = {};
+                    expected[model1.cid] = model1;
+                    expected[model2.cid] = model2;
+                    expect( collection.selected ).toEqual( expected );
+                } );
+
+                it( 'no event is triggered on the new model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "add" );
+                } );
+
+                it( 'no event is triggered on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'a select:all collection event is triggered for the new model', function () {
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [model1], deselected: [] }, collection );
+                } );
+
+                it( 'no collection event is triggered upon removal of the third model', function () {
+                    // The collection _status_ changes from some models being selected to all models being selected, but
+                    // no selection/deselection is involved. We don't have selection events when the status changes, we
+                    // have them when a selection changes. Put differently, we never have events when both diff.selected
+                    // and diff.deselected would be empty.
+                    //
+                    // So the select:all event is only called once, later on, when the new model is added to the
+                    // collection.
+                    expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "select:all" );
+                } );
+
+                it( 'no other selection-related events are triggered in the collection', function () {
+                    // We are ignoring namespaced sub events for the labels here (select:all:selected).
+                    //
+                    // The one select:all event is triggered for the addition of the new model (model1), and has already
+                    // been covered in the preceding test.
+                    expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:none", "select:some", "reselect:any" );
+                } );
+
+            } );
+
+            describe( 'which also contains a third model, selected, to be removed on set()', function () {
+
+                beforeEach( function () {
+                    collection = new MultiSelectCollection( [model2, model3] );
+                    model3.select();
+
+                    spyOn( model1, "trigger" ).and.callThrough();
+                    spyOn( model2, "trigger" ).and.callThrough();
+                    spyOn( model3, "trigger" ).and.callThrough();
+                    spyOn( collection, "trigger" ).and.callThrough();
+
+                    collection.set( [model1, model2] );
+                } );
+
+                it( 'the new model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'the existing model remains selected', function () {
+                    expect( model2.selected ).toBe( true );
+                } );
+
+                it( 'the existing and new model are selected in the collection', function () {
+                    var expected = {};
+                    expected[model1.cid] = model1;
+                    expected[model2.cid] = model2;
+                    expect( collection.selected ).toEqual( expected );
+                } );
+
+                it( 'no event is triggered on the new model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "add" );
+                } );
+
+                it( 'no event is triggered on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'a select:all collection event is triggered upon removal of the third model', function () {
+                    // It may be counter-intuitive to see a select:all event after a selected model is removed, but
+                    // after the removal of the model is complete, the selection has shrunk, and the one remaining model
+                    // (model2) is selected, so: selected:all.
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [], deselected: [model3] }, collection );
+                } );
+
+                it( 'a select:all collection event is triggered for the new model', function () {
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:all", { selected: [model1], deselected: [] }, collection );
+                } );
+
+                it( 'no other selection-related events are triggered in the collection', function () {
+                    // We are ignoring namespaced sub events for the labels here (select:all:selected).
+                    //
+                    // The two select:all events are triggered for the removal of the excess model (model3), and for the
+                    // addition of the new model (model1), and have already been covered in the preceding tests.
+                    expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:none", "select:some", "reselect:any" );
+                    expect( collection.trigger ).toHaveBeenCalledTwiceForEvents( "select:all" );
+                } );
+
+            } );
+            
+        } );
+
+    } );
+
+    describe( 'when a selected model is added with set(), together with a selected model already in the collection, with options.silent enabled', function () {
+
+        var model1, model2, collection;
+
+        beforeEach( function () {
+            model1 = new Model();
+            model2 = new Model();
+
+            model1.select();
+            model2.select();
+        } );
+
+        describe( 'in a Select.One collection', function () {
+
+            beforeEach( function () {
+                collection = new SingleSelectCollection( [model2] );
+
+                spyOn( model1, "trigger" ).and.callThrough();
+                spyOn( model2, "trigger" ).and.callThrough();
+                spyOn( collection, "trigger" ).and.callThrough();
+            } );
+
+            afterEach( function () {
+                collection.close();
+            } );
+
+            describe( 'with the existing model passed in first', function () {
+
+                beforeEach( function () {
+                    collection.set( [model2, model1], { silent: true } );
+                } );
+
+                it( 'the new model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'the existing model is deselected', function () {
+                    expect( model2.selected ).toBe( false );
+                } );
+
+                it( 'the new model is selected in the collection', function () {
+                    expect( collection.selected ).toBe( model1 );
+                } );
+
+                it( 'no event is triggered on the new model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+                it( 'no event is triggered on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+                it( 'no event is triggered in the collection', function () {
+                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+            } );
+
+            describe( 'with the existing model passed in second', function () {
+
+                // NB This may be surprising, but the order does NOT matter. The result is exactly the same as in the
+                // previous test, where the existing model was passed in first.
+                //
+                // One might expect that the order would matter: that the first model gets deselected by the second -
+                // the last one wins. But that doesn't happen because set() just acts as a wrapper around three separate
+                // operations, executed in order:
+                //
+                // - remove() models which are not in the list
+                // - update models which already exist in the collection
+                // - add() the new models
+                //
+                // That sequence of operation takes precedence over the order of models in the array. Additions are
+                // last, so a selected model which is added "wins" and deselects an existing selected model.
+
+                beforeEach( function () {
+                    collection.set( [model1, model2], { silent: true } );
+                } );
+
+                it( 'the new model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'the existing model is deselected', function () {
+                    expect( model2.selected ).toBe( false );
+                } );
+
+                it( 'the new model is selected in the collection', function () {
+                    expect( collection.selected ).toBe( model1 );
+                } );
+
+                it( 'no event is triggered on the new model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+                it( 'no event is triggered on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+                it( 'no event is triggered in the collection', function () {
+                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+            } );
+
+        } );
+
+        describe( 'in a Select.Many collection', function () {
+
+            var model3;
+
+            beforeEach( function () {
+                model3 = new Model();
+            } );
+
+            afterEach( function () {
+                collection.close();
+            } );
+
+            describe( 'which also contains a third model, not selected, to be removed on set()', function () {
+
+                beforeEach( function () {
+                    collection = new MultiSelectCollection( [model2, model3] );
+
+                    spyOn( model1, "trigger" ).and.callThrough();
+                    spyOn( model2, "trigger" ).and.callThrough();
+                    spyOn( model3, "trigger" ).and.callThrough();
+                    spyOn( collection, "trigger" ).and.callThrough();
+
+                    collection.set( [model1, model2], { silent: true } );
+                } );
+
+                it( 'the new model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'the existing model remains selected', function () {
+                    expect( model2.selected ).toBe( true );
+                } );
+
+                it( 'the existing and new model are selected in the collection', function () {
+                    var expected = {};
+                    expected[model1.cid] = model1;
+                    expected[model2.cid] = model2;
+                    expect( collection.selected ).toEqual( expected );
+                } );
+
+                it( 'no event is triggered on the new model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+                it( 'no event is triggered on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+                it( 'no event is triggered in the collection', function () {
+                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+            } );
+
+            describe( 'which also contains a third model, selected, to be removed on set()', function () {
+
+                beforeEach( function () {
+                    collection = new MultiSelectCollection( [model2, model3] );
+                    model3.select();
+
+                    spyOn( model1, "trigger" ).and.callThrough();
+                    spyOn( model2, "trigger" ).and.callThrough();
+                    spyOn( model3, "trigger" ).and.callThrough();
+                    spyOn( collection, "trigger" ).and.callThrough();
+
+                    collection.set( [model1, model2], { silent: true } );
+                } );
+
+                it( 'the new model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'the existing model remains selected', function () {
+                    expect( model2.selected ).toBe( true );
+                } );
+
+                it( 'the existing and new model are selected in the collection', function () {
+                    var expected = {};
+                    expected[model1.cid] = model1;
+                    expected[model2.cid] = model2;
+                    expect( collection.selected ).toEqual( expected );
+                } );
+
+                it( 'no event is triggered on the new model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+                it( 'no event is triggered on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+                it( 'no event is triggered in the collection', function () {
+                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                } );
+
+            } );
+
+        } );
+
+    } );
+
+    describe( 'when a selected model is removed by not being included in set()', function () {
+
+        // The majority of these cases are covered in the tests for addition, which also examine the removal of
+        // pre-existing models which have been selected. Here, we just cover a few edge cases.
+
+        var model, collection;
+
+        beforeEach( function () {
+            model = new Model();
+            model.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
+        } );
+
+        describe( 'by passing an empty model array to set()', function () {
+
+            describe( 'with the removed, selected model being contained in another collection', function () {
+
+                var otherCollection;
+
+                afterEach( function () {
+                    otherCollection.close();
+                } );
+
+                describe( 'in a Select.One collection', function () {
+
+                    beforeEach( function () {
+                        collection = new SingleSelectCollection( [model] );
+                        otherCollection = new SingleSelectCollection( [model] );
+
+                        spyOn( model, "trigger" ).and.callThrough();
+                        spyOn( collection, "trigger" ).and.callThrough();
+
+                        collection.set( [] );
+                    } );
+
+                    it( 'the removed model remains selected', function () {
+                        expect( model.selected ).toBe( true );
+                    } );
+
+                    it( 'the collection does not have a model selected', function () {
+                        expect( collection.selected ).toBeUndefined();
+                    } );
+
+                    it( 'no events are triggered on the model', function () {
+                        expect( model.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "remove" );
+                    } );
+
+                    it( 'a deselect:one event is triggered in the collection', function () {
+                        expect( collection.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model, collection );
+                    } );
+
+                    it( 'no other selection-related events are triggered in the collection', function () {
+                        expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:one", "reselect:one" );
+                        expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "deselect:one" );
+                    } );
+                    
+                } );
+                
+                describe( 'in a Select.Many collection', function () {
+
+                    beforeEach( function () {
+                        collection = new MultiSelectCollection( [model] );
+                        otherCollection = new MultiSelectCollection( [model] );
+
+                        spyOn( model, "trigger" ).and.callThrough();
+                        spyOn( collection, "trigger" ).and.callThrough();
+
+                        collection.set( [] );
+                    } );
+
+                    it( 'the removed model remains selected', function () {
+                        expect( model.selected ).toBe( true );
+                    } );
+
+                    it( 'the collection does not have a model selected', function () {
+                        expect( collection.selected ).toEqual( {} );
+                    } );
+
+                    it( 'no events are triggered on the model', function () {
+                        expect( model.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "remove" );
+                    } );
+
+                    it( 'a select:none event is triggered in the collection', function () {
+                        expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [model] }, collection );
+                    } );
+
+                    it( 'no other selection-related events are triggered in the collection', function () {
+                        expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:all", "select:some", "reselect:any" );
+                        expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "select:none" );
+                    } );
+
+                } );
+
+            } );
+
+            describe( 'with the removed, selected model not being contained in another collection', function () {
+
+                describe( 'in a Select.One collection', function () {
+
+                    beforeEach( function () {
+                        collection = new SingleSelectCollection( [model] );
+
+                        spyOn( model, "trigger" ).and.callThrough();
+                        spyOn( collection, "trigger" ).and.callThrough();
+
+                        collection.set( [] );
+                    } );
+
+                    it( 'the removed model is deselected', function () {
+                        expect( model.selected ).toBe( false );
+                    } );
+
+                    it( 'the collection does not have a model selected', function () {
+                        expect( collection.selected ).toBeUndefined();
+                    } );
+
+                    it( 'a deselect event is triggered on the model', function () {
+                        expect( model.trigger ).toHaveBeenCalledWithInitial( "deselected", model );
+                    } );
+
+                    it( 'no other selection-related events are triggered on the model', function () {
+                        expect( model.trigger ).toHaveBeenCalledOnceForEvents( "deselected" );
+                        expect( model.trigger ).not.toHaveBeenCalledForEvents( "selected", "reselected" );
+                    } );
+
+                    it( 'a deselect:one event is triggered in the collection', function () {
+                        expect( collection.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model, collection );
+                    } );
+
+                    it( 'no other selection-related events are triggered in the collection', function () {
+                        expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:one", "reselect:one" );
+                        expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "deselect:one" );
+                    } );
+
+                } );
+
+                describe( 'in a Select.Many collection', function () {
+
+                    beforeEach( function () {
+                        collection = new MultiSelectCollection( [model] );
+
+                        spyOn( model, "trigger" ).and.callThrough();
+                        spyOn( collection, "trigger" ).and.callThrough();
+
+                        collection.set( [] );
+                    } );
+
+                    it( 'the removed model is deselected', function () {
+                        expect( model.selected ).toBe( false );
+                    } );
+
+                    it( 'the collection does not have a model selected', function () {
+                        expect( collection.selected ).toEqual( {} );
+                    } );
+
+                    it( 'a deselect event is triggered on the model', function () {
+                        expect( model.trigger ).toHaveBeenCalledWithInitial( "deselected", model );
+                    } );
+
+                    it( 'no other selection-related events are triggered on the model', function () {
+                        expect( model.trigger ).toHaveBeenCalledOnceForEvents( "deselected" );
+                        expect( model.trigger ).not.toHaveBeenCalledForEvents( "selected", "reselected" );
+                    } );
+
+                    it( 'a select:none event is triggered in the collection', function () {
+                        expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [model] }, collection );
+                    } );
+
+                    it( 'no other selection-related events are triggered in the collection', function () {
+                        expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:all", "select:some", "reselect:any" );
+                        expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "select:none" );
+                    } );
+
+                } );
+
+            } );
+
+        } );
+
+    } );
+
+    describe( 'when a selected model is removed by not being included in set(), with options.silent enabled', function () {
+
+        // The majority of these cases are covered in the tests for addition, which also examine the removal of
+        // pre-existing models which have been selected. Here, we just cover a few edge cases.
+
+        var model, collection;
+
+        beforeEach( function () {
+            model = new Model();
+            model.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
+        } );
+
+        describe( 'by passing an empty model array to set()', function () {
+
+            describe( 'with the removed, selected model being contained in another collection', function () {
+
+                var otherCollection;
+
+                afterEach( function () {
+                    otherCollection.close();
+                } );
+
+                describe( 'in a Select.One collection', function () {
+
+                    beforeEach( function () {
+                        collection = new SingleSelectCollection( [model] );
+                        otherCollection = new SingleSelectCollection( [model] );
+
+                        spyOn( model, "trigger" ).and.callThrough();
+                        spyOn( collection, "trigger" ).and.callThrough();
+
+                        collection.set( [], { silent: true } );
+                    } );
+
+                    it( 'the removed model remains selected', function () {
+                        expect( model.selected ).toBe( true );
+                    } );
+
+                    it( 'the collection does not have a model selected', function () {
+                        expect( collection.selected ).toBeUndefined();
+                    } );
+
+                    it( 'no events are triggered on the model', function () {
+                        expect( model.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    } );
+
+                    it( 'no events are triggered in the collection', function () {
+                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    } );
+
+                } );
+
+                describe( 'in a Select.Many collection', function () {
+
+                    beforeEach( function () {
+                        collection = new MultiSelectCollection( [model] );
+                        otherCollection = new MultiSelectCollection( [model] );
+
+                        spyOn( model, "trigger" ).and.callThrough();
+                        spyOn( collection, "trigger" ).and.callThrough();
+
+                        collection.set( [], { silent: true } );
+                    } );
+
+                    it( 'the removed model remains selected', function () {
+                        expect( model.selected ).toBe( true );
+                    } );
+
+                    it( 'the collection does not have a model selected', function () {
+                        expect( collection.selected ).toEqual( {} );
+                    } );
+
+                    it( 'no events are triggered on the model', function () {
+                        expect( model.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    } );
+
+                    it( 'no events are triggered in the collection', function () {
+                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    } );
+
+                } );
+
+            } );
+
+            describe( 'with the removed, selected model not being contained in another collection', function () {
+
+                describe( 'in a Select.One collection', function () {
+
+                    beforeEach( function () {
+                        collection = new SingleSelectCollection( [model] );
+
+                        spyOn( model, "trigger" ).and.callThrough();
+                        spyOn( collection, "trigger" ).and.callThrough();
+
+                        collection.set( [], { silent: true } );
+                    } );
+
+                    it( 'the removed model is deselected', function () {
+                        expect( model.selected ).toBe( false );
+                    } );
+
+                    it( 'the collection does not have a model selected', function () {
+                        expect( collection.selected ).toBeUndefined();
+                    } );
+
+                    it( 'no events are triggered on the model', function () {
+                        expect( model.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    } );
+
+                    it( 'no events are triggered in the collection', function () {
+                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    } );
+
+                } );
+
+                describe( 'in a Select.Many collection', function () {
+
+                    beforeEach( function () {
+                        collection = new MultiSelectCollection( [model] );
+
+                        spyOn( model, "trigger" ).and.callThrough();
+                        spyOn( collection, "trigger" ).and.callThrough();
+
+                        collection.set( [], { silent: true } );
+                    } );
+
+                    it( 'the removed model is deselected', function () {
+                        expect( model.selected ).toBe( false );
+                    } );
+
+                    it( 'the collection does not have a model selected', function () {
+                        expect( collection.selected ).toEqual( {} );
+                    } );
+
+                    it( 'no events are triggered on the model', function () {
+                        expect( model.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    } );
+
+                    it( 'no events are triggered in the collection', function () {
+                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    } );
+
+                } );
+
+            } );
+
+        } );
+
+    } );
+
+    describe( 'when a selected model is removed by not being included in set(), with options.add set to false', function () {
+
+        describe( 'set() is passed a new, selected model (to be ignored) and an existing, unselected model', function () {
+
+            var model1, model2, model3, collection;
+
+            beforeEach( function () {
+                model1 = new Model();
+                model2 = new Model();
+                model3 = new Model();
+
+                model1.select();
+                model3.select();
+            } );
+
+            afterEach( function () {
+                collection.close();
+            } );
+
+            describe( 'in a Select.One collection', function () {
+
+                beforeEach( function () {
+                    collection = new SingleSelectCollection( [model2, model3] );
+
+                    spyOn( model1, "trigger" ).and.callThrough();
+                    spyOn( model2, "trigger" ).and.callThrough();
+                    spyOn( model3, "trigger" ).and.callThrough();
+                    spyOn( collection, "trigger" ).and.callThrough();
+
+                    collection.set( [model1, model2], { add: false } );
+                } );
+
+                it( 'the new, selected (ignored) model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'only the existing model is part of the collection', function () {
+                    expect( collection.models ).toEqual( [model2] );
+                } );
+
+                it( 'no model is selected in the collection', function () {
+                    expect( collection.selected ).toBeUndefined();
+                } );
+
+                it( 'no events are fired on the new (ignored) model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'no events are fired on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'a deselect:one collection event is fired for a removed, selected, third model', function () {
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "deselect:one", model3, collection );
+                } );
+
+                it( 'no other selection-related events are fired in the collection', function () {
+                    expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "deselect:one" );
+                    expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:one", "reselect:one" );
+                } );
+
+            } );
+
+            describe( 'in a Select.Many collection', function () {
+
+                beforeEach( function () {
+                    collection = new MultiSelectCollection( [model2, model3] );
+
+                    spyOn( model1, "trigger" ).and.callThrough();
+                    spyOn( model2, "trigger" ).and.callThrough();
+                    spyOn( model3, "trigger" ).and.callThrough();
+                    spyOn( collection, "trigger" ).and.callThrough();
+
+                    collection.set( [model1, model2], { add: false } );
+                } );
+
+                it( 'the new, selected (ignored) model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'only the existing model is part of the collection', function () {
+                    expect( collection.models ).toEqual( [model2] );
+                } );
+
+                it( 'no model is selected in the collection', function () {
+                    expect( collection.selected ).toEqual( {} );
+                } );
+
+                it( 'no events are fired on the new (ignored) model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'no events are fired on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'a select:none collection event is fired for a removed, selected, third model', function () {
+                    expect( collection.trigger ).toHaveBeenCalledWithInitial( "select:none", { selected: [], deselected: [model3] }, collection );
+                } );
+
+                it( 'no other selection-related events are fired in the collection', function () {
+                    expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "select:none" );
+                    expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:some", "select:all", "reselect:any" );
+                } );
+
+            } );
+
+        } );
+
+    } );
+
+    describe( 'when a selected model is removed by not being included in set(), with options.add set to false and options.silent enabled', function () {
+
+        describe( 'set() is passed a new, selected model (to be ignored) and an existing, unselected model', function () {
+
+            var model1, model2, model3, collection;
+
+            beforeEach( function () {
+                model1 = new Model();
+                model2 = new Model();
+                model3 = new Model();
+
+                model1.select();
+                model3.select();
+            } );
+
+            afterEach( function () {
+                collection.close();
+            } );
+
+            describe( 'in a Select.One collection', function () {
+
+                beforeEach( function () {
+                    collection = new SingleSelectCollection( [model2, model3] );
+
+                    spyOn( model1, "trigger" ).and.callThrough();
+                    spyOn( model2, "trigger" ).and.callThrough();
+                    spyOn( model3, "trigger" ).and.callThrough();
+                    spyOn( collection, "trigger" ).and.callThrough();
+
+                    collection.set( [model1, model2], { add: false, silent: true } );
+                } );
+
+                it( 'the new, selected (ignored) model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'only the existing model is part of the collection', function () {
+                    expect( collection.models ).toEqual( [model2] );
+                } );
+
+                it( 'no model is selected in the collection', function () {
+                    expect( collection.selected ).toBeUndefined();
+                } );
+
+                it( 'no events are fired on the new (ignored) model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'no events are fired on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'no events are fired in the collection', function () {
+                    expect( collection.trigger ).not.toHaveBeenCalled();
+                } );
+
+            } );
+
+            describe( 'in a Select.Many collection', function () {
+
+                beforeEach( function () {
+                    collection = new MultiSelectCollection( [model2, model3] );
+
+                    spyOn( model1, "trigger" ).and.callThrough();
+                    spyOn( model2, "trigger" ).and.callThrough();
+                    spyOn( model3, "trigger" ).and.callThrough();
+                    spyOn( collection, "trigger" ).and.callThrough();
+
+                    collection.set( [model1, model2], { add: false, silent: true } );
+                } );
+
+                it( 'the new, selected (ignored) model remains selected', function () {
+                    expect( model1.selected ).toBe( true );
+                } );
+
+                it( 'only the existing model is part of the collection', function () {
+                    expect( collection.models ).toEqual( [model2] );
+                } );
+
+                it( 'no model is selected in the collection', function () {
+                    expect( collection.selected ).toEqual( {} );
+                } );
+
+                it( 'no events are fired on the new (ignored) model', function () {
+                    expect( model1.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'no events are fired on the existing model', function () {
+                    expect( model2.trigger ).not.toHaveBeenCalled();
+                } );
+
+                it( 'no events are fired in the collection', function () {
+                    expect( collection.trigger ).not.toHaveBeenCalled();
+                } );
+
+            } );
+
+        } );
+
+    } );
+
 } );
