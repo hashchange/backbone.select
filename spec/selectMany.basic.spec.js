@@ -50,10 +50,10 @@ describe( "multi-select collection: general", function () {
                 onSelectAll: function () {},
                 onReselect: function () {},
 
-                // Pseudo event handlers modeled on internal events `_selected`,
-                // `_deselected`; should not be invoked automatically
-                on_select: function () {},
-                on_deselect: function () {},
+                // Pseudo event handlers modeled on internal events `@bbs:_selected`,
+                // `@bbs:_deselected`; should not be invoked automatically
+                "on@bbs:_selected": function () {},
+                "on@bbs:_deselected": function () {},
 
                 // Pseudo event handlers modeled on standard Backbone events `add`,
                 // `remove`, `reset`, `all` (as stand-ins for all others) ; should
@@ -72,8 +72,8 @@ describe( "multi-select collection: general", function () {
             spyOn( collection, "onSelectAll" ).and.callThrough();
             spyOn( collection, "onReselect" ).and.callThrough();
 
-            spyOn( collection, "on_select" ).and.callThrough();
-            spyOn( collection, "on_deselect" ).and.callThrough();
+            spyOn( collection, "on@bbs:_selected" ).and.callThrough();
+            spyOn( collection, "on@bbs:_deselected" ).and.callThrough();
 
             spyOn( collection, "onAdd" ).and.callThrough();
             spyOn( collection, "onRemove" ).and.callThrough();
@@ -105,14 +105,14 @@ describe( "multi-select collection: general", function () {
             expect( collection.onReselect ).toHaveBeenCalledWith( [model], collection, {foo: "bar"} );
         } );
 
-        it( 'does not call an event handler accidentally named after the internal _selected event', function () {
-            model.trigger( "_selected", model );
-            expect( collection.on_select ).not.toHaveBeenCalled();
+        it( 'does not call an event handler accidentally named after the internal @bbs:_selected event', function () {
+            model.trigger( "@bbs:_selected", model );
+            expect( collection["on@bbs:_selected"] ).not.toHaveBeenCalled();
         } );
 
-        it( 'does not call an event handler accidentally named after the internal _deselected event', function () {
-            model.trigger( "_deselected", model );
-            expect( collection.on_deselect ).not.toHaveBeenCalled();
+        it( 'does not call an event handler accidentally named after the internal @bbs:_deselected event', function () {
+            model.trigger( "@bbs:_deselected", model );
+            expect( collection["on@bbs:_deselected"] ).not.toHaveBeenCalled();
         } );
 
         it( 'does not automatically call an event handler named after a standard Backbone event (e.g. onAdd)', function () {

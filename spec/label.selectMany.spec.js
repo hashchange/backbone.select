@@ -1208,11 +1208,6 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
                 onSelectAll: function () {},
                 onReselect: function () {},
 
-                // Pseudo event handlers modeled on internal events `_selected`,
-                // `_deselected`; should not be invoked automatically
-                on_select: function () {},
-                on_deselect: function () {},
-
                 // Pseudo event handlers modeled on standard Backbone events `add`,
                 // `remove`, `reset`, `all` (as stand-ins for all others) ; should
                 // not be invoked automatically
@@ -1229,9 +1224,6 @@ describe( 'Custom labels: Select.Me model in Select.Many collection', function (
             spyOn( collection, "onSelectSome" ).and.callThrough();
             spyOn( collection, "onSelectAll" ).and.callThrough();
             spyOn( collection, "onReselect" ).and.callThrough();
-
-            spyOn( collection, "on_select" ).and.callThrough();
-            spyOn( collection, "on_deselect" ).and.callThrough();
 
             spyOn( collection, "onAdd" ).and.callThrough();
             spyOn( collection, "onRemove" ).and.callThrough();

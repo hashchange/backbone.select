@@ -8,7 +8,7 @@
  * @type {string[]}
  */
 jasmine.getInternalBackboneSelectEvents = function () {
-    return ["_selected", "_deselected"];
+    return ["@bbs:_selected", "@bbs:_deselected"];
 };
 
 
