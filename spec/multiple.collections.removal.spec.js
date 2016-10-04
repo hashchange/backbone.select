@@ -173,6 +173,9 @@ describe( "Models shared between multiple collections: removing models with remo
         } );
 
         it( 'should trigger a select:all event on a multi-select collection it is removed from, if all remaining models are still selected', function () {
+            // It may be counter-intuitive to see a select:all event after a selected model is removed, but after the
+            // removal of the model is complete, the selection has shrunk, and the one remaining model is selected, so:
+            // select:all.
             var model3 = new Model();
             var model4 = new Model();
 
@@ -393,6 +396,59 @@ describe( "Models shared between multiple collections: removing models with remo
         it( 'should not trigger an event on a multi-select collection it remains part of', function () {
             singleCollectionA.remove( model1, { silent: true } );
             expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+    } );
+
+    describe( 'when an unselected model is removed and only selected models are left in the collection', function () {
+
+        var model1, model2, collection;
+
+        beforeEach( function () {
+            model1 = new Model();
+            model2 = new Model();
+
+            model1.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
+        } );
+
+        describe( 'in a Select.One collection', function () {
+
+            beforeEach( function () {
+                collection = new SingleSelectCollection( [model1, model2] );
+                spyOn( collection, "trigger" ).and.callThrough();
+
+                collection.remove( model2 );
+            } );
+
+            it( 'no selection-related event is fired in the collection', function () {
+                expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:one", "deselect:one", "reselect:one" );
+            } );
+
+        } );
+
+        describe( 'in a Select.Many collection', function () {
+
+            beforeEach( function () {
+                collection = new MultiSelectCollection( [model1, model2] );
+                spyOn( collection, "trigger" ).and.callThrough();
+
+                collection.remove( model2 );
+            } );
+
+            it( 'no selection-related event is fired in the collection', function () {
+                // The status of the collection changes from some models being selected to all models being selected. That
+                // may sound like a trigger for the select:all event, but it is not what the event is for.
+                //
+                // Even though the status changes, no selection or deselection is involved. We don't have selection events
+                // when the status changes, we have them when a selection changes. Put differently, we never have events
+                // when both diff.selected and diff.deselected would be empty.
+                expect( collection.trigger ).not.toHaveBeenCalledForEvents( "select:none", "select:some", "select:all", "reselect:any" );
+            } );
+
         } );
 
     } );
