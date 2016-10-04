@@ -1248,7 +1248,6 @@
                 needsFakeEvent = isSilent && !isInSubcall;
 
             args[1] = options;
-            options["@bbs:backboneSubcall"] = true;
 
             if ( needsFakeEvent ) {
                 fakeEventOptions = _.clone( options );
@@ -1259,9 +1258,17 @@
             // delegates part of its work to add() with an internal (and silent) call. For that reason, we can't remove
             // backboneSubcall from the visible options before the "reset" event is fired - it has to be sanitized in
             // trigger() itself.
+            options["@bbs:backboneSubcall"] = true;
             returned = reset.apply( this, args );
 
-            if ( needsFakeEvent ) onReset( this, fakeEventOptions );
+            if ( needsFakeEvent ) {
+                onReset( this, fakeEventOptions );
+
+                // Notify plugins with an unofficial event.
+                //
+                // The event is safe to use: it is part of the API, guaranteed by tests.
+                this.trigger( "@bbs:reset:silent", this, fakeEventOptions );
+            }
 
             return returned;
         };

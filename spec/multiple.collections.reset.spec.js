@@ -386,13 +386,15 @@ describe( "Models shared between multiple collections: adding and removing model
         } );
 
         it( 'should not trigger a collection event when added to a single-select collection', function () {
+            // We ignore the @bbs:reset:silent event here, which is always fired during an otherwise silent reset.
             singleCollectionA.reset( [model1], { silent: true } );
-            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:reset:silent" );
         } );
 
         it( 'should not trigger a collection event when added to a multi-select collection', function () {
+            // We ignore the @bbs:reset:silent event here, which is always fired during an otherwise silent reset.
             multiCollectionA.reset( [model1], { silent: true } );
-            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:reset:silent" );
         } );
 
         it( 'should not trigger an event on another single-select collection holding the model', function () {
@@ -411,8 +413,9 @@ describe( "Models shared between multiple collections: adding and removing model
         } );
 
         it( 'should not trigger a collection event when added to a singe-select collection, even if multiple models with selected status are added, and all but the last one are deselected', function () {
+            // We ignore the @bbs:reset:silent event here, which is always fired during an otherwise silent reset.
             singleCollectionA.reset( [model1, model2], { silent: true } );
-            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:reset:silent" );
         } );
 
         it( 'should not trigger a multi-select collection event when the reset is inducing a deselection in another multi-select collection', function () {
@@ -599,15 +602,146 @@ describe( "Models shared between multiple collections: adding and removing model
         } );
 
         it( 'should not trigger a single-select collection event while being removed from all collections, single-select collection last', function () {
+            // We ignore the @bbs:reset:silent event here, which is always fired during an otherwise silent reset.
             multiCollectionA.reset( null, { silent: true } );
             singleCollectionA.reset( null, { silent: true } );
-            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:reset:silent" );
         } );
 
         it( 'should not trigger a multi-select collection event while being removed from all collections, multi-select collection last', function () {
+            // We ignore the @bbs:reset:silent event here, which is always fired during an otherwise silent reset.
             singleCollectionA.reset( null, { silent: true } );
             multiCollectionA.reset( null, { silent: true } );
-            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:reset:silent" );
+        } );
+
+    } );
+
+    describe( 'The event @bbs:reset:silent', function () {
+
+        var newPlainModel, newSelectedModel, existingModel, collection;
+
+        beforeEach( function () {
+            newPlainModel = new Backbone.Model();
+            newSelectedModel = new Model();
+            existingModel = new Model();
+
+            existingModel.select();
+            newSelectedModel.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
+        } );
+
+        describe( 'in a Select.One collection', function () {
+
+            beforeEach( function () {
+                collection = new SingleSelectCollection( [existingModel] );
+                spyOn( collection, "trigger" ).and.callThrough();
+            } );
+
+            it( 'is fired on reset() with options.silent enabled', function () {
+                collection.reset( null, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "@bbs:reset:silent" );
+            } );
+
+            it( 'passes along the collection as first argument', function () {
+                collection.reset( null, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:reset:silent", collection );
+            } );
+
+            it( 'passes along an options object as second argument, containing the previous models in options.previousModels', function () {
+                collection.reset( null, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:reset:silent", collection, { silent: true, previousModels: [existingModel] } );
+            } );
+
+            it( 'is fired after reset() has done its job', function () {
+                var modelsInCollection;
+
+                collection.on( "@bbs:reset:silent", function ( cbCollection ) {
+                    modelsInCollection = cbCollection.models.slice();
+                } );
+
+                collection.reset( [newPlainModel], { silent: true } );
+                expect( modelsInCollection ).toEqual( [newPlainModel] );
+            } );
+
+            it( 'is fired after new models have been processed by Backbone.Select, ie after selections have been updated and the Select.Me mixin has been applied to plain models', function () {
+                var selectedInCollection, pickyType;
+
+                collection.on( "@bbs:reset:silent", function ( cbCollection ) {
+                    selectedInCollection = cbCollection.selected;
+                    pickyType = cbCollection.first() && cbCollection.first()._pickyType;
+                } );
+
+                collection.reset( [newSelectedModel], { silent: true } );
+                expect( selectedInCollection ).toBe( newSelectedModel );
+
+                collection.reset( [newPlainModel], { silent: true } );
+                expect( pickyType ).toEqual( "Backbone.Select.Me" );
+            } );
+
+            it( 'is not fired on reset() if options.silent is not enabled', function () {
+                collection.reset();
+                expect( collection.trigger ).not.toHaveBeenCalledOnceForEvents( "@bbs:reset:silent" );
+            } );
+
+        } );
+
+        describe( 'in a Select.Many collection', function () {
+
+            beforeEach( function () {
+                collection = new MultiSelectCollection( [existingModel] );
+                spyOn( collection, "trigger" ).and.callThrough();
+            } );
+
+            it( 'is fired on reset() with options.silent enabled', function () {
+                collection.reset( null, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "@bbs:reset:silent" );
+            } );
+
+            it( 'passes along the collection as first argument', function () {
+                collection.reset( null, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:reset:silent", collection );
+            } );
+
+            it( 'passes along an options object as second argument, containing the previous models in options.previousModels', function () {
+                collection.reset( null, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:reset:silent", collection, { silent: true, previousModels: [existingModel] } );
+            } );
+
+            it( 'is fired after reset() has done its job', function () {
+                var modelsInCollection;
+
+                collection.on( "@bbs:reset:silent", function ( cbCollection ) {
+                    modelsInCollection = cbCollection.models.slice();
+                } );
+
+                collection.reset( [newPlainModel], { silent: true } );
+                expect( modelsInCollection ).toEqual( [newPlainModel] );
+            } );
+
+            it( 'is fired after new models have been processed by Backbone.Select, ie after selections have been updated and the Select.Me mixin has been applied to plain models', function () {
+                var selectedInCollection, pickyType;
+
+                collection.on( "@bbs:reset:silent", function ( cbCollection ) {
+                    selectedInCollection = _.clone( cbCollection.selected );
+                    pickyType = cbCollection.first() && cbCollection.first()._pickyType;
+                } );
+
+                collection.reset( [newSelectedModel], { silent: true } );
+                expect( _.values( selectedInCollection ) ).toEqual( [newSelectedModel] );
+
+                collection.reset( [newPlainModel], { silent: true } );
+                expect( pickyType ).toEqual( "Backbone.Select.Me" );
+            } );
+
+            it( 'is not fired on reset() if options.silent is not enabled', function () {
+                collection.reset();
+                expect( collection.trigger ).not.toHaveBeenCalledOnceForEvents( "@bbs:reset:silent" );
+            } );
+
         } );
 
     } );
