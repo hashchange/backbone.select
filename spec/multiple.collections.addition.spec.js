@@ -459,13 +459,15 @@ describe( "Models shared between multiple collections: adding models during inst
         } );
 
         it( 'should not trigger a single-select collection event when added to a single-select collection', function () {
+            // We ignore the "@bbs:add:silent" event here, which is always fired during an otherwise silent addition.
             singleCollectionA.add( model2, { silent: true } );
-            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:add:silent" );
         } );
 
         it( 'should not trigger a multi-select collection event when added to a multi-select collection', function () {
+            // We ignore the "@bbs:add:silent" event here, which is always fired during an otherwise silent addition.
             multiCollectionA.add( model4, { silent: true } );
-            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:add:silent" );
         } );
 
         it( 'should not trigger a multi-select collection event when the addition is inducing a deselection in another multi-select collection', function () {
@@ -990,18 +992,161 @@ describe( "Models shared between multiple collections: adding models during inst
         } );
 
         it( 'should not trigger a single-select collection event when created in a single-select collection', function () {
+            // We ignore the "@bbs:add:silent" event here, which is always fired during an otherwise silent addition.
             singleCollectionA.create( {}, { silent: true } );
-            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "request" );
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "request", "@bbs:add:silent" );
         } );
 
         it( 'should not trigger a multi-select collection event when created in a multi-select collection', function () {
+            // We ignore the "@bbs:add:silent" event here, which is always fired during an otherwise silent addition.
             multiCollectionA.create( {}, { silent: true } );
-            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "request" );
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "request", "@bbs:add:silent" );
         } );
 
         it( 'should not trigger a multi-select collection event when the model creation is inducing a deselection in another multi-select collection', function () {
             singleCollectionA.create( {}, { silent: true } );
             expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+        } );
+
+    } );
+
+    describe( 'The event @bbs:add:silent, when triggered by add()', function () {
+
+        // Only covering add() here. See also the corresponding tests for the event when triggered by set().
+
+        var newPlainModel, newSelectedModel, existingModel, collection;
+
+        beforeEach( function () {
+            newPlainModel = new Backbone.Model();
+            newSelectedModel = new Model();
+            existingModel = new Model();
+
+            existingModel.select();
+            newSelectedModel.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
+        } );
+
+        describe( 'in a Select.One collection', function () {
+
+            beforeEach( function () {
+                collection = new SingleSelectCollection( [existingModel] );
+                spyOn( collection, "trigger" ).and.callThrough();
+            } );
+
+            it( 'is fired on add() with options.silent enabled', function () {
+                collection.add( newPlainModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "@bbs:add:silent" );
+            } );
+
+            it( 'passes along the model as first argument', function () {
+                collection.add( newPlainModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:add:silent", newPlainModel );
+            } );
+
+            it( 'passes along the collection as second argument', function () {
+                collection.add( newPlainModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:add:silent", newPlainModel, collection );
+            } );
+
+            it( 'passes along an options object as third argument', function () {
+                collection.add( newPlainModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:add:silent", newPlainModel, collection, { silent: true } );
+            } );
+
+            it( 'is fired after add() has done its job', function () {
+                var modelsInCollection;
+
+                collection.on( "@bbs:add:silent", function ( model, cbCollection ) {
+                    modelsInCollection = cbCollection.models.slice();
+                } );
+
+                collection.add( newPlainModel, { silent: true } );
+                expect( modelsInCollection ).toEqual( [existingModel, newPlainModel] );
+            } );
+
+            it( 'is fired after new models have been processed by Backbone.Select, ie after selections have been updated and the Select.Me mixin has been applied to plain models', function () {
+                var selectedInCollection, pickyType;
+
+                collection.on( "@bbs:add:silent", function ( model, cbCollection ) {
+                    selectedInCollection = cbCollection.selected;
+                    pickyType = cbCollection.first() && cbCollection.first()._pickyType;
+                } );
+
+                collection.add( newSelectedModel, { silent: true } );
+                expect( selectedInCollection ).toBe( newSelectedModel );
+
+                collection.add( newPlainModel, { silent: true } );
+                expect( pickyType ).toEqual( "Backbone.Select.Me" );
+            } );
+
+            it( 'is not fired on add() if options.silent is not enabled', function () {
+                collection.add( newPlainModel );
+                expect( collection.trigger ).not.toHaveBeenCalledForEvents( "@bbs:add:silent" );
+            } );
+
+        } );
+
+        describe( 'in a Select.Many collection', function () {
+
+            beforeEach( function () {
+                collection = new MultiSelectCollection( [existingModel] );
+                spyOn( collection, "trigger" ).and.callThrough();
+            } );
+
+            it( 'is fired on add() with options.silent enabled', function () {
+                collection.add( newPlainModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "@bbs:add:silent" );
+            } );
+
+            it( 'passes along the model as first argument', function () {
+                collection.add( newPlainModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:add:silent", newPlainModel );
+            } );
+
+            it( 'passes along the collection as second argument', function () {
+                collection.add( newPlainModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:add:silent", newPlainModel, collection );
+            } );
+
+            it( 'passes along an options object as third argument', function () {
+                collection.add( newPlainModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:add:silent", newPlainModel, collection, { silent: true } );
+            } );
+
+            it( 'is fired after add() has done its job', function () {
+                var modelsInCollection;
+
+                collection.on( "@bbs:add:silent", function ( model, cbCollection ) {
+                    modelsInCollection = cbCollection.models.slice();
+                } );
+
+                collection.add( newPlainModel, { silent: true } );
+                expect( modelsInCollection ).toEqual( [existingModel, newPlainModel] );
+            } );
+
+            it( 'is fired after new models have been processed by Backbone.Select, ie after selections have been updated and the Select.Me mixin has been applied to plain models', function () {
+                var selectedInCollection, pickyType;
+
+                collection.on( "@bbs:add:silent", function ( model, cbCollection ) {
+                    selectedInCollection = _.clone( cbCollection.selected );
+                    pickyType = cbCollection.first() && cbCollection.first()._pickyType;
+                } );
+
+                collection.add( newSelectedModel, { silent: true } );
+                expect( _.values( selectedInCollection ) ).toEqual( [existingModel, newSelectedModel] );
+
+                collection.add( newPlainModel, { silent: true } );
+                expect( pickyType ).toEqual( "Backbone.Select.Me" );
+            } );
+
+            it( 'is not fired on add() if options.silent is not enabled', function () {
+                collection.add( newPlainModel );
+                expect( collection.trigger ).not.toHaveBeenCalledForEvents( "@bbs:add:silent" );
+            } );
+
         } );
 
     } );

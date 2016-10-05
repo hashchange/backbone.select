@@ -1122,7 +1122,7 @@
         var add = context.add;
 
         context.add = function () {
-            var returned, models, previousModels,
+            var returned, models, previousModels, fakeEventOptions,
 
                 args = _.toArray( arguments ),
                 options = args[1] ? _.clone( args[1] ) : {},
@@ -1132,10 +1132,13 @@
                 needsFakeEvent = isSilent && !isInSubcall;
 
             args[1] = options;
+
+            if ( needsFakeEvent ) {
+                fakeEventOptions = _.clone( options );
+                previousModels = this.models && this.models.slice() || [];
+            }
+
             options["@bbs:backboneSubcall"] = true;
-
-            if ( needsFakeEvent ) previousModels = this.models && this.models.slice() || [];
-
             models = returned = add.apply( this, args );
 
             if ( needsFakeEvent && models ) {
@@ -1143,7 +1146,15 @@
                 models = _.difference( models, previousModels );
 
                 _.each( models, function ( model ) {
-                    onAdd( model, this, options );
+
+                    var _options = _.clone( fakeEventOptions );
+                    onAdd( model, this, _options );
+
+                    // Notify plugins with an unofficial event.
+                    //
+                    // The event is safe to use: it is part of the API, guaranteed by tests.
+                    this.trigger( "@bbs:add:silent", model, this, _options );
+
                 }, this );
             }
 
@@ -1206,8 +1217,15 @@
                     addedModels = _.difference( models, previousModels );
 
                     _.each( addedModels, function ( model ) {
+
                         var _options = _.clone( fakeEventOptions );
                         onAdd( model, this, _options );
+
+                        // Notify plugins with an unofficial event.
+                        //
+                        // The event is safe to use: it is part of the API, guaranteed by tests.
+                        this.trigger( "@bbs:add:silent", model, this, _options );
+
                     }, this );
 
                 }
