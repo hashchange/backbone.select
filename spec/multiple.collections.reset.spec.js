@@ -684,7 +684,7 @@ describe( "Models shared between multiple collections: adding and removing model
 
             it( 'is not fired on reset() if options.silent is not enabled', function () {
                 collection.reset();
-                expect( collection.trigger ).not.toHaveBeenCalledOnceForEvents( "@bbs:reset:silent" );
+                expect( collection.trigger ).not.toHaveBeenCalledForEvents( "@bbs:reset:silent" );
             } );
 
         } );
@@ -739,7 +739,7 @@ describe( "Models shared between multiple collections: adding and removing model
 
             it( 'is not fired on reset() if options.silent is not enabled', function () {
                 collection.reset();
-                expect( collection.trigger ).not.toHaveBeenCalledOnceForEvents( "@bbs:reset:silent" );
+                expect( collection.trigger ).not.toHaveBeenCalledForEvents( "@bbs:reset:silent" );
             } );
 
         } );
