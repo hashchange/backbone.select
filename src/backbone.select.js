@@ -1155,7 +1155,7 @@
         var set = context.set;
 
         context.set = function () {
-            var returned, models, previousModels, addedModels, removedModels,
+            var returned, models, previousModels, addedModels, removedModels, removeIndexes, fakeEventOptions,
 
                 args = _.toArray( arguments ),
                 options = args[1] ? _.clone( args[1] ) : {},
@@ -1165,10 +1165,13 @@
                 needsFakeEvent = isSilent && !isInSubcall;
 
             args[1] = options;
+
+            if ( needsFakeEvent ) {
+                fakeEventOptions = _.clone( options );
+                previousModels = this.models && this.models.slice() || [];
+            }
+
             options["@bbs:backboneSubcall"] = true;
-
-            if ( needsFakeEvent ) previousModels = this.models && this.models.slice() || [];
-
             models = returned = set.apply( this, args );
 
             if ( needsFakeEvent && models ) {
@@ -1180,9 +1183,20 @@
                 if ( options.remove === undefined || !!options.remove ) {
 
                     removedModels = _.difference( previousModels, models );
+                    removeIndexes = getRemoveIndexes( removedModels, previousModels );
 
                     _.each( removedModels, function ( model ) {
-                        onRemove( model, this, options );
+
+                        var _options = _.clone( fakeEventOptions );
+                        _options.index = removeIndexes[model.cid];
+
+                        onRemove( model, this, _options );
+
+                        // Notify plugins with an unofficial event.
+                        //
+                        // The event is safe to use: it is part of the API, guaranteed by tests.
+                        this.trigger( "@bbs:remove:silent", model, this, _options );
+
                     }, this );
 
                 }
@@ -1192,7 +1206,8 @@
                     addedModels = _.difference( models, previousModels );
 
                     _.each( addedModels, function ( model ) {
-                        onAdd( model, this, options );
+                        var _options = _.clone( fakeEventOptions );
+                        onAdd( model, this, _options );
                     }, this );
 
                 }
@@ -1207,7 +1222,7 @@
         var remove = context.remove;
 
         context.remove = function () {
-            var returned, removed,
+            var returned, removed, removeIndexes, fakeEventOptions,
 
                 args = _.toArray( arguments ),
                 options = args[1] ? _.clone( args[1] ) : {},
@@ -1217,15 +1232,30 @@
                 needsFakeEvent = isSilent && !isInSubcall;
 
             args[1] = options;
-            options["@bbs:backboneSubcall"] = true;
 
+            if ( needsFakeEvent ) {
+                fakeEventOptions = _.clone( options );
+                removeIndexes = getRemoveIndexes( args[0], this.models );
+            }
+
+            options["@bbs:backboneSubcall"] = true;
             removed = returned = remove.apply( this, args );
 
             if ( needsFakeEvent && removed ) {
                 if ( !_.isArray( removed ) ) removed = [removed];
 
                 _.each( removed, function ( model ) {
-                    onRemove( model, this, options );
+
+                    var _options = _.clone( fakeEventOptions );
+                    _options.index = removeIndexes[model.cid];
+
+                    onRemove( model, this, _options );
+
+                    // Notify plugins with an unofficial event.
+                    //
+                    // The event is safe to use: it is part of the API, guaranteed by tests.
+                    this.trigger( "@bbs:remove:silent", model, this, _options );
+
                 }, this );
             }
 
@@ -1321,6 +1351,27 @@
             };
 
         })();
+    }
+
+    // Helpers for patchSilent*
+
+    function getRemoveIndexes ( modelsToRemove, models ) {
+        var indexes = {},
+            toRemove = modelsToRemove || [];
+
+        if( !_.isArray( toRemove ) ) toRemove = [toRemove];
+
+        models = models.slice() || [];
+
+        _.each( toRemove, function ( model ) {
+            var index = _.indexOf( models, model );
+            if ( index !== -1 ) {
+                indexes[model.cid] = index;
+                models.splice( index, 1 );
+            }
+        } );
+
+        return indexes;
     }
 
     // Helpers for augmentTrigger

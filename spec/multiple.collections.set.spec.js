@@ -323,13 +323,15 @@ describe( "Models shared between multiple collections: adding and removing model
         } );
 
         it( 'should not trigger a collection event when added to a single-select collection', function () {
+            // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise silent removal.
             singleCollectionA.set( model5, { silent: true } );
-            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( singleCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
         } );
 
         it( 'should not trigger a collection event when added to a multi-select collection', function () {
+            // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise silent removal.
             multiCollectionA.set( model5, { silent: true } );
-            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+            expect( multiCollectionA.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
         } );
 
         it( 'should not trigger a collection event in another multi-select collection holding the model', function () {
@@ -1054,7 +1056,9 @@ describe( "Models shared between multiple collections: adding and removing model
                 } );
 
                 it( 'no event is triggered in the collection', function () {
-                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise silent
+                    // removal.
+                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
                 } );
 
             } );
@@ -1097,7 +1101,9 @@ describe( "Models shared between multiple collections: adding and removing model
                 } );
 
                 it( 'no event is triggered in the collection', function () {
-                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                    // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise silent
+                    // removal.
+                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
                 } );
 
             } );
@@ -1341,7 +1347,9 @@ describe( "Models shared between multiple collections: adding and removing model
                     } );
 
                     it( 'no events are triggered in the collection', function () {
-                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                        // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise
+                        // silent removal.
+                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
                     } );
 
                 } );
@@ -1371,7 +1379,9 @@ describe( "Models shared between multiple collections: adding and removing model
                     } );
 
                     it( 'no events are triggered in the collection', function () {
-                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                        // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise
+                        // silent removal.
+                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
                     } );
 
                 } );
@@ -1404,7 +1414,9 @@ describe( "Models shared between multiple collections: adding and removing model
                     } );
 
                     it( 'no events are triggered in the collection', function () {
-                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                        // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise
+                        // silent removal.
+                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
                     } );
 
                 } );
@@ -1433,7 +1445,9 @@ describe( "Models shared between multiple collections: adding and removing model
                     } );
 
                     it( 'no events are triggered in the collection', function () {
-                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEvents();
+                        // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise
+                        // silent removal.
+                        expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
                     } );
 
                 } );
@@ -1608,7 +1622,9 @@ describe( "Models shared between multiple collections: adding and removing model
                 } );
 
                 it( 'no events are fired in the collection', function () {
-                    expect( collection.trigger ).not.toHaveBeenCalled();
+                    // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise silent
+                    // removal.
+                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
                 } );
 
             } );
@@ -1647,9 +1663,172 @@ describe( "Models shared between multiple collections: adding and removing model
                 } );
 
                 it( 'no events are fired in the collection', function () {
-                    expect( collection.trigger ).not.toHaveBeenCalled();
+                    // We ignore the "@bbs:remove:silent" event here, which is always fired during an otherwise silent
+                    // removal.
+                    expect( collection.trigger ).not.toHaveBeenCalled_ignoringInternalEventsAnd( "@bbs:remove:silent" );
                 } );
 
+            } );
+
+        } );
+
+    } );
+
+    describe( 'The event @bbs:remove:silent, when triggered by set()', function () {
+
+        // Only covering set() here. See also the corresponding tests for the event when triggered by remove().
+
+        var removedModel, remainingModel, collection;
+
+        beforeEach( function () {
+            removedModel = new Model();
+            remainingModel = new Model();
+
+            removedModel.select();
+        } );
+
+        afterEach( function () {
+            collection.close();
+        } );
+
+        describe( 'in a Select.One collection', function () {
+
+            beforeEach( function () {
+                collection = new SingleSelectCollection( [removedModel, remainingModel] );
+                spyOn( collection, "trigger" ).and.callThrough();
+            } );
+
+            it( 'is fired while removing models with set() and options.silent enabled', function () {
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "@bbs:remove:silent" );
+            } );
+
+            it( 'passes along the removed model as first argument', function () {
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel );
+            } );
+
+            it( 'passes along the collection as second argument', function () {
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection );
+            } );
+
+            it( 'passes along an options object as third argument, containing the index of the removed model in options.index', function () {
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0 } );
+            } );
+
+            it( 'passes along an options object as third argument, containing the index of the removed models in options.index when a series of models are removed', function () {
+                var removedModel2 = new Model(),
+                    removedModel3 = new Model();
+
+                collection.reset( [removedModel, remainingModel, removedModel2, removedModel3] );
+                collection.trigger.calls.reset();
+
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0 } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel2, collection, { silent: true, index: 1 } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel3, collection, { silent: true, index: 1 } );
+            } );
+
+            it( 'is fired after remove() has done its job', function () {
+                var modelsInCollection;
+
+                collection.on( "@bbs:remove:silent", function ( model, cbCollection ) {
+                    modelsInCollection = cbCollection.models.slice();
+                } );
+
+                collection.set( remainingModel, { silent: true } );
+                expect( modelsInCollection ).toEqual( [remainingModel] );
+            } );
+
+            it( 'is fired after the removed model has been processed by Backbone.Select, ie after selections have been updated', function () {
+                var selectedInCollection, removedModelSelected;
+
+                collection.on( "@bbs:remove:silent", function ( model, cbCollection ) {
+                    selectedInCollection = cbCollection.selected;
+                    removedModelSelected = model.selected;
+                } );
+
+                collection.set( remainingModel, { silent: true } );
+                expect( selectedInCollection ).toBeUndefined();
+                expect( removedModelSelected ).toEqual( false );
+            } );
+
+            it( 'is not fired on remove() if options.silent is not enabled', function () {
+                collection.set( remainingModel );
+                expect( collection.trigger ).not.toHaveBeenCalledForEvents( "@bbs:remove:silent" );
+            } );
+
+        } );
+
+        describe( 'in a Select.Many collection', function () {
+
+            beforeEach( function () {
+                collection = new MultiSelectCollection( [removedModel, remainingModel] );
+                spyOn( collection, "trigger" ).and.callThrough();
+            } );
+
+            it( 'is fired while removing models with set() and options.silent enabled', function () {
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledOnceForEvents( "@bbs:remove:silent" );
+            } );
+
+            it( 'passes along the removed model as first argument', function () {
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel );
+            } );
+
+            it( 'passes along the collection as second argument', function () {
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection );
+            } );
+
+            it( 'passes along an options object as third argument, containing the index of the removed model in options.index', function () {
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0 } );
+            } );
+
+            it( 'passes along an options object as third argument, containing the index of the removed models in options.index when a series of models are removed', function () {
+                var removedModel2 = new Model(),
+                    removedModel3 = new Model();
+
+                collection.reset( [removedModel, remainingModel, removedModel2, removedModel3] );
+                collection.trigger.calls.reset();
+
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0 } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel2, collection, { silent: true, index: 1 } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel3, collection, { silent: true, index: 1 } );
+            } );
+
+            it( 'is fired after remove() has done its job', function () {
+                var modelsInCollection;
+
+                collection.on( "@bbs:remove:silent", function ( model, cbCollection ) {
+                    modelsInCollection = cbCollection.models.slice();
+                } );
+
+                collection.set( remainingModel, { silent: true } );
+                expect( modelsInCollection ).toEqual( [remainingModel] );
+            } );
+
+            it( 'is fired after the removed model has been processed by Backbone.Select, ie after selections have been updated', function () {
+                var selectedInCollection, removedModelSelected;
+
+                collection.on( "@bbs:remove:silent", function ( model, cbCollection ) {
+                    selectedInCollection = _.clone( cbCollection.selected );
+                    removedModelSelected = model.selected;
+                } );
+
+                collection.set( remainingModel, { silent: true } );
+                expect( selectedInCollection ).toEqual( {} );
+                expect( removedModelSelected ).toEqual( false );
+            } );
+
+            it( 'is not fired on remove() if options.silent is not enabled', function () {
+                collection.set( remainingModel );
+                expect( collection.trigger ).not.toHaveBeenCalledForEvents( "@bbs:remove:silent" );
             } );
 
         } );
