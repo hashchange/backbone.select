@@ -1201,13 +1201,37 @@ Let's clarify the effect of the `@bbs:silentLocally` flag in practical terms:
 
 #### Internal events
 
-##### `@bbs:add:silent`, `@bbs:remove:silent`, `@bbs:reset:silent`
+##### `@bbs:add:silent`
 
-The events `@bbs:add:silent`, `@bbs:remove:silent`, and `@bbs:reset:silent` are fired after an otherwise silent addition, removal, or reset. 
+The `@bbs:add:silent` event is fired after an otherwise silent addition. It is only triggered with `options.silent` being set.
 
-By the time the event is fired, selections have been updated and the underlying add, remove or reset action has run its course. The event is not fired during an ordinary, non-silent action.
+By the time the event is fired, selections have been updated and the underlying action, which would normally trigger an `"add"` event, has run its course.
 
-The arguments passed to event handlers are the same as with ordinary `add`, `remove` and `reset` events. That includes event-specific options, ie `options.previousModels` for a reset, and `options.index` during model removal.
+Event handlers receive the same arguments as for an ordinary `"add"` event.
+
+##### `@bbs:remove:silent`
+
+The `@bbs:remove:silent` event is fired after an otherwise silent removal. It is only triggered with `options.silent` being set.
+
+By the time the event is fired, selections have been updated and the underlying action, which would normally trigger a `"remove"` event, has run its course.
+
+Event handlers receive the same arguments as for an ordinary `"remove"` event, including `options.index`.
+
+In addition, `options["@bbs:wasSelected"]` flags if the removed model had been selected.  That is useful because the model is no longer selected by the time the event fires (unless it is still part of another collection). The flag fills that information gap.
+
+The status is stored per label. So, to retrieve the status with regard to the `selected` label, query 
+
+```js
+options["@bbs:wasSelected"]["selected"]
+```
+
+##### `@bbs:reset:silent`
+
+The `@bbs:reset:silent` event is fired after an otherwise silent reset. It is only triggered with `options.silent` being set.
+
+By the time the event is fired, selections have been updated and the underlying action, which would normally trigger a `"reset"` event, has run its course.
+
+Event handlers receive the same arguments as for an ordinary `"reset"` event, including `options.previousModels`.
 
 
 ## Build process and tests
@@ -1267,6 +1291,10 @@ That's why donations are welcome, and be it as nod of appreciation to keep spiri
 [![Donate with Paypal][donations-paypal-button]][donations-paypal-link]
 
 ## Release notes
+
+### v2.1.0
+
+- Added `@bbs:wasSelected` to the options of the `@bbs:remove:silent` event
 
 ### v2.0.0
 
