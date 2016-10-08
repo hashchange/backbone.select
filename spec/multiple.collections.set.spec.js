@@ -1862,22 +1862,43 @@ describe( "Models shared between multiple collections: adding and removing model
                 expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection );
             } );
 
-            it( 'passes along an options object as third argument, containing the index of the removed model in options.index', function () {
+            it( 'passes along an options object as third argument, containing the previous selection state and the index of the removed model', function () {
+                // The selection state is stored in options["@bbs:wasSelected"], the index in options.index
                 collection.set( remainingModel, { silent: true } );
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0 } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0, "@bbs:wasSelected": { selected: true } } );
             } );
 
-            it( 'passes along an options object as third argument, containing the index of the removed models in options.index when a series of models are removed', function () {
+            it( 'passes along an options object as third argument, containing the previous selection state and the index of the removed models, when a series of models are removed', function () {
                 var removedModel2 = new Model(),
                     removedModel3 = new Model();
 
                 collection.reset( [removedModel, remainingModel, removedModel2, removedModel3] );
+                removedModel.select();
+
                 collection.trigger.calls.reset();
 
                 collection.set( remainingModel, { silent: true } );
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0 } );
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel2, collection, { silent: true, index: 1 } );
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel3, collection, { silent: true, index: 1 } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0, "@bbs:wasSelected": { selected: true } } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel2, collection, { silent: true, index: 1, "@bbs:wasSelected": { selected: false } } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel3, collection, { silent: true, index: 1, "@bbs:wasSelected": { selected: false } } );
+            } );
+
+            it( 'passes along an options object as third argument, which captures the previous selection state for varying labels in each model', function () {
+                var removedModel2 = new Model(),
+                    removedModel3 = new Model();
+
+                collection.reset( [removedModel, remainingModel, removedModel2, removedModel3] );
+
+                removedModel.select();
+                removedModel2.select( { label: "starred" } );
+                removedModel3.select( { label: "picked" } );
+
+                collection.trigger.calls.reset();
+
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0, "@bbs:wasSelected": { selected: true, starred: false, picked: false } } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel2, collection, { silent: true, index: 1, "@bbs:wasSelected": { selected: false, starred: true, picked: false } } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel3, collection, { silent: true, index: 1, "@bbs:wasSelected": { selected: false, starred: false, picked: true } } );
             } );
 
             it( 'is fired after remove() has done its job', function () {
@@ -1933,22 +1954,44 @@ describe( "Models shared between multiple collections: adding and removing model
                 expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection );
             } );
 
-            it( 'passes along an options object as third argument, containing the index of the removed model in options.index', function () {
+            it( 'passes along an options object as third argument, containing the previous selection state and the index of the removed model', function () {
+                // The selection state is stored in options["@bbs:wasSelected"], the index in options.index
                 collection.set( remainingModel, { silent: true } );
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0 } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0, "@bbs:wasSelected": { selected: true } } );
             } );
 
-            it( 'passes along an options object as third argument, containing the index of the removed models in options.index when a series of models are removed', function () {
+            it( 'passes along an options object as third argument, containing the previous selection state and the index of the removed models, when a series of models are removed', function () {
                 var removedModel2 = new Model(),
                     removedModel3 = new Model();
 
                 collection.reset( [removedModel, remainingModel, removedModel2, removedModel3] );
+                removedModel.select();
+
                 collection.trigger.calls.reset();
 
                 collection.set( remainingModel, { silent: true } );
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0 } );
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel2, collection, { silent: true, index: 1 } );
-                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel3, collection, { silent: true, index: 1 } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0, "@bbs:wasSelected": { selected: true } } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel2, collection, { silent: true, index: 1, "@bbs:wasSelected": { selected: false } } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel3, collection, { silent: true, index: 1, "@bbs:wasSelected": { selected: false } } );
+            } );
+
+            it( 'passes along an options object as third argument, which captures the previous selection state for varying labels in each model', function () {
+                var removedModel2 = new Model(),
+                    removedModel3 = new Model();
+
+                collection.reset( [removedModel, remainingModel, removedModel2, removedModel3] );
+
+                removedModel.select();
+                removedModel.select( { label: "starred" } );
+                removedModel2.select( { label: "starred" } );
+                removedModel3.select( { label: "picked" } );
+
+                collection.trigger.calls.reset();
+
+                collection.set( remainingModel, { silent: true } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel, collection, { silent: true, index: 0, "@bbs:wasSelected": { selected: true, starred: true, picked: false } } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel2, collection, { silent: true, index: 1, "@bbs:wasSelected": { selected: false, starred: true, picked: false } } );
+                expect( collection.trigger ).toHaveBeenCalledWithInitial( "@bbs:remove:silent", removedModel3, collection, { silent: true, index: 1, "@bbs:wasSelected": { selected: false, starred: false, picked: true } } );
             } );
 
             it( 'is fired after remove() has done its job', function () {

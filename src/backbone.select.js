@@ -1166,7 +1166,8 @@
         var set = context.set;
 
         context.set = function () {
-            var returned, models, previousModels, addedModels, removedModels, removeIndexes, fakeEventOptions,
+            var returned, models, previousModels, modelSelectionStatus,
+                addedModels, removedModels, removeIndexes, fakeEventOptions,
 
                 args = _.toArray( arguments ),
                 options = args[1] ? _.clone( args[1] ) : {},
@@ -1180,6 +1181,7 @@
             if ( needsFakeEvent ) {
                 fakeEventOptions = _.clone( options );
                 previousModels = this.models && this.models.slice() || [];
+                modelSelectionStatus = getSelectionStatusForModels( this );
             }
 
             options["@bbs:backboneSubcall"] = true;
@@ -1200,6 +1202,7 @@
 
                         var _options = _.clone( fakeEventOptions );
                         _options.index = removeIndexes[model.cid];
+                        _options["@bbs:wasSelected"] = modelSelectionStatus[model.cid];
 
                         onRemove( model, this, _options );
 
@@ -1240,10 +1243,11 @@
         var remove = context.remove;
 
         context.remove = function () {
-            var returned, removed, removeIndexes, fakeEventOptions,
+            var returned, removed, removeIndexes, modelSelectionStatus, fakeEventOptions,
 
                 args = _.toArray( arguments ),
                 options = args[1] ? _.clone( args[1] ) : {},
+                modelsToRemove = args[0],
 
                 isSilent = options.silent,
                 isInSubcall = options["@bbs:backboneSubcall"],
@@ -1253,7 +1257,8 @@
 
             if ( needsFakeEvent ) {
                 fakeEventOptions = _.clone( options );
-                removeIndexes = getRemoveIndexes( args[0], this.models );
+                removeIndexes = getRemoveIndexes( modelsToRemove, this.models );
+                modelSelectionStatus = getSelectionStatusForModels( this, modelsToRemove );
             }
 
             options["@bbs:backboneSubcall"] = true;
@@ -1266,6 +1271,7 @@
 
                     var _options = _.clone( fakeEventOptions );
                     _options.index = removeIndexes[model.cid];
+                    _options["@bbs:wasSelected"] = modelSelectionStatus[model.cid];
 
                     onRemove( model, this, _options );
 
@@ -1390,6 +1396,22 @@
         } );
 
         return indexes;
+    }
+
+    function getSelectionStatusForModels ( collection, modelSubset ) {
+        var models = modelSubset || collection.models,
+            modelStatusByCid = {};
+
+        if( !_.isArray( models ) ) models = [models];
+
+        forEachLabelInCollection( collection, function ( label ) {
+            _.each( models, function ( model ) {
+                modelStatusByCid[model.cid] || ( modelStatusByCid[model.cid] = {} );
+                modelStatusByCid[model.cid][label] = !!model[label];
+            } );
+        } );
+
+        return modelStatusByCid;
     }
 
     // Helpers for augmentTrigger
