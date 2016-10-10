@@ -452,6 +452,18 @@
                     ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
 
                     augmentTrigger( hostObject );
+                },
+
+                custom: {
+
+                    /**
+                     * @type {Function|undefined}
+                     * @param {Backbone.Model}      model       a plain Backbone model, or a subtype, without the Select.Me mixin applied
+                     * @param {Backbone.Collection} collection  a Select.One or Select.Many collection
+                     * @param {Object}              [options]   the options which will later be provided to the `applyTo()` method of the mixin
+                     */
+                    applyModelMixin: undefined
+
                 }
 
             },
@@ -507,7 +519,7 @@
                             // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined for the
                             // collection, the model will share it. If models need a different setting, do not rely on
                             // an auto-applied mixin.
-                            ensureModelMixin( model, options );
+                            ensureModelMixin( model, hostObject, options );
 
                             registerCollectionWithModel( model, hostObject );
 
@@ -588,7 +600,7 @@
                             // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined for the
                             // collection, the model will share it. If models need a different setting, do not rely on
                             // an auto-applied mixin.
-                            ensureModelMixin( model, options );
+                            ensureModelMixin( model, hostObject, options );
 
                             registerCollectionWithModel( model, hostObject );
 
@@ -684,7 +696,7 @@
     }
 
     function onAdd ( model, collection, options ) {
-        ensureModelMixin( model, options );
+        ensureModelMixin( model, collection, options );
 
         registerCollectionWithModel( model, collection );
         forEachLabelInModel( model, function ( label ) {
@@ -754,7 +766,7 @@
         } );
 
         collection.each( function ( model ) {
-            ensureModelMixin( model, options );
+            ensureModelMixin( model, collection, options );
             registerCollectionWithModel( model, collection );
             ensureModelLabelsInCollection( model, collection );
         } );
@@ -787,7 +799,7 @@
         } );
 
         collection.each( function ( model ) {
-            ensureModelMixin( model, options );
+            ensureModelMixin( model, collection, options );
             registerCollectionWithModel( model, collection );
             ensureModelLabelsInCollection( model, collection );
         } );
@@ -861,8 +873,19 @@
     //
     // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined in the options, the model will be set
     // up accordingly.
-    function ensureModelMixin( model, options ) {
-        if ( !model._pickyType ) Backbone.Select.Me.applyTo( model, options );
+    function ensureModelMixin( model, collection, options ) {
+        var applyModelMixin;
+
+        if ( !model._pickyType ) {
+            applyModelMixin = Backbone.Select.Me.custom.applyModelMixin;
+
+            if ( applyModelMixin && _.isFunction( applyModelMixin ) ) {
+                applyModelMixin( model, collection, options );
+            } else {
+                Backbone.Select.Me.applyTo( model, options );
+            }
+
+        }
     }
 
     function ensureLabelIsRegistered ( name, obj ) {

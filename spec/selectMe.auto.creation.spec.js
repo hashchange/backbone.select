@@ -582,4 +582,128 @@ describe( 'Automatic creation of Select.Me models', function () {
 
     } );
 
+    describe( 'Backbone.Select.Me.custom.applyModelMixin is defined', function () {
+
+        var origApplyModelMixin,
+
+            modelCreationScenarios = _.extend( parseScenarios, {
+                "existing models are passed in, without the Select.Me mixin being applied": function ( fixture ) {
+                    fixture.modelDataSets = _.map( fixture.attributeSets, function ( attributeSet ) {
+                        return new Backbone.Model( attributeSet );
+                    } );
+                }
+            } );
+
+        beforeEach( function () {
+
+            f = new AutoCreationFixture( [
+                { number: 1 },
+                { number: 2 },
+                { number: 3 }
+            ] );
+
+            origApplyModelMixin = Backbone.Select.Me.custom.applyModelMixin;
+
+            Backbone.Select.Me.custom.applyModelMixin = function ( model, collection, options ) {
+                Backbone.Select.Me.applyTo( model, options );
+                model._detectedPickyType = collection._pickyType;
+            };
+
+        } );
+
+        afterEach( function () {
+            Backbone.Select.Me.custom.applyModelMixin = origApplyModelMixin;
+        } );
+
+        describeWithData( collectionTypeScenarios, function ( configureCollectionType ) {
+
+            beforeEach( function () {
+                configureCollectionType( f );
+            } );
+
+            describeWithData( modelCreationScenarios, function ( configureParsing ) {
+
+                beforeEach( function () {
+                    configureParsing( f );
+                } );
+
+                describe( 'During instantiation', function () {
+                    var collection, models;
+
+                    beforeEach( function () {
+                        f.creationMethod = "new";
+
+                        spyOn( Backbone.Select.Me.custom, "applyModelMixin" ).and.callThrough();
+
+                        collection = f.createPopulatedCollection( f.modelDataSets );
+                        models = collection.models;
+                    } );
+
+                    afterEach( function () {
+                        collection.close();
+                    } );
+
+                    it( 'applyModelMixin() is called once per model', function () {
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveCallCount( 3 );
+                    } );
+
+                    it( 'applyModelMixin() is called with the model, not yet augmented with the mixin, as the first argument', function () {
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[0] );
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[1] );
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[2] );
+
+                    } );
+
+                    it( 'applyModelMixin() is called with the collection as the second argument', function () {
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[0], collection );
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[1], collection );
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[2], collection );
+
+                    } );
+
+                    it( 'applyModelMixin() is called with the options, which would otherwise be passed to Backbone.Select.Me.applyTo(), as the third argument', function () {
+                        var options = f.options.parse ? jasmine.objectContaining( { parse: true } ) : jasmine.any( Object );
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[0], collection, options );
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[0], collection, options );
+                        expect( Backbone.Select.Me.custom.applyModelMixin ).toHaveBeenCalledWithInitial( models[0], collection, options );
+                    } );
+
+                    it( 'the modifications, made by applyModelMixin() to the models, persist and are present in the models after instantiation', function () {
+                        expect( models[0]._detectedPickyType ).toEqual( collection._pickyType );
+                        expect( models[1]._detectedPickyType ).toEqual( collection._pickyType );
+                        expect( models[2]._detectedPickyType ).toEqual( collection._pickyType );
+                    } );
+
+                } );
+
+            } );
+
+            describe( 'existing models are passed in, with the Select.Me mixin already applied', function () {
+                var collection;
+
+                beforeEach( function () {
+                    f.creationMethod = "new";
+                    f.modelDataSets = _.map( f.attributeSets, function ( attributeSet ) {
+                        return new SelectMeModel( attributeSet );
+                    } );
+
+                    spyOn( Backbone.Select.Me.custom, "applyModelMixin" ).and.callThrough();
+
+                    collection = f.createPopulatedCollection( f.modelDataSets );
+                } );
+
+                afterEach( function () {
+                    collection.close();
+                } );
+
+                it( 'During instantiation, applyModelMixin() is not called', function () {
+                    expect( Backbone.Select.Me.custom.applyModelMixin ).not.toHaveBeenCalled();
+                } );
+
+            } );
+
+        } );
+
+    } );
+
 } );
