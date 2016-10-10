@@ -1,4 +1,4 @@
-// Backbone.Select, v2.0.0
+// Backbone.Select, v2.1.0
 // Copyright (c) 2014-2016 Michael Heim, Zeilenwechsel.de
 //           (c) 2013 Derick Bailey, Muted Solutions, LLC.
 // Distributed under MIT license
@@ -458,6 +458,18 @@
                     ensureLabelIsRegistered( hostObject._pickyDefaultLabel, hostObject );
 
                     augmentTrigger( hostObject );
+                },
+
+                custom: {
+
+                    /**
+                     * @type {Function|undefined}
+                     * @param {Backbone.Model}      model       a plain Backbone model, or a subtype, without the Select.Me mixin applied
+                     * @param {Backbone.Collection} collection  a Select.One or Select.Many collection
+                     * @param {Object}              [options]   the options which will later be provided to the `applyTo()` method of the mixin
+                     */
+                    applyModelMixin: undefined
+
                 }
 
             },
@@ -513,7 +525,7 @@
                             // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined for the
                             // collection, the model will share it. If models need a different setting, do not rely on
                             // an auto-applied mixin.
-                            ensureModelMixin( model, options );
+                            ensureModelMixin( model, hostObject, options );
 
                             registerCollectionWithModel( model, hostObject );
 
@@ -594,7 +606,7 @@
                             // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined for the
                             // collection, the model will share it. If models need a different setting, do not rely on
                             // an auto-applied mixin.
-                            ensureModelMixin( model, options );
+                            ensureModelMixin( model, hostObject, options );
 
                             registerCollectionWithModel( model, hostObject );
 
@@ -690,7 +702,7 @@
     }
 
     function onAdd ( model, collection, options ) {
-        ensureModelMixin( model, options );
+        ensureModelMixin( model, collection, options );
 
         registerCollectionWithModel( model, collection );
         forEachLabelInModel( model, function ( label ) {
@@ -760,7 +772,7 @@
         } );
 
         collection.each( function ( model ) {
-            ensureModelMixin( model, options );
+            ensureModelMixin( model, collection, options );
             registerCollectionWithModel( model, collection );
             ensureModelLabelsInCollection( model, collection );
         } );
@@ -793,7 +805,7 @@
         } );
 
         collection.each( function ( model ) {
-            ensureModelMixin( model, options );
+            ensureModelMixin( model, collection, options );
             registerCollectionWithModel( model, collection );
             ensureModelLabelsInCollection( model, collection );
         } );
@@ -867,8 +879,19 @@
     //
     // Options are passed on to the mixin. Ie, if `defaultLabel` has been defined in the options, the model will be set
     // up accordingly.
-    function ensureModelMixin( model, options ) {
-        if ( !model._pickyType ) Backbone.Select.Me.applyTo( model, options );
+    function ensureModelMixin( model, collection, options ) {
+        var applyModelMixin;
+
+        if ( !model._pickyType ) {
+            applyModelMixin = Backbone.Select.Me.custom.applyModelMixin;
+
+            if ( applyModelMixin && _.isFunction( applyModelMixin ) ) {
+                applyModelMixin( model, collection, options );
+            } else {
+                Backbone.Select.Me.applyTo( model, options );
+            }
+
+        }
     }
 
     function ensureLabelIsRegistered ( name, obj ) {
@@ -1172,7 +1195,8 @@
         var set = context.set;
 
         context.set = function () {
-            var returned, models, previousModels, addedModels, removedModels, removeIndexes, fakeEventOptions,
+            var returned, models, previousModels, modelSelectionStatus,
+                addedModels, removedModels, removeIndexes, fakeEventOptions,
 
                 args = _.toArray( arguments ),
                 options = args[1] ? _.clone( args[1] ) : {},
@@ -1186,6 +1210,7 @@
             if ( needsFakeEvent ) {
                 fakeEventOptions = _.clone( options );
                 previousModels = this.models && this.models.slice() || [];
+                modelSelectionStatus = getSelectionStatusForModels( this );
             }
 
             options["@bbs:backboneSubcall"] = true;
@@ -1206,6 +1231,7 @@
 
                         var _options = _.clone( fakeEventOptions );
                         _options.index = removeIndexes[model.cid];
+                        _options["@bbs:wasSelected"] = modelSelectionStatus[model.cid];
 
                         onRemove( model, this, _options );
 
@@ -1246,10 +1272,11 @@
         var remove = context.remove;
 
         context.remove = function () {
-            var returned, removed, removeIndexes, fakeEventOptions,
+            var returned, removed, removeIndexes, modelSelectionStatus, fakeEventOptions,
 
                 args = _.toArray( arguments ),
                 options = args[1] ? _.clone( args[1] ) : {},
+                modelsToRemove = args[0],
 
                 isSilent = options.silent,
                 isInSubcall = options["@bbs:backboneSubcall"],
@@ -1259,7 +1286,8 @@
 
             if ( needsFakeEvent ) {
                 fakeEventOptions = _.clone( options );
-                removeIndexes = getRemoveIndexes( args[0], this.models );
+                removeIndexes = getRemoveIndexes( modelsToRemove, this.models );
+                modelSelectionStatus = getSelectionStatusForModels( this, modelsToRemove );
             }
 
             options["@bbs:backboneSubcall"] = true;
@@ -1272,6 +1300,7 @@
 
                     var _options = _.clone( fakeEventOptions );
                     _options.index = removeIndexes[model.cid];
+                    _options["@bbs:wasSelected"] = modelSelectionStatus[model.cid];
 
                     onRemove( model, this, _options );
 
@@ -1398,6 +1427,22 @@
         return indexes;
     }
 
+    function getSelectionStatusForModels ( collection, modelSubset ) {
+        var models = modelSubset || collection.models,
+            modelStatusByCid = {};
+
+        if( !_.isArray( models ) ) models = [models];
+
+        forEachLabelInCollection( collection, function ( label ) {
+            _.each( models, function ( model ) {
+                modelStatusByCid[model.cid] || ( modelStatusByCid[model.cid] = {} );
+                modelStatusByCid[model.cid][label] = !!model[label];
+            } );
+        } );
+
+        return modelStatusByCid;
+    }
+
     // Helpers for augmentTrigger
 
     // Checks if the event is generated by Backbone.Select. Excludes internal events like `@bbs:_selected`.
@@ -1426,7 +1471,7 @@
     }
 
     Backbone.Select = Select;
-    Backbone.Select.version = "2.0.0";
+    Backbone.Select.version = "2.1.0";
 
     // Capture existing Backbone model and collection methods and properties, as well as the mixin methods and
     // properties, to populate a blacklist of illegal label names.
