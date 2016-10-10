@@ -21,7 +21,7 @@
     "tests"
   ],
   "dependencies": {
-    "backbone.cycle": "^2.1.4",
+    "backbone.cycle": "^3.0.0",
     "backbone.picky": "~0.2.0",
     "foundation": "~5.5.3",
     "jquery": "~3.1.1",
