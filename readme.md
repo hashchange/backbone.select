@@ -48,7 +48,7 @@ If you are a happy user of this project already, you can support its development
     * [Special considerations when calling `set()`](#special-considerations-when-calling-set)
 - [Compatibility with Backbone's own select method](#compatibility-with-backbones-own-select-method)
 - [Compatibility with Backbone.Picky](#compatibility-with-backbonepicky)
-- [Internal properties](#internal-properties)
+- [Extension API](#extension-api)
 - [Build process and tests](#build-process-and-tests), [donations](#facilitating-development), [release notes](#release-notes), [credits, copyright, MIT license](#credits-copyright-mit-license)
 
 ## An introductory example
@@ -1160,17 +1160,19 @@ Picky.MultiSelect is treated the same way. Use `Backbone.Select.Many.applyTo( th
 
 If you no longer use a collection and are about to discard it, you need to close it first: call `collection.close()`. [See above][close-collection].
 
-## Internal properties
+## Extension API
 
-There are a number of internal properties which nevertheless are part of the public API of Backbone.Select. You should not need to even know about them when you apply the mixins to your own objects. But they can come in handy if you build a component on top of Backbone.Select. (An example of such a component is [Backbone.Cycle][].)
+There are a number of internal properties, flags, events, and configuration settings which nevertheless are part of the public API of Backbone.Select. You should not need to even know about them when you apply the mixins to your own objects. But they can come in handy if you build a component on top of Backbone.Select. (An example of such a component is [Backbone.Cycle][].)
 
-But beware: **Use them read-only.**
+The API is safeguarded by tests. Introducing a breaking change would entail moving to a new major version of Backbone.Select. In other words, the API is safe to use – never mind it is largely internal.
 
-The behaviour of these properties, as described below, is safeguarded by tests. Introducing a breaking change would entail moving to a new major version of Backbone.Select. In other words, they are safe to use – never mind they are internal.
+### Internal properties
+
+**Use the following properties read-only.**
 
 Internal properties are prefixed with `_picky`. (The first such property was introduced when Backbone.Select was still a bunch of PRs for Backbone.Picky, hence the name.) 
 
-Not all of the `_picky` properties are part of the public API, though. If you encounter one and don't see it in the list below, it might change or be removed at any time, so don't rely on it (or monitor it closely).
+In addition to the properties listed here, you'll find other ones with a `_picky` prefix in the source. But the `_picky` prefix in itself does not mean that a property is part of the public API. If you encounter a property and don't see it in the list below, it might change or be removed at any time, so don't rely on it (or monitor it closely).
 
 ##### `_pickyType`
 
@@ -1233,6 +1235,21 @@ By the time the event is fired, selections have been updated and the underlying 
 
 Event handlers receive the same arguments as for an ordinary `"reset"` event, including `options.previousModels`.
 
+#### Configuration settings
+
+##### `Backbone.Select.Me.custom.applyModelMixin`
+
+The `applyModelMixin` configuration can be set to a function which applies a custom model mixin to a model.
+
+When raw model data or plain Backbone models are passed to a collection, the Select.Me model mixin is [applied to them automatically][select.me-auto-applied]. In case you want to supply modified versions of the Select.Me mixin at that point, set `Backbone.Select.Me.custom.applyModelMixin` to a function which applies a mixin as you see fit.
+
+The `applyModelMixin` function can pick variations of the `Select.Me` mixin based on the collection (type), or based on an option. The function is called with the following arguments: 
+
+- `model`: the model to which the mixin must be applied
+- `collection`: the collection to which the model has been added
+- `options`: the options which would normally be passed to `Backbone.Select.Me.applyTo()`.
+
+By default, `Backbone.Select.Me.custom.applyModelMixin` is undefined, and the standard `Select.Me` mixin is used. The setting is global. If you change it, the function will be applied throughout your entire application.
 
 ## Build process and tests
 
@@ -1295,6 +1312,7 @@ That's why donations are welcome, and be it as nod of appreciation to keep spiri
 ### v2.1.0
 
 - Added `@bbs:wasSelected` to the options of the `@bbs:remove:silent` event
+- Added the `Backbone.Select.Me.custom.applyModelMixin` configuration setting
 
 ### v2.0.0
 
