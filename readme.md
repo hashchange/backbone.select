@@ -1457,7 +1457,7 @@ Other:
 
 Special credits go to [Derick Bailey][muted-solutions], who created the original version of this component, [Backbone.Picky][]. I have forked it at version 0.2.0. Backbone.Picky is no longer developed; see the [Backbone.Picky Compatibility section][picky-compatibility] if you want to migrate.
 
-Copyright (c) 2014-2016 Michael Heim<br>
+Copyright (c) 2014-2017 Michael Heim<br>
 Copyright (c) 2013 Derick Bailey, Muted Solutions, LLC
 
 Code in the data provider test helper: (c) 2014 Box, Inc., Apache 2.0 license. [See file][data-provider.js].
