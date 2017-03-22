@@ -29,6 +29,11 @@
     "collections"
   ],
   "license": "MIT",
+  "scripts": {
+    "cleanup": "del-cli bower_components demo/bower_demo_components node_modules -f",
+    "setup": "npm install && bower install && cd demo && bower install && cd ..",
+    "reinstall": "npm run cleanup -s && npm run setup || npm run setup"
+  },
   "dependencies": {
     "backbone": "^1.0.0 <1.4.0",
     "underscore": "^1.5.0 <1.9.0"
@@ -36,6 +41,7 @@
   "devDependencies": {
     "bower": "^1.8.0",
     "connect-livereload": "~0.6.0",
+    "del-cli": "~0.2.1",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-concat": "~1.0.1",

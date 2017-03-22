@@ -1257,12 +1257,12 @@ If you'd like to fix, customize or otherwise improve the project: here are your 
 
 ### Setup
 
-[npm][] and [Bower][] set up the environment for you.
+[npm][] sets up the environment for you.
 
-- The only thing you've got to have on your machine is [Node.js]. Download the installer [here][Node.js].
-- Open a command prompt in the project directory.
-- Run `npm install`. (Creates the environment.)
-- Run `bower install`. (Fetches the dependencies of the script.)
+- The only thing you've got to have on your machine (besides Git) is [Node.js]. Download the installer [here][Node.js].
+- Clone the project and open a command prompt in the project directory.
+- Run the setup with `npm run setup`.
+- Make sure the Grunt CLI is installed as a global Node module. If not, or if you are not sure, run `npm install -g grunt-cli` from the command prompt.
 
 Your test and build environment is ready now. If you want to test against specific versions of Backbone, edit `bower.json` first.
 
@@ -1281,7 +1281,7 @@ A handful of commands manage everything for you:
 - Change the version number throughout the project with `grunt setver --to=1.2.3`. Or just increment the revision with `grunt setver --inc`. (Remember to rebuild the project with `grunt` afterwards.)
 - `grunt getver` will quickly tell you which version you are at.
 
-Finally, if need be, you can set up a quick demo page to play with the code. First, edit the files in the `demo` directory. Then display `demo/index.html`, live-reloading your changes to the code or the page, with `grunt demo`. Libraries needed for the demo/playground should go into the Bower dev dependencies, in the project-wide `bower.json`, or else be managed by the dedicated `bower.json` in the demo directory.
+Finally, if need be, you can set up a quick demo page to play with the code. First, edit the files in the `demo` directory. Then display `demo/index.html`, live-reloading your changes to the code or the page, with `grunt demo`. Libraries needed for the demo/playground should go into the Bower dev dependencies – in the project-wide `bower.json` – or else be managed by the dedicated `bower.json` in the demo directory.
 
 _The `grunt interactive` and `grunt demo` commands spin up a web server, opening up the **whole project** to access via http._ So please be aware of the security implications. You can restrict that access to localhost in `Gruntfile.js` if you just use browsers on your machine.
 
