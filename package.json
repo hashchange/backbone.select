@@ -35,8 +35,8 @@
     "reinstall": "npm run cleanup -s && npm run setup || npm run setup"
   },
   "dependencies": {
-    "backbone": "^1.0.0 <1.4.0",
-    "underscore": "^1.5.0 <1.9.0"
+    "backbone": "^1.0.0",
+    "underscore": "^1.5.0"
   },
   "devDependencies": {
     "bower": "^1.8.0",
